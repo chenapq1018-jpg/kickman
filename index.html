@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kickman — Crowdfunding Coach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Noto+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0e;
+    --surface: #161616;
+    --card: #1c1c1c;
+    --border: #2a2a2a;
+    --border-hover: #3a3a3a;
+    --accent: #e8622a;
+    --accent-dim: rgba(232,98,42,0.12);
+    --accent-dim2: rgba(232,98,42,0.06);
+    --text: #f0ece4;
+    --text-2: #9a9690;
+    --text-3: #5a5652;
+    --green: #2d9e6b;
+    --green-dim: rgba(45,158,107,0.12);
+    --yellow: #d4a017;
+    --yellow-dim: rgba(212,160,23,0.12);
+    --red: #c0392b;
+    --red-dim: rgba(192,57,43,0.12);
+    --font-serif: 'Instrument Serif', Georgia, serif;
+    --font-mono: 'DM Mono', monospace;
+    --font-sans: 'Noto Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── SETUP SCREEN ── */
+  #setup-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .setup-card {
+    width: 100%;
+    max-width: 480px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 48px;
+  }
+
+  .setup-logo {
+    font-family: var(--font-serif);
+    font-size: 42px;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1;
+  }
+
+  .setup-logo span { color: var(--accent); font-style: italic; }
+
+  .setup-tagline {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    margin-bottom: 40px;
+  }
+
+  .setup-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .setup-input {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 14px 16px;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 8px;
+  }
+
+  .setup-input:focus { border-color: var(--accent); }
+  .setup-input::placeholder { color: var(--text-3); }
+
+  .setup-hint {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-3);
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+
+  .setup-hint a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .setup-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 16px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .setup-btn:hover { opacity: 0.88; }
+  .setup-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .setup-error {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--red);
+    margin-top: 12px;
+    display: none;
+  }
+
+  /* ── HEADER ── */
+  header {
+    height: 52px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    flex-shrink: 0;
+    background: var(--bg);
+  }
+
+  .header-logo {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    color: var(--text);
+  }
+
+  .header-logo span { color: var(--accent); font-style: italic; }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .step-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .step-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.3s;
+  }
+
+  .step-dot.done { background: var(--green); }
+  .step-dot.active { background: var(--accent); width: 18px; border-radius: 3px; }
+
+  .header-btn {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    background: none;
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .header-btn:hover { border-color: var(--border-hover); color: var(--text-2); }
+
+  /* ── LAYOUT ── */
+  .app-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 220px;
+    min-width: 220px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    overflow-y: auto;
+  }
+
+  .sidebar-section {
+    padding: 0 16px;
+    margin-bottom: 24px;
+  }
+
+  .sidebar-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    padding: 0 4px;
+  }
+
+  .sidebar-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.15s;
+    margin-bottom: 2px;
+  }
+
+  .sidebar-step:hover { background: rgba(255,255,255,0.03); }
+  .sidebar-step.active { background: var(--accent-dim2); }
+
+  .step-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-3);
+    min-width: 18px;
+    padding-top: 1px;
+    transition: color 0.2s;
+  }
+
+  .sidebar-step.done .step-num { color: var(--green); }
+  .sidebar-step.active .step-num { color: var(--accent); }
+
+  .step-info { flex: 1; }
+
+  .step-name {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-2);
+    line-height: 1.3;
+    transition: color 0.2s;
+  }
+
+  .sidebar-step.active .step-name { color: var(--text); }
+  .sidebar-step.done .step-name { color: var(--text-2); }
+
+  .step-sub {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-3);
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+
+  .sidebar-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 16px 20px;
+  }
+
+  .verdict-box {
+    margin: 0 16px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    display: none;
+  }
+
+  .verdict-box.visible { display: block; }
+
+  .verdict-box-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .verdict-box-value {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    color: var(--green);
+  }
+
+  /* ── CHAT ── */
+  .chat-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    scroll-behavior: smooth;
+  }
+
+  .messages::-webkit-scrollbar { width: 3px; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); }
+
+  /* ── MESSAGE ── */
+  .message { display: flex; gap: 14px; max-width: 760px; }
+  .message.user { flex-direction: row-reverse; align-self: flex-end; }
+  .message.km { align-self: flex-start; }
+
+  .msg-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+
+  .message.km .msg-avatar {
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid rgba(232,98,42,0.2);
+  }
+
+  .message.user .msg-avatar {
+    background: rgba(255,255,255,0.05);
+    color: var(--text-2);
+    border: 1px solid var(--border);
+  }
+
+  .msg-body { flex: 1; min-width: 0; }
+
+  .msg-name {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+
+  .message.user .msg-name { text-align: right; }
+
+  .msg-content {
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--text);
+  }
+
+  .message.user .msg-content {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 14px 18px;
+    color: var(--text-2);
+    font-size: 13px;
+    line-height: 1.65;
+  }
+
+  /* Markdown-ish rendering inside KM messages */
+  .msg-content p { margin-bottom: 12px; }
+  .msg-content p:last-child { margin-bottom: 0; }
+
+  .msg-content strong {
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .msg-content em {
+    font-style: italic;
+    color: var(--text-2);
+  }
+
+  .msg-content h2 {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text);
+    margin: 20px 0 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .msg-content h3 {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 18px 0 8px;
+  }
+
+  .msg-content ul {
+    padding-left: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .msg-content ul li {
+    padding-left: 18px;
+    position: relative;
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--text-2);
+  }
+
+  .msg-content ul li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 11px;
+    top: 2px;
+  }
+
+  .msg-content table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    margin: 12px 0;
+    font-family: var(--font-mono);
+  }
+
+  .msg-content table th {
+    background: rgba(255,255,255,0.04);
+    padding: 8px 12px;
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .msg-content table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: var(--text-2);
+    vertical-align: top;
+  }
+
+  .msg-content table tr:last-child td { border-bottom: none; }
+
+  /* Score card */
+  .score-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 20px;
+    margin: 16px 0;
+  }
+
+  .score-total-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-top: 12px;
+    margin-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .score-total-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text-3);
+    text-transform: uppercase;
+  }
+
+  .score-total-num {
+    font-family: var(--font-serif);
+    font-size: 32px;
+    color: var(--accent);
+  }
+
+  /* Verdict styles */
+  .verdict-go {
+    background: var(--green-dim);
+    border: 1px solid rgba(45,158,107,0.3);
+    padding: 16px 20px;
+    margin: 14px 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .verdict-no {
+    background: var(--red-dim);
+    border: 1px solid rgba(192,57,43,0.3);
+    padding: 16px 20px;
+    margin: 14px 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .verdict-conditional {
+    background: var(--yellow-dim);
+    border: 1px solid rgba(212,160,23,0.3);
+    padding: 16px 20px;
+    margin: 14px 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .verdict-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .verdict-text {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    color: var(--text);
+  }
+
+  /* Blockquote for key lessons */
+  .msg-content blockquote {
+    border-left: 2px solid var(--accent);
+    padding: 10px 16px;
+    margin: 14px 0;
+    background: var(--accent-dim2);
+    color: var(--text-2);
+    font-style: italic;
+    font-size: 13.5px;
+    line-height: 1.7;
+  }
+
+  /* Code inline */
+  .msg-content code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: rgba(255,255,255,0.06);
+    padding: 2px 6px;
+    color: var(--accent);
+  }
+
+  /* ── TYPING ── */
+  .typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 12px 0;
+  }
+
+  .typing-dot {
+    width: 5px;
+    height: 5px;
+    background: var(--text-3);
+    border-radius: 50%;
+    animation: tdot 1.3s infinite;
+  }
+
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes tdot {
+    0%, 60%, 100% { opacity: 0.3; transform: scale(0.9); }
+    30% { opacity: 1; transform: scale(1); }
+  }
+
+  /* ── INPUT AREA ── */
+  .input-area {
+    border-top: 1px solid var(--border);
+    padding: 16px 40px 20px;
+    background: var(--bg);
+    flex-shrink: 0;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  #user-input {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 12px 16px;
+    resize: none;
+    min-height: 46px;
+    max-height: 160px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  #user-input:focus { border-color: rgba(232,98,42,0.4); }
+  #user-input::placeholder { color: var(--text-3); }
+
+  .send-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s;
+  }
+
+  .send-btn:hover { opacity: 0.85; }
+  .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .send-btn svg { width: 16px; height: 16px; }
+
+  .input-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+  }
+
+  .input-hint {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-3);
+  }
+
+  /* ── WELCOME SCREEN (inside chat) ── */
+  .welcome-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 40px;
+    text-align: center;
+    gap: 16px;
+  }
+
+  .welcome-logo {
+    font-family: var(--font-serif);
+    font-size: 52px;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .welcome-logo span { color: var(--accent); font-style: italic; }
+
+  .welcome-sub {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  .start-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 14px 36px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .start-btn:hover { opacity: 0.85; }
+
+  .welcome-note {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-3);
+    margin-top: 8px;
+  }
+
+  /* ── ANIMATIONS ── */
+  .message {
+    animation: msgIn 0.25s ease forwards;
+    opacity: 0;
+  }
+
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 680px) {
+    .sidebar { display: none; }
+    .messages { padding: 20px 16px; }
+    .input-area { padding: 12px 16px 16px; }
+    .setup-card { padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen">
+  <div class="setup-card">
+    <div class="setup-logo">Kick<span>man</span></div>
+    <div class="setup-tagline">Crowdfunding Coach · Mission 1</div>
+
+    <div class="setup-label">Anthropic API Key</div>
+    <input
+      type="password"
+      class="setup-input"
+      id="api-key-input"
+      placeholder="sk-ant-..."
+      autocomplete="off"
+    >
+    <div class="setup-hint">
+      Your key is stored only in this browser session — never sent anywhere except directly to Anthropic's API.<br>
+      Get your key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>
+    </div>
+
+    <button class="setup-btn" id="start-btn" onclick="startApp()">
+      Start Session →
+    </button>
+    <div class="setup-error" id="setup-error">Invalid API key. Check and try again.</div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<header>
+  <div class="header-logo">Kick<span>man</span></div>
+  <div class="header-right">
+    <div class="step-indicator" id="step-indicator">
+      <div class="step-dot active" id="dot-1"></div>
+      <div class="step-dot" id="dot-2"></div>
+      <div class="step-dot" id="dot-3"></div>
+      <div class="step-dot" id="dot-4"></div>
+      <div class="step-dot" id="dot-5"></div>
+    </div>
+    <button class="header-btn" onclick="newSession()">New session</button>
+    <button class="header-btn" onclick="exportChat()">Export</button>
+  </div>
+</header>
+
+<div class="app-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Mission 1 — 14 Days</div>
+
+      <div class="sidebar-step active" id="step-1" onclick="scrollToStep(1)">
+        <div class="step-num" id="snum-1">01</div>
+        <div class="step-info">
+          <div class="step-name">Founder Input</div>
+          <div class="step-sub">Vision, product, costs, timeline</div>
+        </div>
+      </div>
+
+      <div class="sidebar-step idle" id="step-2" onclick="scrollToStep(2)">
+        <div class="step-num" id="snum-2">02</div>
+        <div class="step-info">
+          <div class="step-name">Product Alignment</div>
+          <div class="step-sub">Doc + Readiness Score</div>
+        </div>
+      </div>
+
+      <div class="sidebar-step idle" id="step-3" onclick="scrollToStep(3)">
+        <div class="step-num" id="snum-3">03</div>
+        <div class="step-info">
+          <div class="step-name">Marketing Approaches</div>
+          <div class="step-sub">3 angles, pick one</div>
+        </div>
+      </div>
+
+      <div class="sidebar-step idle" id="step-4" onclick="scrollToStep(4)">
+        <div class="step-num" id="snum-4">04</div>
+        <div class="step-info">
+          <div class="step-name">Landing Page Briefs</div>
+          <div class="step-sub">2 versions to test</div>
+        </div>
+      </div>
+
+      <div class="sidebar-step idle" id="step-5" onclick="scrollToStep(5)">
+        <div class="step-num" id="snum-5">05</div>
+        <div class="step-info">
+          <div class="step-name">Go / No-Go Report</div>
+          <div class="step-sub">Validation → verdict</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="verdict-box" id="verdict-display">
+      <div class="verdict-box-label">Current Verdict</div>
+      <div class="verdict-box-value" id="verdict-value">—</div>
+    </div>
+  </aside>
+
+  <!-- CHAT -->
+  <div class="chat-container">
+
+    <!-- Welcome state -->
+    <div class="welcome-state" id="welcome-state">
+      <div class="welcome-logo">Kick<span>man</span></div>
+      <div class="welcome-sub">Crowdfunding Coach · Mission 1</div>
+      <button class="start-btn" onclick="kickStart()">Begin →</button>
+      <div class="welcome-note">14 days · Go / No-Go decision · Kickstarter-ready</div>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages" id="messages" style="display:none"></div>
+
+    <!-- Input -->
+    <div class="input-area" id="input-area" style="display:none">
+      <div class="input-row">
+        <textarea
+          id="user-input"
+          placeholder="Your response..."
+          rows="1"
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this)"
+        ></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()" title="Send">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+      <div class="input-meta">
+        <span class="input-hint" id="input-hint">↵ send · shift+↵ newline</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let apiKey = '';
+let history = [];
+let currentStep = 1;
+let isLoading = false;
+
+// ─── SYSTEM PROMPT ─────────────────────────────────────────────────────────
+const SYSTEM = `# IDENTITY
+
+You are Kickman — a world-class crowdfunding coach trained on every Kickstarter campaign that raised over $1,000,000 USD. You know what separates campaigns that fund in 24 hours from ones that die quietly.
+
+Your user is typically: a first-time founder, non-marketing background, cost-conscious, passionate about their product but uncertain how to present it to the world.
+
+Your mission: In 14 days, give this founder a clear Go / No-Go decision — is this product worth launching on Kickstarter, and what's the winning angle?
+
+# HOW YOU WORK
+
+You guide the founder through 5 sequential steps. Never skip. Never proceed without confirmation.
+
+At the end of every response, you output exactly one of:
+- A structured deliverable (document, table, brief)
+- A sharp question
+- A decision point with options
+
+You speak like a sharp, direct advisor. No filler. No cheerleading. When something looks risky, you say so. When you reference a campaign strategy, you name the real campaign it came from.
+
+# STEP 1 — FOUNDER INPUT
+
+When a new conversation begins, say exactly this:
+
+"Welcome. I'm Kickman.
+
+My job: figure out in 14 days whether your product is worth launching on Kickstarter — and exactly how to position it to win.
+
+Answer these 4 questions honestly. The more raw, the better.
+
+1. Why are you building this? What's the personal story or frustration behind it?
+2. What does the product do? Plain language, no jargon.
+3. What does it cost to make one unit (rough estimate)? What price were you thinking?
+4. Timeline — when will you have a sample ready? When do you want to launch? When can you ship to backers?
+
+Take your time."
+
+After they respond, ask 2–3 sharp follow-up questions if anything is unclear. Then say: "Got it. Running your product through alignment now." and move to Step 2.
+
+# STEP 2 — PRODUCT ALIGNMENT DOCUMENT
+
+Output a structured document with these exact sections:
+
+**PRODUCT NAME & DEFINITION**
+One crisp sentence. What it is and who it's for.
+
+**INTERNAL DESCRIPTION**
+2–3 sentences. How the team describes it internally. Functional, no spin.
+
+**ALL FEATURES**
+Bullet list. Concrete and specific. No vague claims.
+
+**BENEFITS**
+Reframe features as human outcomes. What changes in the backer's life?
+
+**WHAT MIGHT BACKERS FEAR OR DOUBT**
+The top 4–6 real objections: price, delivery risk, "why not just use X", quality concerns.
+
+**WHAT WE WANT PEOPLE TO THINK AND FEEL**
+The emotional destination. What does a perfect backer feel 30 seconds after seeing this?
+
+---
+
+**READINESS SCORE: X / 10**
+
+Score these 5 dimensions, 2 points each:
+
+| Dimension | Score | Reasoning |
+|---|---|---|
+| Problem Clarity | /2 | |
+| Product Differentiation | /2 | |
+| Target Audience Sharpness | /2 | |
+| Timeline Feasibility | /2 | |
+| Unit Economics | /2 | |
+
+Then 2–3 sentences interpreting the total. What it means. What the biggest risks are.
+
+End with: "Does this feel accurate? Correct anything I've got wrong — then we move to marketing approaches."
+
+# STEP 3 — THREE MARKETING APPROACHES
+
+Present exactly 3 approaches. Each must be meaningfully different — not just tone variations.
+
+For each:
+
+**APPROACH [A / B / C]: [Name]**
+- Core angle: one sentence
+- Why this works: reference 1–2 real $1M+ campaigns that used a similar approach
+- Who it resonates with: the backer psychographic
+- Sample headline: a real headline they could test
+- Risk: what could go wrong
+
+End with: "Which approach feels most true to your product and story? Pick one, or tell me what you'd combine."
+
+# STEP 4 — LANDING PAGE BRIEFS
+
+Generate 2 landing page versions based on the chosen approach.
+
+For each version:
+
+**LP VERSION [1 / 2]: [Name]**
+- Headline
+- Subheadline
+- Hero visual direction
+- 3 core sections (name + 2-sentence description + emotional goal)
+- CTA (exact button text + what they're signing up for)
+- What this version tests (one hypothesis)
+
+Then output a Validation Playbook:
+
+**VALIDATION PLAYBOOK**
+- Budget: $300–500
+- Platform recommendation with reasoning
+- Ad creative direction: 2–3 specific ideas
+- What to measure: CPL target, reservation rate target
+- Duration: 7–10 days, 200 clicks per version minimum
+
+End with: "Set this up, run it for 7–10 days, then bring me the numbers."
+
+# STEP 5 — GO / NO-GO REPORT
+
+When the founder returns with validation data, ask for clicks, leads/reservations, CPL for each version, and any qualitative signals.
+
+Then output:
+
+**KICKMAN MISSION 1 — FINAL REPORT**
+
+Validation summary table with benchmarks.
+
+**VERDICT: GO ✅ / NO-GO ❌ / CONDITIONAL ⚠️**
+
+- GO = CPL under $5, reservation rate over 15%, clear winner
+- NO-GO = CPL over 2x benchmark, low signal
+- CONDITIONAL = mixed signals, one specific condition required
+
+**WINNING ANGLE** (if GO or CONDITIONAL)
+**WHAT THE DATA TELLS US** — 3–5 bullets
+**RISKS TO WATCH** — 2–3 honest risks
+**RECOMMENDED NEXT STEP** — specific
+
+# REFERENCE CAMPAIGNS
+
+- Pebble 2012: category creation + community rally. $1M in hours. Lead with "be part of something new."
+- Pebble Time 2015: launched 1 week before Apple Watch. Used competitor as launch fuel.
+- EcoFlow DELTA Pro 2021: fear → freedom arc. $1M in 10 min. Dual audience: preppers + outdoor.
+- Peak Design Tripod 2019: engineering depth storytelling. 9th campaign, 100K+ warm list.
+- Flow Hive 2015: one magic visual moment. Built entire campaign around 30 seconds of video.
+- Coolest Cooler 2014: $13M raised, FAILED TO SHIP. Unit economics wrong at scale. Always flag this risk.
+- Exploding Kittens 2015: creator audience (7M readers). Goal in 8 min. Low price, max backer count.
+- Snapmaker 2019: 3-in-1 value consolidation. Multiple audiences, technical spec storytelling.
+- Oculus Rift 2012: one expert endorser (Carmack) changed credibility overnight.
+- Gravity Blanket 2017: clinical tool → consumer product. Science-backed democratization.
+- Nebia Shower 2015: sustainability without sacrifice. Tim Cook = instant credibility.
+- Glowforge 2015: category democratization. Ran own pre-order. Warning: 2-year delays.
+- BauBax Jacket 2015: feature list as viral content. Each feature a GIF reveal.
+- MVMT Watches 2013: DTC disruption. Perceived value gap was the entire pitch.
+- OUYA 2012: anti-establishment platform rally. Warning: ecosystem dependency killed it.
+
+# RULES
+
+1. Never move to next step without explicit user confirmation
+2. Never invent campaign data — only reference campaigns listed above
+3. Always show reasoning — "I'm suggesting X because Y campaign did Z"
+4. If product has serious structural problems, say so clearly
+5. No filler, no cheerleading
+6. End every response with exactly one: deliverable, question, or decision point`;
+
+// ─── SETUP ────────────────────────────────────────────────────────────────────
+function startApp() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key.startsWith('sk-ant-') && !key.startsWith('sk-')) {
+    document.getElementById('setup-error').style.display = 'block';
+    return;
+  }
+  apiKey = key;
+  document.getElementById('setup-screen').style.display = 'none';
+}
+
+document.getElementById('api-key-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') startApp();
+});
+
+// ─── KICK START ───────────────────────────────────────────────────────────────
+async function kickStart() {
+  document.getElementById('welcome-state').style.display = 'none';
+  document.getElementById('messages').style.display = 'flex';
+  document.getElementById('input-area').style.display = 'block';
+  await callKickman('start');
+}
+
+// ─── API CALL ─────────────────────────────────────────────────────────────────
+async function callKickman(trigger) {
+  if (isLoading) return;
+  isLoading = true;
+  setSendDisabled(true);
+
+  const messages = trigger === 'start'
+    ? [{ role: 'user', content: 'Begin.' }]
+    : history;
+
+  showTyping();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2048,
+        system: SYSTEM,
+        messages: messages
+      })
+    });
+
+    removeTyping();
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      addMessage('km', `Connection error: ${err.error?.message || res.status}. Check your API key and try again.`);
+      isLoading = false;
+      setSendDisabled(false);
+      return;
+    }
+
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+
+    if (trigger === 'start') {
+      history = [
+        { role: 'user', content: 'Begin.' },
+        { role: 'assistant', content: text }
+      ];
+    } else {
+      history.push({ role: 'assistant', content: text });
+    }
+
+    addMessage('km', text);
+    detectStep(text);
+
+  } catch (e) {
+    removeTyping();
+    addMessage('km', 'Network error. Check your connection and try again.');
+  }
+
+  isLoading = false;
+  setSendDisabled(false);
+}
+
+// ─── SEND ─────────────────────────────────────────────────────────────────────
+async function sendMessage() {
+  const input = document.getElementById('user-input');
+  const text = input.value.trim();
+  if (!text || isLoading) return;
+
+  input.value = '';
+  autoResize(input);
+
+  history.push({ role: 'user', content: text });
+  addMessage('user', text);
+  await callKickman('continue');
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+// ─── RENDER MESSAGE ───────────────────────────────────────────────────────────
+function addMessage(role, raw) {
+  const container = document.getElementById('messages');
+  const wrapper = document.createElement('div');
+  wrapper.className = `message ${role}`;
+
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = role === 'km' ? 'KM' : 'YOU';
+
+  const body = document.createElement('div');
+  body.className = 'msg-body';
+
+  const name = document.createElement('div');
+  name.className = 'msg-name';
+  name.textContent = role === 'km' ? 'Kickman' : 'You';
+
+  const content = document.createElement('div');
+  content.className = 'msg-content';
+
+  if (role === 'km') {
+    content.innerHTML = renderMarkdown(raw);
+  } else {
+    content.textContent = raw;
+  }
+
+  body.appendChild(name);
+  body.appendChild(content);
+  wrapper.appendChild(avatar);
+  wrapper.appendChild(body);
+  container.appendChild(wrapper);
+  container.scrollTop = container.scrollHeight;
+}
+
+// ─── MARKDOWN RENDERER ────────────────────────────────────────────────────────
+function renderMarkdown(text) {
+  let html = text;
+
+  // Verdict detection
+  if (html.includes('VERDICT: GO') || html.includes('VERDICT: ✅')) {
+    html = html.replace(/\*\*VERDICT:.*?GO.*?\*\*/g, '<div class="verdict-go"><span class="verdict-icon">✅</span><span class="verdict-text">GO — Launch it</span></div>');
+    updateVerdict('go');
+  } else if (html.includes('VERDICT: NO-GO') || html.includes('VERDICT: ❌')) {
+    html = html.replace(/\*\*VERDICT:.*?NO-GO.*?\*\*/g, '<div class="verdict-no"><span class="verdict-icon">❌</span><span class="verdict-text">No-Go — Not yet</span></div>');
+    updateVerdict('no-go');
+  } else if (html.includes('VERDICT: CONDITIONAL') || html.includes('VERDICT: ⚠️')) {
+    html = html.replace(/\*\*VERDICT:.*?CONDITIONAL.*?\*\*/g, '<div class="verdict-conditional"><span class="verdict-icon">⚠️</span><span class="verdict-text">Conditional</span></div>');
+    updateVerdict('conditional');
+  }
+
+  // Headers
+  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^# (.+)$/gm, '<h2>$1</h2>');
+
+  // Bold + italic
+  html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+  // Tables
+  html = html.replace(/(\|.+\|\n)((?:\|.+\|\n)*)/g, (match) => {
+    const rows = match.trim().split('\n');
+    if (rows.length < 2) return match;
+    const headerCells = rows[0].split('|').filter(c => c.trim()).map(c => `<th>${c.trim()}</th>`).join('');
+    let tableHtml = `<table><thead><tr>${headerCells}</tr></thead><tbody>`;
+    for (let i = 2; i < rows.length; i++) {
+      if (!rows[i].trim()) continue;
+      const cells = rows[i].split('|').filter(c => c.trim()).map(c => `<td>${c.trim()}</td>`).join('');
+      tableHtml += `<tr>${cells}</tr>`;
+    }
+    tableHtml += '</tbody></table>';
+    return tableHtml;
+  });
+
+  // Bullet lists — group consecutive lines
+  html = html.replace(/((?:^[-*•] .+\n?)+)/gm, (match) => {
+    const items = match.trim().split('\n')
+      .filter(l => l.trim())
+      .map(l => `<li>${l.replace(/^[-*•] /, '').trim()}</li>`)
+      .join('');
+    return `<ul>${items}</ul>`;
+  });
+
+  // Blockquotes
+  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+
+  // Inline code
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+  // Horizontal rules
+  html = html.replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid var(--border);margin:16px 0;">');
+
+  // Paragraphs — wrap blocks separated by blank lines
+  html = html
+    .split(/\n\n+/)
+    .map(block => {
+      block = block.trim();
+      if (!block) return '';
+      if (block.startsWith('<')) return block;
+      return `<p>${block.replace(/\n/g, '<br>')}</p>`;
+    })
+    .join('\n');
+
+  return html;
+}
+
+// ─── STEP DETECTION ───────────────────────────────────────────────────────────
+function detectStep(text) {
+  if (text.includes('READINESS SCORE') || text.includes('Product Alignment')) {
+    setStep(3);
+  } else if (text.includes('APPROACH A') || text.includes('APPROACH B')) {
+    setStep(4);
+  } else if (text.includes('LP VERSION') || text.includes('VALIDATION PLAYBOOK')) {
+    setStep(5);
+  } else if (text.includes('FINAL REPORT') || text.includes('VERDICT:')) {
+    setStep(6);
+  }
+}
+
+function setStep(next) {
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById(`step-${i}`);
+    const dot = document.getElementById(`dot-${i}`);
+    if (!el) continue;
+    el.className = 'sidebar-step';
+    dot.className = 'step-dot';
+    if (i < next - 1) {
+      el.classList.add('done');
+      dot.classList.add('done');
+    } else if (i === next - 1) {
+      el.classList.add('active');
+      dot.classList.add('active');
+    } else {
+      el.classList.add('idle');
+    }
+  }
+  currentStep = next - 1;
+}
+
+function updateVerdict(type) {
+  const box = document.getElementById('verdict-display');
+  const val = document.getElementById('verdict-value');
+  box.classList.add('visible');
+  if (type === 'go') { val.textContent = '✅ GO'; val.style.color = 'var(--green)'; }
+  else if (type === 'no-go') { val.textContent = '❌ No-Go'; val.style.color = 'var(--red)'; }
+  else { val.textContent = '⚠️ Conditional'; val.style.color = 'var(--yellow)'; }
+}
+
+// ─── TYPING INDICATOR ─────────────────────────────────────────────────────────
+function showTyping() {
+  const container = document.getElementById('messages');
+  const wrapper = document.createElement('div');
+  wrapper.className = 'message km';
+  wrapper.id = 'typing-indicator';
+
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = 'KM';
+
+  const body = document.createElement('div');
+  body.className = 'msg-body';
+
+  const name = document.createElement('div');
+  name.className = 'msg-name';
+  name.textContent = 'Kickman';
+
+  const ind = document.createElement('div');
+  ind.className = 'typing-indicator';
+  ind.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+
+  body.appendChild(name);
+  body.appendChild(ind);
+  wrapper.appendChild(avatar);
+  wrapper.appendChild(body);
+  container.appendChild(wrapper);
+  container.scrollTop = container.scrollHeight;
+}
+
+function removeTyping() {
+  document.getElementById('typing-indicator')?.remove();
+}
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+}
+
+function setSendDisabled(v) {
+  document.getElementById('send-btn').disabled = v;
+}
+
+function scrollToStep(n) {
+  // future: scroll to step anchor
+}
+
+function newSession() {
+  if (confirm('Start a new session? Current conversation will be lost.')) {
+    history = [];
+    currentStep = 1;
+    document.getElementById('messages').innerHTML = '';
+    document.getElementById('messages').style.display = 'none';
+    document.getElementById('input-area').style.display = 'none';
+    document.getElementById('welcome-state').style.display = 'flex';
+    document.getElementById('verdict-display').classList.remove('visible');
+    for (let i = 1; i <= 5; i++) {
+      document.getElementById(`step-${i}`).className = i === 1 ? 'sidebar-step active' : 'sidebar-step idle';
+      document.getElementById(`dot-${i}`).className = i === 1 ? 'step-dot active' : 'step-dot';
+    }
+  }
+}
+
+function exportChat() {
+  const text = history
+    .map(m => `[${m.role.toUpperCase()}]\n${m.content}`)
+    .join('\n\n---\n\n');
+  const blob = new Blob([text], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `kickman-session-${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+}
+</script>
+</body>
+</html>
