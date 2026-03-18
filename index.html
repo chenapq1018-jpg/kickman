@@ -42,8 +42,8 @@
     overflow: hidden;
   }
 
-  /* ── SETUP SCREEN ── */
-  #setup-screen {
+  /* ── PASSWORD SCREEN ── */
+  #password-screen {
     position: fixed;
     inset: 0;
     background: var(--bg);
@@ -56,7 +56,7 @@
 
   .setup-card {
     width: 100%;
-    max-width: 480px;
+    max-width: 440px;
     background: var(--surface);
     border: 1px solid var(--border);
     padding: 48px;
@@ -64,7 +64,7 @@
 
   .setup-logo {
     font-family: var(--font-serif);
-    font-size: 42px;
+    font-size: 44px;
     color: var(--text);
     margin-bottom: 6px;
     line-height: 1;
@@ -96,27 +96,23 @@
     border: 1px solid var(--border);
     color: var(--text);
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: 14px;
     padding: 14px 16px;
     outline: none;
     transition: border-color 0.2s;
     margin-bottom: 8px;
+    letter-spacing: 3px;
   }
 
   .setup-input:focus { border-color: var(--accent); }
-  .setup-input::placeholder { color: var(--text-3); }
+  .setup-input::placeholder { color: var(--text-3); letter-spacing: 1px; }
 
   .setup-hint {
     font-family: var(--font-mono);
     font-size: 10px;
     color: var(--text-3);
-    margin-bottom: 32px;
+    margin-bottom: 28px;
     line-height: 1.6;
-  }
-
-  .setup-hint a {
-    color: var(--accent);
-    text-decoration: none;
   }
 
   .setup-btn {
@@ -142,6 +138,7 @@
     color: var(--red);
     margin-top: 12px;
     display: none;
+    line-height: 1.5;
   }
 
   /* ── HEADER ── */
@@ -164,21 +161,12 @@
 
   .header-logo span { color: var(--accent); font-style: italic; }
 
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
+  .header-right { display: flex; align-items: center; gap: 16px; }
 
-  .step-indicator {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
+  .step-indicator { display: flex; align-items: center; gap: 6px; }
 
   .step-dot {
-    width: 6px;
-    height: 6px;
+    width: 6px; height: 6px;
     border-radius: 50%;
     background: var(--border);
     transition: all 0.3s;
@@ -203,11 +191,7 @@
   .header-btn:hover { border-color: var(--border-hover); color: var(--text-2); }
 
   /* ── LAYOUT ── */
-  .app-layout {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-  }
+  .app-layout { display: flex; flex: 1; overflow: hidden; }
 
   /* ── SIDEBAR ── */
   .sidebar {
@@ -220,10 +204,7 @@
     overflow-y: auto;
   }
 
-  .sidebar-section {
-    padding: 0 16px;
-    margin-bottom: 24px;
-  }
+  .sidebar-section { padding: 0 16px; margin-bottom: 24px; }
 
   .sidebar-label {
     font-family: var(--font-mono);
@@ -273,7 +254,6 @@
   }
 
   .sidebar-step.active .step-name { color: var(--text); }
-  .sidebar-step.done .step-name { color: var(--text-2); }
 
   .step-sub {
     font-family: var(--font-mono);
@@ -283,11 +263,7 @@
     line-height: 1.4;
   }
 
-  .sidebar-divider {
-    height: 1px;
-    background: var(--border);
-    margin: 0 16px 20px;
-  }
+  .sidebar-divider { height: 1px; background: var(--border); margin: 0 16px 20px; }
 
   .verdict-box {
     margin: 0 16px;
@@ -298,30 +274,11 @@
   }
 
   .verdict-box.visible { display: block; }
-
-  .verdict-box-label {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: var(--text-3);
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-
-  .verdict-box-value {
-    font-family: var(--font-serif);
-    font-size: 20px;
-    color: var(--green);
-  }
+  .verdict-box-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px; color: var(--text-3); text-transform: uppercase; margin-bottom: 6px; }
+  .verdict-box-value { font-family: var(--font-serif); font-size: 20px; color: var(--green); }
 
   /* ── CHAT ── */
-  .chat-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    min-width: 0;
-  }
+  .chat-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
 
   .messages {
     flex: 1;
@@ -337,13 +294,17 @@
   .messages::-webkit-scrollbar-thumb { background: var(--border); }
 
   /* ── MESSAGE ── */
-  .message { display: flex; gap: 14px; max-width: 760px; }
+  .message { display: flex; gap: 14px; max-width: 760px; animation: msgIn 0.25s ease forwards; opacity: 0; }
   .message.user { flex-direction: row-reverse; align-self: flex-end; }
   .message.km { align-self: flex-start; }
 
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
   .msg-avatar {
-    width: 30px;
-    height: 30px;
+    width: 30px; height: 30px;
     border-radius: 2px;
     flex-shrink: 0;
     display: flex;
@@ -356,36 +317,15 @@
     margin-top: 2px;
   }
 
-  .message.km .msg-avatar {
-    background: var(--accent-dim);
-    color: var(--accent);
-    border: 1px solid rgba(232,98,42,0.2);
-  }
-
-  .message.user .msg-avatar {
-    background: rgba(255,255,255,0.05);
-    color: var(--text-2);
-    border: 1px solid var(--border);
-  }
+  .message.km .msg-avatar { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(232,98,42,0.2); }
+  .message.user .msg-avatar { background: rgba(255,255,255,0.05); color: var(--text-2); border: 1px solid var(--border); }
 
   .msg-body { flex: 1; min-width: 0; }
 
-  .msg-name {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--text-3);
-    text-transform: uppercase;
-    margin-bottom: 7px;
-  }
-
+  .msg-name { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; color: var(--text-3); text-transform: uppercase; margin-bottom: 7px; }
   .message.user .msg-name { text-align: right; }
 
-  .msg-content {
-    font-size: 14px;
-    line-height: 1.75;
-    color: var(--text);
-  }
+  .msg-content { font-size: 14px; line-height: 1.75; color: var(--text); }
 
   .message.user .msg-content {
     background: var(--card);
@@ -396,24 +336,14 @@
     line-height: 1.65;
   }
 
-  /* Markdown-ish rendering inside KM messages */
   .msg-content p { margin-bottom: 12px; }
   .msg-content p:last-child { margin-bottom: 0; }
-
-  .msg-content strong {
-    font-weight: 500;
-    color: var(--text);
-  }
-
-  .msg-content em {
-    font-style: italic;
-    color: var(--text-2);
-  }
+  .msg-content strong { font-weight: 500; color: var(--text); }
+  .msg-content em { font-style: italic; color: var(--text-2); }
 
   .msg-content h2 {
     font-family: var(--font-serif);
-    font-size: 20px;
-    font-weight: 400;
+    font-size: 20px; font-weight: 400;
     color: var(--text);
     margin: 20px 0 10px;
     padding-bottom: 8px;
@@ -422,198 +352,58 @@
 
   .msg-content h3 {
     font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 2px;
+    font-size: 11px; letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--accent);
     margin: 18px 0 8px;
   }
 
-  .msg-content ul {
-    padding-left: 0;
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-bottom: 12px;
-  }
+  .msg-content ul { padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
 
-  .msg-content ul li {
-    padding-left: 18px;
-    position: relative;
-    font-size: 13.5px;
-    line-height: 1.65;
-    color: var(--text-2);
-  }
+  .msg-content ul li { padding-left: 18px; position: relative; font-size: 13.5px; line-height: 1.65; color: var(--text-2); }
+  .msg-content ul li::before { content: '→'; position: absolute; left: 0; color: var(--accent); font-size: 11px; top: 2px; }
 
-  .msg-content ul li::before {
-    content: '→';
-    position: absolute;
-    left: 0;
-    color: var(--accent);
-    font-size: 11px;
-    top: 2px;
-  }
-
-  .msg-content table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12.5px;
-    margin: 12px 0;
-    font-family: var(--font-mono);
-  }
-
-  .msg-content table th {
-    background: rgba(255,255,255,0.04);
-    padding: 8px 12px;
-    text-align: left;
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--text-3);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .msg-content table td {
-    padding: 8px 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    color: var(--text-2);
-    vertical-align: top;
-  }
-
+  .msg-content table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin: 12px 0; font-family: var(--font-mono); }
+  .msg-content table th { background: rgba(255,255,255,0.04); padding: 8px 12px; text-align: left; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-3); border-bottom: 1px solid var(--border); }
+  .msg-content table td { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text-2); vertical-align: top; }
   .msg-content table tr:last-child td { border-bottom: none; }
 
-  /* Score card */
-  .score-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    padding: 20px;
-    margin: 16px 0;
-  }
+  .verdict-go { background: var(--green-dim); border: 1px solid rgba(45,158,107,0.3); padding: 16px 20px; margin: 14px 0; display: flex; align-items: center; gap: 14px; }
+  .verdict-no { background: var(--red-dim); border: 1px solid rgba(192,57,43,0.3); padding: 16px 20px; margin: 14px 0; display: flex; align-items: center; gap: 14px; }
+  .verdict-conditional { background: var(--yellow-dim); border: 1px solid rgba(212,160,23,0.3); padding: 16px 20px; margin: 14px 0; display: flex; align-items: center; gap: 14px; }
+  .verdict-icon { font-size: 24px; flex-shrink: 0; }
+  .verdict-text { font-family: var(--font-serif); font-size: 22px; color: var(--text); }
 
-  .score-total-row {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    padding-top: 12px;
-    margin-top: 12px;
-    border-top: 1px solid var(--border);
-  }
-
-  .score-total-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--text-3);
-    text-transform: uppercase;
-  }
-
-  .score-total-num {
-    font-family: var(--font-serif);
-    font-size: 32px;
-    color: var(--accent);
-  }
-
-  /* Verdict styles */
-  .verdict-go {
-    background: var(--green-dim);
-    border: 1px solid rgba(45,158,107,0.3);
-    padding: 16px 20px;
-    margin: 14px 0;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .verdict-no {
-    background: var(--red-dim);
-    border: 1px solid rgba(192,57,43,0.3);
-    padding: 16px 20px;
-    margin: 14px 0;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .verdict-conditional {
-    background: var(--yellow-dim);
-    border: 1px solid rgba(212,160,23,0.3);
-    padding: 16px 20px;
-    margin: 14px 0;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .verdict-icon {
-    font-size: 24px;
-    flex-shrink: 0;
-  }
-
-  .verdict-text {
-    font-family: var(--font-serif);
-    font-size: 22px;
-    color: var(--text);
-  }
-
-  /* Blockquote for key lessons */
-  .msg-content blockquote {
-    border-left: 2px solid var(--accent);
-    padding: 10px 16px;
-    margin: 14px 0;
-    background: var(--accent-dim2);
-    color: var(--text-2);
-    font-style: italic;
-    font-size: 13.5px;
-    line-height: 1.7;
-  }
-
-  /* Code inline */
-  .msg-content code {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    background: rgba(255,255,255,0.06);
-    padding: 2px 6px;
-    color: var(--accent);
-  }
+  .msg-content blockquote { border-left: 2px solid var(--accent); padding: 10px 16px; margin: 14px 0; background: var(--accent-dim2); color: var(--text-2); font-style: italic; font-size: 13.5px; line-height: 1.7; }
+  .msg-content code { font-family: var(--font-mono); font-size: 12px; background: rgba(255,255,255,0.06); padding: 2px 6px; color: var(--accent); }
 
   /* ── TYPING ── */
-  .typing-indicator {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 12px 0;
-  }
-
-  .typing-dot {
-    width: 5px;
-    height: 5px;
-    background: var(--text-3);
-    border-radius: 50%;
-    animation: tdot 1.3s infinite;
-  }
-
+  .typing-indicator { display: flex; align-items: center; gap: 5px; padding: 12px 0; }
+  .typing-dot { width: 5px; height: 5px; background: var(--text-3); border-radius: 50%; animation: tdot 1.3s infinite; }
   .typing-dot:nth-child(2) { animation-delay: 0.2s; }
   .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes tdot { 0%,60%,100%{opacity:0.3;transform:scale(0.9)} 30%{opacity:1;transform:scale(1)} }
 
-  @keyframes tdot {
-    0%, 60%, 100% { opacity: 0.3; transform: scale(0.9); }
-    30% { opacity: 1; transform: scale(1); }
+  /* ── WELCOME ── */
+  .welcome-state {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 60px 40px; text-align: center; gap: 16px;
   }
 
-  /* ── INPUT AREA ── */
-  .input-area {
-    border-top: 1px solid var(--border);
-    padding: 16px 40px 20px;
-    background: var(--bg);
-    flex-shrink: 0;
-  }
+  .welcome-logo { font-family: var(--font-serif); font-size: 52px; color: var(--text); line-height: 1; margin-bottom: 4px; }
+  .welcome-logo span { color: var(--accent); font-style: italic; }
+  .welcome-sub { font-family: var(--font-mono); font-size: 11px; letter-spacing: 3px; color: var(--text-3); text-transform: uppercase; margin-bottom: 32px; }
 
-  .input-row {
-    display: flex;
-    gap: 10px;
-    align-items: flex-end;
-  }
+  .start-btn { background: var(--accent); color: #fff; border: none; font-family: var(--font-mono); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; padding: 14px 36px; cursor: pointer; transition: opacity 0.2s; }
+  .start-btn:hover { opacity: 0.85; }
+
+  .welcome-note { font-family: var(--font-mono); font-size: 10px; color: var(--text-3); margin-top: 8px; }
+
+  /* ── INPUT ── */
+  .input-area { border-top: 1px solid var(--border); padding: 16px 40px 20px; background: var(--bg); flex-shrink: 0; }
+
+  .input-row { display: flex; gap: 10px; align-items: flex-end; }
 
   #user-input {
     flex: 1;
@@ -634,102 +424,14 @@
   #user-input:focus { border-color: rgba(232,98,42,0.4); }
   #user-input::placeholder { color: var(--text-3); }
 
-  .send-btn {
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    width: 46px;
-    height: 46px;
-    flex-shrink: 0;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.2s;
-  }
-
+  .send-btn { background: var(--accent); color: #fff; border: none; width: 46px; height: 46px; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: opacity 0.2s; }
   .send-btn:hover { opacity: 0.85; }
   .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
   .send-btn svg { width: 16px; height: 16px; }
 
-  .input-meta {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 8px;
-  }
+  .input-meta { display: flex; justify-content: space-between; margin-top: 8px; }
+  .input-hint { font-family: var(--font-mono); font-size: 10px; color: var(--text-3); }
 
-  .input-hint {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text-3);
-  }
-
-  /* ── WELCOME SCREEN (inside chat) ── */
-  .welcome-state {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 40px;
-    text-align: center;
-    gap: 16px;
-  }
-
-  .welcome-logo {
-    font-family: var(--font-serif);
-    font-size: 52px;
-    color: var(--text);
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .welcome-logo span { color: var(--accent); font-style: italic; }
-
-  .welcome-sub {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 3px;
-    color: var(--text-3);
-    text-transform: uppercase;
-    margin-bottom: 32px;
-  }
-
-  .start-btn {
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    padding: 14px 36px;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
-
-  .start-btn:hover { opacity: 0.85; }
-
-  .welcome-note {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text-3);
-    margin-top: 8px;
-  }
-
-  /* ── ANIMATIONS ── */
-  .message {
-    animation: msgIn 0.25s ease forwards;
-    opacity: 0;
-  }
-
-  @keyframes msgIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ── RESPONSIVE ── */
   @media (max-width: 680px) {
     .sidebar { display: none; }
     .messages { padding: 20px 16px; }
@@ -740,29 +442,24 @@
 </head>
 <body>
 
-<!-- SETUP SCREEN -->
-<div id="setup-screen">
+<!-- PASSWORD SCREEN -->
+<div id="password-screen">
   <div class="setup-card">
     <div class="setup-logo">Kick<span>man</span></div>
     <div class="setup-tagline">Crowdfunding Coach · Mission 1</div>
 
-    <div class="setup-label">Anthropic API Key</div>
+    <div class="setup-label">Access Password</div>
     <input
       type="password"
       class="setup-input"
-      id="api-key-input"
-      placeholder="sk-ant-..."
+      id="password-input"
+      placeholder="Enter password"
       autocomplete="off"
     >
-    <div class="setup-hint">
-      Your key is stored only in this browser session — never sent anywhere except directly to Anthropic's API.<br>
-      Get your key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>
-    </div>
+    <div class="setup-hint">Contact the team to get access.</div>
 
-    <button class="setup-btn" id="start-btn" onclick="startApp()">
-      Start Session →
-    </button>
-    <div class="setup-error" id="setup-error">Invalid API key. Check and try again.</div>
+    <button class="setup-btn" id="pw-btn" onclick="checkPassword()">Enter →</button>
+    <div class="setup-error" id="pw-error">Wrong password. Try again.</div>
   </div>
 </div>
 
@@ -783,13 +480,11 @@
 </header>
 
 <div class="app-layout">
-
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-section">
       <div class="sidebar-label">Mission 1 — 14 Days</div>
 
-      <div class="sidebar-step active" id="step-1" onclick="scrollToStep(1)">
+      <div class="sidebar-step active" id="step-1">
         <div class="step-num" id="snum-1">01</div>
         <div class="step-info">
           <div class="step-name">Founder Input</div>
@@ -797,7 +492,7 @@
         </div>
       </div>
 
-      <div class="sidebar-step idle" id="step-2" onclick="scrollToStep(2)">
+      <div class="sidebar-step idle" id="step-2">
         <div class="step-num" id="snum-2">02</div>
         <div class="step-info">
           <div class="step-name">Product Alignment</div>
@@ -805,7 +500,7 @@
         </div>
       </div>
 
-      <div class="sidebar-step idle" id="step-3" onclick="scrollToStep(3)">
+      <div class="sidebar-step idle" id="step-3">
         <div class="step-num" id="snum-3">03</div>
         <div class="step-info">
           <div class="step-name">Marketing Approaches</div>
@@ -813,7 +508,7 @@
         </div>
       </div>
 
-      <div class="sidebar-step idle" id="step-4" onclick="scrollToStep(4)">
+      <div class="sidebar-step idle" id="step-4">
         <div class="step-num" id="snum-4">04</div>
         <div class="step-info">
           <div class="step-name">Landing Page Briefs</div>
@@ -821,7 +516,7 @@
         </div>
       </div>
 
-      <div class="sidebar-step idle" id="step-5" onclick="scrollToStep(5)">
+      <div class="sidebar-step idle" id="step-5">
         <div class="step-num" id="snum-5">05</div>
         <div class="step-info">
           <div class="step-name">Go / No-Go Report</div>
@@ -838,10 +533,7 @@
     </div>
   </aside>
 
-  <!-- CHAT -->
   <div class="chat-container">
-
-    <!-- Welcome state -->
     <div class="welcome-state" id="welcome-state">
       <div class="welcome-logo">Kick<span>man</span></div>
       <div class="welcome-sub">Crowdfunding Coach · Mission 1</div>
@@ -849,20 +541,12 @@
       <div class="welcome-note">14 days · Go / No-Go decision · Kickstarter-ready</div>
     </div>
 
-    <!-- Messages -->
     <div class="messages" id="messages" style="display:none"></div>
 
-    <!-- Input -->
     <div class="input-area" id="input-area" style="display:none">
       <div class="input-row">
-        <textarea
-          id="user-input"
-          placeholder="Your response..."
-          rows="1"
-          onkeydown="handleKey(event)"
-          oninput="autoResize(this)"
-        ></textarea>
-        <button class="send-btn" id="send-btn" onclick="sendMessage()" title="Send">
+        <textarea id="user-input" placeholder="Your response..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"></line>
             <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
@@ -870,21 +554,17 @@
         </button>
       </div>
       <div class="input-meta">
-        <span class="input-hint" id="input-hint">↵ send · shift+↵ newline</span>
+        <span class="input-hint">↵ send · shift+↵ newline</span>
       </div>
     </div>
-
   </div>
 </div>
 
 <script>
-// ─── STATE ────────────────────────────────────────────────────────────────────
-let apiKey = '';
+let password = '';
 let history = [];
-let currentStep = 1;
 let isLoading = false;
 
-// ─── SYSTEM PROMPT ─────────────────────────────────────────────────────────
 const SYSTEM = `# IDENTITY
 
 You are Kickman — a world-class crowdfunding coach trained on every Kickstarter campaign that raised over $1,000,000 USD. You know what separates campaigns that fund in 24 hours from ones that die quietly.
@@ -931,25 +611,23 @@ Output a structured document with these exact sections:
 One crisp sentence. What it is and who it's for.
 
 **INTERNAL DESCRIPTION**
-2–3 sentences. How the team describes it internally. Functional, no spin.
+2–3 sentences. Functional, no spin.
 
 **ALL FEATURES**
-Bullet list. Concrete and specific. No vague claims.
+Bullet list. Concrete and specific.
 
 **BENEFITS**
-Reframe features as human outcomes. What changes in the backer's life?
+Reframe features as human outcomes.
 
 **WHAT MIGHT BACKERS FEAR OR DOUBT**
-The top 4–6 real objections: price, delivery risk, "why not just use X", quality concerns.
+Top 4–6 real objections.
 
 **WHAT WE WANT PEOPLE TO THINK AND FEEL**
-The emotional destination. What does a perfect backer feel 30 seconds after seeing this?
+The emotional destination.
 
 ---
 
 **READINESS SCORE: X / 10**
-
-Score these 5 dimensions, 2 points each:
 
 | Dimension | Score | Reasoning |
 |---|---|---|
@@ -959,70 +637,46 @@ Score these 5 dimensions, 2 points each:
 | Timeline Feasibility | /2 | |
 | Unit Economics | /2 | |
 
-Then 2–3 sentences interpreting the total. What it means. What the biggest risks are.
-
-End with: "Does this feel accurate? Correct anything I've got wrong — then we move to marketing approaches."
+2–3 sentences interpreting the total. End with: "Does this feel accurate? Correct anything I've got wrong — then we move to marketing approaches."
 
 # STEP 3 — THREE MARKETING APPROACHES
 
-Present exactly 3 approaches. Each must be meaningfully different — not just tone variations.
+Present exactly 3 approaches, each meaningfully different.
 
 For each:
-
 **APPROACH [A / B / C]: [Name]**
 - Core angle: one sentence
-- Why this works: reference 1–2 real $1M+ campaigns that used a similar approach
-- Who it resonates with: the backer psychographic
-- Sample headline: a real headline they could test
-- Risk: what could go wrong
+- Why this works: reference 1–2 real $1M+ campaigns
+- Who it resonates with
+- Sample headline
+- Risk
 
-End with: "Which approach feels most true to your product and story? Pick one, or tell me what you'd combine."
+End with: "Which approach feels most true to your product and story?"
 
 # STEP 4 — LANDING PAGE BRIEFS
 
-Generate 2 landing page versions based on the chosen approach.
-
-For each version:
+2 versions based on chosen approach.
 
 **LP VERSION [1 / 2]: [Name]**
 - Headline
 - Subheadline
 - Hero visual direction
-- 3 core sections (name + 2-sentence description + emotional goal)
-- CTA (exact button text + what they're signing up for)
-- What this version tests (one hypothesis)
+- 3 core sections
+- CTA
+- What this version tests
 
-Then output a Validation Playbook:
+Then: **VALIDATION PLAYBOOK** with budget, platform, ad ideas, metrics, duration.
 
-**VALIDATION PLAYBOOK**
-- Budget: $300–500
-- Platform recommendation with reasoning
-- Ad creative direction: 2–3 specific ideas
-- What to measure: CPL target, reservation rate target
-- Duration: 7–10 days, 200 clicks per version minimum
-
-End with: "Set this up, run it for 7–10 days, then bring me the numbers."
+End with: "Set this up, run it 7–10 days, then bring me the numbers."
 
 # STEP 5 — GO / NO-GO REPORT
 
-When the founder returns with validation data, ask for clicks, leads/reservations, CPL for each version, and any qualitative signals.
+Ask for data: clicks, leads/reservations, CPL per version, qualitative signals.
 
-Then output:
-
-**KICKMAN MISSION 1 — FINAL REPORT**
-
-Validation summary table with benchmarks.
-
-**VERDICT: GO ✅ / NO-GO ❌ / CONDITIONAL ⚠️**
-
-- GO = CPL under $5, reservation rate over 15%, clear winner
-- NO-GO = CPL over 2x benchmark, low signal
-- CONDITIONAL = mixed signals, one specific condition required
-
-**WINNING ANGLE** (if GO or CONDITIONAL)
-**WHAT THE DATA TELLS US** — 3–5 bullets
-**RISKS TO WATCH** — 2–3 honest risks
-**RECOMMENDED NEXT STEP** — specific
+Output **KICKMAN MISSION 1 — FINAL REPORT** with:
+- Validation summary table
+- **VERDICT: GO ✅ / NO-GO ❌ / CONDITIONAL ⚠️**
+- WINNING ANGLE, WHAT THE DATA TELLS US, RISKS TO WATCH, NEXT STEP
 
 # REFERENCE CAMPAIGNS
 
@@ -1037,7 +691,7 @@ Validation summary table with benchmarks.
 - Oculus Rift 2012: one expert endorser (Carmack) changed credibility overnight.
 - Gravity Blanket 2017: clinical tool → consumer product. Science-backed democratization.
 - Nebia Shower 2015: sustainability without sacrifice. Tim Cook = instant credibility.
-- Glowforge 2015: category democratization. Ran own pre-order. Warning: 2-year delays.
+- Glowforge 2015: category democratization. Warning: 2-year delivery delays.
 - BauBax Jacket 2015: feature list as viral content. Each feature a GIF reveal.
 - MVMT Watches 2013: DTC disruption. Perceived value gap was the entire pitch.
 - OUYA 2012: anti-establishment platform rally. Warning: ecosystem dependency killed it.
@@ -1045,28 +699,26 @@ Validation summary table with benchmarks.
 # RULES
 
 1. Never move to next step without explicit user confirmation
-2. Never invent campaign data — only reference campaigns listed above
-3. Always show reasoning — "I'm suggesting X because Y campaign did Z"
-4. If product has serious structural problems, say so clearly
+2. Never invent campaign data
+3. Always show reasoning
+4. Call out structural problems clearly
 5. No filler, no cheerleading
 6. End every response with exactly one: deliverable, question, or decision point`;
 
-// ─── SETUP ────────────────────────────────────────────────────────────────────
-function startApp() {
-  const key = document.getElementById('api-key-input').value.trim();
-  if (!key.startsWith('sk-ant-') && !key.startsWith('sk-')) {
-    document.getElementById('setup-error').style.display = 'block';
-    return;
-  }
-  apiKey = key;
-  document.getElementById('setup-screen').style.display = 'none';
+// ── PASSWORD CHECK ──
+function checkPassword() {
+  const pw = document.getElementById('password-input').value.trim();
+  if (!pw) return;
+  password = pw;
+  // We'll verify on first API call — just hide the screen
+  document.getElementById('password-screen').style.display = 'none';
 }
 
-document.getElementById('api-key-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') startApp();
+document.getElementById('password-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkPassword();
 });
 
-// ─── KICK START ───────────────────────────────────────────────────────────────
+// ── START ──
 async function kickStart() {
   document.getElementById('welcome-state').style.display = 'none';
   document.getElementById('messages').style.display = 'flex';
@@ -1074,7 +726,7 @@ async function kickStart() {
   await callKickman('start');
 }
 
-// ─── API CALL ─────────────────────────────────────────────────────────────────
+// ── API ──
 async function callKickman(trigger) {
   if (isLoading) return;
   isLoading = true;
@@ -1087,27 +739,35 @@ async function callKickman(trigger) {
   showTyping();
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('/api/chat', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2048,
+        messages,
         system: SYSTEM,
-        messages: messages
+        password
       })
     });
 
     removeTyping();
 
+    if (res.status === 401) {
+      // Wrong password — show password screen again
+      document.getElementById('pw-error').textContent = 'Wrong password. Try again.';
+      document.getElementById('pw-error').style.display = 'block';
+      document.getElementById('password-screen').style.display = 'flex';
+      document.getElementById('messages').style.display = 'none';
+      document.getElementById('input-area').style.display = 'none';
+      document.getElementById('welcome-state').style.display = 'flex';
+      history = [];
+      isLoading = false;
+      setSendDisabled(false);
+      return;
+    }
+
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      addMessage('km', `Connection error: ${err.error?.message || res.status}. Check your API key and try again.`);
+      addMessage('km', `Error: ${err.error || res.status}. Please try again.`);
       isLoading = false;
       setSendDisabled(false);
       return;
@@ -1137,28 +797,23 @@ async function callKickman(trigger) {
   setSendDisabled(false);
 }
 
-// ─── SEND ─────────────────────────────────────────────────────────────────────
+// ── SEND ──
 async function sendMessage() {
   const input = document.getElementById('user-input');
   const text = input.value.trim();
   if (!text || isLoading) return;
-
   input.value = '';
   autoResize(input);
-
   history.push({ role: 'user', content: text });
   addMessage('user', text);
   await callKickman('continue');
 }
 
 function handleKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
 
-// ─── RENDER MESSAGE ───────────────────────────────────────────────────────────
+// ── RENDER ──
 function addMessage(role, raw) {
   const container = document.getElementById('messages');
   const wrapper = document.createElement('div');
@@ -1177,12 +832,7 @@ function addMessage(role, raw) {
 
   const content = document.createElement('div');
   content.className = 'msg-content';
-
-  if (role === 'km') {
-    content.innerHTML = renderMarkdown(raw);
-  } else {
-    content.textContent = raw;
-  }
+  content.innerHTML = role === 'km' ? renderMarkdown(raw) : escapeHtml(raw);
 
   body.appendChild(name);
   body.appendChild(content);
@@ -1192,110 +842,79 @@ function addMessage(role, raw) {
   container.scrollTop = container.scrollHeight;
 }
 
-// ─── MARKDOWN RENDERER ────────────────────────────────────────────────────────
+function escapeHtml(text) {
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
 function renderMarkdown(text) {
   let html = text;
 
-  // Verdict detection
-  if (html.includes('VERDICT: GO') || html.includes('VERDICT: ✅')) {
+  if (html.includes('VERDICT: GO') || html.includes('GO ✅')) {
     html = html.replace(/\*\*VERDICT:.*?GO.*?\*\*/g, '<div class="verdict-go"><span class="verdict-icon">✅</span><span class="verdict-text">GO — Launch it</span></div>');
     updateVerdict('go');
-  } else if (html.includes('VERDICT: NO-GO') || html.includes('VERDICT: ❌')) {
+  } else if (html.includes('VERDICT: NO-GO') || html.includes('NO-GO ❌')) {
     html = html.replace(/\*\*VERDICT:.*?NO-GO.*?\*\*/g, '<div class="verdict-no"><span class="verdict-icon">❌</span><span class="verdict-text">No-Go — Not yet</span></div>');
     updateVerdict('no-go');
-  } else if (html.includes('VERDICT: CONDITIONAL') || html.includes('VERDICT: ⚠️')) {
+  } else if (html.includes('VERDICT: CONDITIONAL') || html.includes('CONDITIONAL ⚠️')) {
     html = html.replace(/\*\*VERDICT:.*?CONDITIONAL.*?\*\*/g, '<div class="verdict-conditional"><span class="verdict-icon">⚠️</span><span class="verdict-text">Conditional</span></div>');
     updateVerdict('conditional');
   }
 
-  // Headers
   html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
   html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
   html = html.replace(/^# (.+)$/gm, '<h2>$1</h2>');
-
-  // Bold + italic
   html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
 
-  // Tables
-  html = html.replace(/(\|.+\|\n)((?:\|.+\|\n)*)/g, (match) => {
-    const rows = match.trim().split('\n');
-    if (rows.length < 2) return match;
-    const headerCells = rows[0].split('|').filter(c => c.trim()).map(c => `<th>${c.trim()}</th>`).join('');
-    let tableHtml = `<table><thead><tr>${headerCells}</tr></thead><tbody>`;
-    for (let i = 2; i < rows.length; i++) {
-      if (!rows[i].trim()) continue;
-      const cells = rows[i].split('|').filter(c => c.trim()).map(c => `<td>${c.trim()}</td>`).join('');
-      tableHtml += `<tr>${cells}</tr>`;
-    }
-    tableHtml += '</tbody></table>';
-    return tableHtml;
+  html = html.replace(/(\|.+\|\n)((?:\|[-| ]+\|\n))((?:\|.+\|\n)*)/g, (match, header, sep, body) => {
+    const headerCells = header.split('|').filter(c => c.trim()).map(c => `<th>${c.trim()}</th>`).join('');
+    let t = `<table><thead><tr>${headerCells}</tr></thead><tbody>`;
+    body.trim().split('\n').filter(r => r.trim()).forEach(row => {
+      const cells = row.split('|').filter(c => c.trim()).map(c => `<td>${c.trim()}</td>`).join('');
+      t += `<tr>${cells}</tr>`;
+    });
+    return t + '</tbody></table>';
   });
 
-  // Bullet lists — group consecutive lines
-  html = html.replace(/((?:^[-*•] .+\n?)+)/gm, (match) => {
-    const items = match.trim().split('\n')
-      .filter(l => l.trim())
-      .map(l => `<li>${l.replace(/^[-*•] /, '').trim()}</li>`)
-      .join('');
+  html = html.replace(/((?:^[-*] .+\n?)+)/gm, match => {
+    const items = match.trim().split('\n').filter(l => l.trim())
+      .map(l => `<li>${l.replace(/^[-*] /, '').trim()}</li>`).join('');
     return `<ul>${items}</ul>`;
   });
 
-  // Blockquotes
   html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
-
-  // Inline code
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-  // Horizontal rules
   html = html.replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid var(--border);margin:16px 0;">');
 
-  // Paragraphs — wrap blocks separated by blank lines
-  html = html
-    .split(/\n\n+/)
-    .map(block => {
-      block = block.trim();
-      if (!block) return '';
-      if (block.startsWith('<')) return block;
-      return `<p>${block.replace(/\n/g, '<br>')}</p>`;
-    })
-    .join('\n');
+  html = html.split(/\n\n+/).map(block => {
+    block = block.trim();
+    if (!block) return '';
+    if (block.startsWith('<')) return block;
+    return `<p>${block.replace(/\n/g, '<br>')}</p>`;
+  }).join('\n');
 
   return html;
 }
 
-// ─── STEP DETECTION ───────────────────────────────────────────────────────────
+// ── STEP DETECTION ──
 function detectStep(text) {
-  if (text.includes('READINESS SCORE') || text.includes('Product Alignment')) {
-    setStep(3);
-  } else if (text.includes('APPROACH A') || text.includes('APPROACH B')) {
-    setStep(4);
-  } else if (text.includes('LP VERSION') || text.includes('VALIDATION PLAYBOOK')) {
-    setStep(5);
-  } else if (text.includes('FINAL REPORT') || text.includes('VERDICT:')) {
-    setStep(6);
-  }
+  if (text.includes('READINESS SCORE') || text.includes('PRODUCT NAME & DEFINITION')) setStep(3);
+  else if (text.includes('APPROACH A') || text.includes('APPROACH B')) setStep(4);
+  else if (text.includes('LP VERSION') || text.includes('VALIDATION PLAYBOOK')) setStep(5);
+  else if (text.includes('FINAL REPORT') || text.includes('VERDICT:')) setStep(6);
 }
 
 function setStep(next) {
   for (let i = 1; i <= 5; i++) {
     const el = document.getElementById(`step-${i}`);
     const dot = document.getElementById(`dot-${i}`);
-    if (!el) continue;
     el.className = 'sidebar-step';
     dot.className = 'step-dot';
-    if (i < next - 1) {
-      el.classList.add('done');
-      dot.classList.add('done');
-    } else if (i === next - 1) {
-      el.classList.add('active');
-      dot.classList.add('active');
-    } else {
-      el.classList.add('idle');
-    }
+    if (i < next - 1) { el.classList.add('done'); dot.classList.add('done'); }
+    else if (i === next - 1) { el.classList.add('active'); dot.classList.add('active'); }
+    else el.classList.add('idle');
   }
-  currentStep = next - 1;
 }
 
 function updateVerdict(type) {
@@ -1307,58 +926,27 @@ function updateVerdict(type) {
   else { val.textContent = '⚠️ Conditional'; val.style.color = 'var(--yellow)'; }
 }
 
-// ─── TYPING INDICATOR ─────────────────────────────────────────────────────────
+// ── UTILS ──
 function showTyping() {
   const container = document.getElementById('messages');
-  const wrapper = document.createElement('div');
-  wrapper.className = 'message km';
-  wrapper.id = 'typing-indicator';
-
-  const avatar = document.createElement('div');
-  avatar.className = 'msg-avatar';
-  avatar.textContent = 'KM';
-
-  const body = document.createElement('div');
-  body.className = 'msg-body';
-
-  const name = document.createElement('div');
-  name.className = 'msg-name';
-  name.textContent = 'Kickman';
-
-  const ind = document.createElement('div');
-  ind.className = 'typing-indicator';
+  const w = document.createElement('div');
+  w.className = 'message km'; w.id = 'typing-indicator';
+  const av = document.createElement('div'); av.className = 'msg-avatar'; av.textContent = 'KM';
+  const b = document.createElement('div'); b.className = 'msg-body';
+  const n = document.createElement('div'); n.className = 'msg-name'; n.textContent = 'Kickman';
+  const ind = document.createElement('div'); ind.className = 'typing-indicator';
   ind.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
-
-  body.appendChild(name);
-  body.appendChild(ind);
-  wrapper.appendChild(avatar);
-  wrapper.appendChild(body);
-  container.appendChild(wrapper);
-  container.scrollTop = container.scrollHeight;
+  b.appendChild(n); b.appendChild(ind); w.appendChild(av); w.appendChild(b);
+  container.appendChild(w); container.scrollTop = container.scrollHeight;
 }
 
-function removeTyping() {
-  document.getElementById('typing-indicator')?.remove();
-}
-
-// ─── UTILS ────────────────────────────────────────────────────────────────────
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 160) + 'px';
-}
-
-function setSendDisabled(v) {
-  document.getElementById('send-btn').disabled = v;
-}
-
-function scrollToStep(n) {
-  // future: scroll to step anchor
-}
+function removeTyping() { document.getElementById('typing-indicator')?.remove(); }
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 160) + 'px'; }
+function setSendDisabled(v) { document.getElementById('send-btn').disabled = v; }
 
 function newSession() {
   if (confirm('Start a new session? Current conversation will be lost.')) {
     history = [];
-    currentStep = 1;
     document.getElementById('messages').innerHTML = '';
     document.getElementById('messages').style.display = 'none';
     document.getElementById('input-area').style.display = 'none';
@@ -1372,14 +960,10 @@ function newSession() {
 }
 
 function exportChat() {
-  const text = history
-    .map(m => `[${m.role.toUpperCase()}]\n${m.content}`)
-    .join('\n\n---\n\n');
+  const text = history.map(m => `[${m.role.toUpperCase()}]\n${m.content}`).join('\n\n---\n\n');
   const blob = new Blob([text], { type: 'text/plain' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `kickman-session-${new Date().toISOString().slice(0,10)}.txt`;
-  a.click();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `kickman-${new Date().toISOString().slice(0,10)}.txt`; a.click();
 }
 </script>
 </body>
