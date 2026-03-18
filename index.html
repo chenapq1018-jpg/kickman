@@ -8,528 +8,232 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Noto+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0e0e0e;
-    --surface: #161616;
-    --card: #1c1c1c;
-    --border: #2a2a2a;
-    --border-hover: #3a3a3a;
-    --accent: #e8622a;
-    --accent-dim: rgba(232,98,42,0.12);
-    --accent-dim2: rgba(232,98,42,0.06);
-    --text: #f0ece4;
-    --text-2: #9a9690;
-    --text-3: #5a5652;
-    --green: #2d9e6b;
-    --green-dim: rgba(45,158,107,0.12);
-    --yellow: #d4a017;
-    --yellow-dim: rgba(212,160,23,0.12);
-    --red: #c0392b;
-    --red-dim: rgba(192,57,43,0.12);
-    --font-serif: 'Instrument Serif', Georgia, serif;
-    --font-mono: 'DM Mono', monospace;
-    --font-sans: 'Noto Sans', sans-serif;
+    --bg:#0e0e0e; --surface:#161616; --card:#1c1c1c; --border:#2a2a2a; --border-hover:#3a3a3a;
+    --accent:#e8622a; --accent-dim:rgba(232,98,42,0.12); --accent-dim2:rgba(232,98,42,0.06);
+    --text:#f0ece4; --text-2:#9a9690; --text-3:#5a5652;
+    --green:#2d9e6b; --green-dim:rgba(45,158,107,0.12);
+    --yellow:#d4a017; --yellow-dim:rgba(212,160,23,0.12);
+    --red:#c0392b; --red-dim:rgba(192,57,43,0.12);
+    --font-serif:'Instrument Serif',Georgia,serif;
+    --font-mono:'DM Mono',monospace;
+    --font-sans:'Noto Sans',sans-serif;
   }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-sans);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-sans);
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  /* ── PASSWORD SCREEN ── */
-  #password-screen {
-    position: fixed;
-    inset: 0;
-    background: var(--bg);
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-  }
-
-  .setup-card {
-    width: 100%;
-    max-width: 440px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 48px;
-  }
-
-  .setup-logo {
-    font-family: var(--font-serif);
-    font-size: 44px;
-    color: var(--text);
-    margin-bottom: 6px;
-    line-height: 1;
-  }
-
-  .setup-logo span { color: var(--accent); font-style: italic; }
-
-  .setup-tagline {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 3px;
-    color: var(--text-3);
-    text-transform: uppercase;
-    margin-bottom: 40px;
-  }
-
-  .setup-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--text-3);
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-
-  .setup-input {
-    width: 100%;
-    background: var(--card);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: var(--font-mono);
-    font-size: 14px;
-    padding: 14px 16px;
-    outline: none;
-    transition: border-color 0.2s;
-    margin-bottom: 8px;
-    letter-spacing: 3px;
-  }
-
-  .setup-input:focus { border-color: var(--accent); }
-  .setup-input::placeholder { color: var(--text-3); letter-spacing: 1px; }
-
-  .setup-hint {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text-3);
-    margin-bottom: 28px;
-    line-height: 1.6;
-  }
-
-  .setup-btn {
-    width: 100%;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    padding: 16px;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
-
-  .setup-btn:hover { opacity: 0.88; }
-  .setup-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  .setup-error {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--red);
-    margin-top: 12px;
-    display: none;
-    line-height: 1.5;
-  }
+  /* ── LOGIN ── */
+  #login-screen{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;align-items:center;justify-content:center;padding:24px;}
+  .login-card{width:100%;max-width:440px;background:var(--surface);border:1px solid var(--border);padding:48px;}
+  .login-logo{font-family:var(--font-serif);font-size:44px;color:var(--text);margin-bottom:6px;line-height:1;}
+  .login-logo span{color:var(--accent);font-style:italic;}
+  .login-tagline{font-family:var(--font-mono);font-size:11px;letter-spacing:3px;color:var(--text-3);text-transform:uppercase;margin-bottom:40px;}
+  .login-label{font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--text-3);text-transform:uppercase;margin-bottom:8px;}
+  .login-input{width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:var(--font-mono);font-size:14px;padding:13px 16px;outline:none;transition:border-color .2s;margin-bottom:16px;}
+  .login-input:focus{border-color:var(--accent);}
+  .login-input::placeholder{color:var(--text-3);}
+  .login-btn{width:100%;background:var(--accent);color:#fff;border:none;font-family:var(--font-mono);font-size:12px;letter-spacing:3px;text-transform:uppercase;padding:16px;cursor:pointer;transition:opacity .2s;}
+  .login-btn:hover{opacity:.88;}
+  .login-btn:disabled{opacity:.4;cursor:not-allowed;}
+  .login-error{font-family:var(--font-mono);font-size:11px;color:var(--red);margin-top:12px;display:none;}
+  .login-hint{font-family:var(--font-mono);font-size:10px;color:var(--text-3);margin-top:10px;line-height:1.6;}
 
   /* ── HEADER ── */
-  header {
-    height: 52px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 24px;
-    flex-shrink: 0;
-    background: var(--bg);
-  }
-
-  .header-logo {
-    font-family: var(--font-serif);
-    font-size: 22px;
-    color: var(--text);
-  }
-
-  .header-logo span { color: var(--accent); font-style: italic; }
-
-  .header-right { display: flex; align-items: center; gap: 16px; }
-
-  .step-indicator { display: flex; align-items: center; gap: 6px; }
-
-  .step-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--border);
-    transition: all 0.3s;
-  }
-
-  .step-dot.done { background: var(--green); }
-  .step-dot.active { background: var(--accent); width: 18px; border-radius: 3px; }
-
-  .header-btn {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--text-3);
-    background: none;
-    border: 1px solid var(--border);
-    padding: 6px 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .header-btn:hover { border-color: var(--border-hover); color: var(--text-2); }
+  header{height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;background:var(--bg);}
+  .header-logo{font-family:var(--font-serif);font-size:22px;color:var(--text);}
+  .header-logo span{color:var(--accent);font-style:italic;}
+  .header-right{display:flex;align-items:center;gap:12px;}
+  .header-user{font-family:var(--font-mono);font-size:10px;color:var(--text-3);letter-spacing:1px;}
+  .step-indicator{display:flex;align-items:center;gap:6px;}
+  .step-dot{width:6px;height:6px;border-radius:50%;background:var(--border);transition:all .3s;}
+  .step-dot.done{background:var(--green);}
+  .step-dot.active{background:var(--accent);width:18px;border-radius:3px;}
+  .header-btn{font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);background:none;border:1px solid var(--border);padding:6px 12px;cursor:pointer;transition:all .2s;}
+  .header-btn:hover{border-color:var(--border-hover);color:var(--text-2);}
 
   /* ── LAYOUT ── */
-  .app-layout { display: flex; flex: 1; overflow: hidden; }
+  .app-layout{display:flex;flex:1;overflow:hidden;}
 
   /* ── SIDEBAR ── */
-  .sidebar {
-    width: 220px;
-    min-width: 220px;
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    padding: 20px 0;
-    overflow-y: auto;
-  }
+  .sidebar{width:240px;min-width:240px;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+  .sidebar-top{padding:14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+  .new-btn{width:100%;background:var(--accent);color:#fff;border:none;font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:10px;cursor:pointer;transition:opacity .2s;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .new-btn:hover{opacity:.85;}
 
-  .sidebar-section { padding: 0 16px; margin-bottom: 24px; }
+  .sessions-list{flex:1;overflow-y:auto;padding:6px 0;}
+  .sessions-label{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--text-3);text-transform:uppercase;padding:8px 16px 4px;}
 
-  .sidebar-label {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    letter-spacing: 3px;
-    color: var(--text-3);
-    text-transform: uppercase;
-    margin-bottom: 10px;
-    padding: 0 4px;
-  }
+  .session-row{display:flex;align-items:stretch;}
+  .session-item{flex:1;min-width:0;padding:9px 14px;cursor:pointer;border-left:2px solid transparent;transition:all .15s;}
+  .session-item:hover{background:rgba(255,255,255,.03);}
+  .session-item.active{background:var(--accent-dim2);border-left-color:var(--accent);}
+  .session-name{font-size:12px;font-weight:500;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
+  .session-item.active .session-name{color:var(--text);}
+  .session-meta{font-family:var(--font-mono);font-size:10px;color:var(--text-3);margin-top:3px;display:flex;gap:6px;align-items:center;}
+  .badge{font-size:9px;letter-spacing:1px;background:var(--border);color:var(--text-3);padding:1px 6px;border-radius:2px;}
+  .badge.go{background:var(--green-dim);color:var(--green);}
+  .badge.no-go{background:var(--red-dim);color:var(--red);}
+  .badge.conditional{background:var(--yellow-dim);color:var(--yellow);}
+  .session-del{width:28px;flex-shrink:0;background:none;border:none;color:var(--text-3);cursor:pointer;opacity:0;transition:all .15s;font-size:16px;display:flex;align-items:center;justify-content:center;}
+  .session-row:hover .session-del{opacity:1;}
+  .session-del:hover{color:var(--red);}
+  .session-name-input{background:transparent;border:none;border-bottom:1px solid var(--accent);color:var(--text);font-size:12px;font-family:var(--font-sans);font-weight:500;width:100%;outline:none;padding:0;}
 
-  .sidebar-step {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 8px 10px;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background 0.15s;
-    margin-bottom: 2px;
-  }
+  .sync-status{padding:6px 16px;font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:1px;min-height:22px;}
+  .sync-status.saving{color:var(--yellow);}
+  .sync-status.saved{color:var(--green);}
+  .sync-status.error{color:var(--red);}
 
-  .sidebar-step:hover { background: rgba(255,255,255,0.03); }
-  .sidebar-step.active { background: var(--accent-dim2); }
-
-  .step-num {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-3);
-    min-width: 18px;
-    padding-top: 1px;
-    transition: color 0.2s;
-  }
-
-  .sidebar-step.done .step-num { color: var(--green); }
-  .sidebar-step.active .step-num { color: var(--accent); }
-
-  .step-info { flex: 1; }
-
-  .step-name {
-    font-family: var(--font-sans);
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-2);
-    line-height: 1.3;
-    transition: color 0.2s;
-  }
-
-  .sidebar-step.active .step-name { color: var(--text); }
-
-  .step-sub {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text-3);
-    margin-top: 2px;
-    line-height: 1.4;
-  }
-
-  .sidebar-divider { height: 1px; background: var(--border); margin: 0 16px 20px; }
-
-  .verdict-box {
-    margin: 0 16px;
-    padding: 12px;
-    border: 1px solid var(--border);
-    background: var(--card);
-    display: none;
-  }
-
-  .verdict-box.visible { display: block; }
-  .verdict-box-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px; color: var(--text-3); text-transform: uppercase; margin-bottom: 6px; }
-  .verdict-box-value { font-family: var(--font-serif); font-size: 20px; color: var(--green); }
+  .steps-section{padding:6px 0;flex-shrink:0;border-top:1px solid var(--border);}
+  .steps-label{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--text-3);text-transform:uppercase;padding:6px 16px 4px;}
+  .sidebar-step{display:flex;align-items:flex-start;gap:10px;padding:6px 14px;}
+  .step-num{font-family:var(--font-mono);font-size:11px;color:var(--text-3);min-width:18px;padding-top:1px;}
+  .sidebar-step.done .step-num{color:var(--green);}
+  .sidebar-step.active .step-num{color:var(--accent);}
+  .step-info{flex:1;}
+  .step-name{font-size:11px;font-weight:500;color:var(--text-3);line-height:1.3;}
+  .sidebar-step.active .step-name{color:var(--text);}
+  .sidebar-step.done .step-name{color:var(--text-2);}
 
   /* ── CHAT ── */
-  .chat-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+  .chat-container{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+  .messages{flex:1;overflow-y:auto;padding:28px 36px;display:flex;flex-direction:column;gap:24px;scroll-behavior:smooth;}
+  .messages::-webkit-scrollbar{width:3px;}
+  .messages::-webkit-scrollbar-thumb{background:var(--border);}
 
-  .messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 32px 40px;
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
-    scroll-behavior: smooth;
-  }
+  .message{display:flex;gap:14px;max-width:740px;animation:msgIn .25s ease forwards;opacity:0;}
+  .message.user{flex-direction:row-reverse;align-self:flex-end;}
+  .message.km{align-self:flex-start;}
+  @keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-  .messages::-webkit-scrollbar { width: 3px; }
-  .messages::-webkit-scrollbar-thumb { background: var(--border); }
-
-  /* ── MESSAGE ── */
-  .message { display: flex; gap: 14px; max-width: 760px; animation: msgIn 0.25s ease forwards; opacity: 0; }
-  .message.user { flex-direction: row-reverse; align-self: flex-end; }
-  .message.km { align-self: flex-start; }
-
-  @keyframes msgIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .msg-avatar {
-    width: 30px; height: 30px;
-    border-radius: 2px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 1px;
-    margin-top: 2px;
-  }
-
-  .message.km .msg-avatar { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(232,98,42,0.2); }
-  .message.user .msg-avatar { background: rgba(255,255,255,0.05); color: var(--text-2); border: 1px solid var(--border); }
-
-  .msg-body { flex: 1; min-width: 0; }
-
-  .msg-name { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; color: var(--text-3); text-transform: uppercase; margin-bottom: 7px; }
-  .message.user .msg-name { text-align: right; }
-
-  .msg-content { font-size: 14px; line-height: 1.75; color: var(--text); }
-
-  .message.user .msg-content {
-    background: var(--card);
-    border: 1px solid var(--border);
-    padding: 14px 18px;
-    color: var(--text-2);
-    font-size: 13px;
-    line-height: 1.65;
-  }
-
-  .msg-content p { margin-bottom: 12px; }
-  .msg-content p:last-child { margin-bottom: 0; }
-  .msg-content strong { font-weight: 500; color: var(--text); }
-  .msg-content em { font-style: italic; color: var(--text-2); }
-
-  .msg-content h2 {
-    font-family: var(--font-serif);
-    font-size: 20px; font-weight: 400;
-    color: var(--text);
-    margin: 20px 0 10px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .msg-content h3 {
-    font-family: var(--font-mono);
-    font-size: 11px; letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin: 18px 0 8px;
-  }
-
-  .msg-content ul { padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
-
-  .msg-content ul li { padding-left: 18px; position: relative; font-size: 13.5px; line-height: 1.65; color: var(--text-2); }
-  .msg-content ul li::before { content: '→'; position: absolute; left: 0; color: var(--accent); font-size: 11px; top: 2px; }
-
-  .msg-content table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin: 12px 0; font-family: var(--font-mono); }
-  .msg-content table th { background: rgba(255,255,255,0.04); padding: 8px 12px; text-align: left; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-3); border-bottom: 1px solid var(--border); }
-  .msg-content table td { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text-2); vertical-align: top; }
-  .msg-content table tr:last-child td { border-bottom: none; }
-
-  .verdict-go { background: var(--green-dim); border: 1px solid rgba(45,158,107,0.3); padding: 16px 20px; margin: 14px 0; display: flex; align-items: center; gap: 14px; }
-  .verdict-no { background: var(--red-dim); border: 1px solid rgba(192,57,43,0.3); padding: 16px 20px; margin: 14px 0; display: flex; align-items: center; gap: 14px; }
-  .verdict-conditional { background: var(--yellow-dim); border: 1px solid rgba(212,160,23,0.3); padding: 16px 20px; margin: 14px 0; display: flex; align-items: center; gap: 14px; }
-  .verdict-icon { font-size: 24px; flex-shrink: 0; }
-  .verdict-text { font-family: var(--font-serif); font-size: 22px; color: var(--text); }
-
-  .msg-content blockquote { border-left: 2px solid var(--accent); padding: 10px 16px; margin: 14px 0; background: var(--accent-dim2); color: var(--text-2); font-style: italic; font-size: 13.5px; line-height: 1.7; }
-  .msg-content code { font-family: var(--font-mono); font-size: 12px; background: rgba(255,255,255,0.06); padding: 2px 6px; color: var(--accent); }
+  .msg-avatar{width:30px;height:30px;border-radius:2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:10px;font-weight:500;letter-spacing:1px;margin-top:2px;}
+  .message.km .msg-avatar{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(232,98,42,.2);}
+  .message.user .msg-avatar{background:rgba(255,255,255,.05);color:var(--text-2);border:1px solid var(--border);}
+  .msg-body{flex:1;min-width:0;}
+  .msg-name{font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--text-3);text-transform:uppercase;margin-bottom:7px;}
+  .message.user .msg-name{text-align:right;}
+  .msg-content{font-size:14px;line-height:1.75;color:var(--text);}
+  .message.user .msg-content{background:var(--card);border:1px solid var(--border);padding:14px 18px;color:var(--text-2);font-size:13px;line-height:1.65;}
+  .msg-content p{margin-bottom:12px;} .msg-content p:last-child{margin-bottom:0;}
+  .msg-content strong{font-weight:500;color:var(--text);}
+  .msg-content em{font-style:italic;color:var(--text-2);}
+  .msg-content h2{font-family:var(--font-serif);font-size:20px;font-weight:400;color:var(--text);margin:20px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+  .msg-content h3{font-family:var(--font-mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin:18px 0 8px;}
+  .msg-content ul{padding-left:0;list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:12px;}
+  .msg-content ul li{padding-left:18px;position:relative;font-size:13.5px;line-height:1.65;color:var(--text-2);}
+  .msg-content ul li::before{content:'→';position:absolute;left:0;color:var(--accent);font-size:11px;top:2px;}
+  .msg-content table{width:100%;border-collapse:collapse;font-size:12.5px;margin:12px 0;font-family:var(--font-mono);}
+  .msg-content table th{background:rgba(255,255,255,.04);padding:8px 12px;text-align:left;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);border-bottom:1px solid var(--border);}
+  .msg-content table td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text-2);vertical-align:top;}
+  .msg-content table tr:last-child td{border-bottom:none;}
+  .verdict-go{background:var(--green-dim);border:1px solid rgba(45,158,107,.3);padding:16px 20px;margin:14px 0;display:flex;align-items:center;gap:14px;}
+  .verdict-no{background:var(--red-dim);border:1px solid rgba(192,57,43,.3);padding:16px 20px;margin:14px 0;display:flex;align-items:center;gap:14px;}
+  .verdict-conditional{background:var(--yellow-dim);border:1px solid rgba(212,160,23,.3);padding:16px 20px;margin:14px 0;display:flex;align-items:center;gap:14px;}
+  .verdict-icon{font-size:24px;flex-shrink:0;}
+  .verdict-text{font-family:var(--font-serif);font-size:22px;color:var(--text);}
+  .msg-content blockquote{border-left:2px solid var(--accent);padding:10px 16px;margin:14px 0;background:var(--accent-dim2);color:var(--text-2);font-style:italic;font-size:13.5px;line-height:1.7;}
+  .msg-content code{font-family:var(--font-mono);font-size:12px;background:rgba(255,255,255,.06);padding:2px 6px;color:var(--accent);}
 
   /* ── TYPING ── */
-  .typing-indicator { display: flex; align-items: center; gap: 5px; padding: 12px 0; }
-  .typing-dot { width: 5px; height: 5px; background: var(--text-3); border-radius: 50%; animation: tdot 1.3s infinite; }
-  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes tdot { 0%,60%,100%{opacity:0.3;transform:scale(0.9)} 30%{opacity:1;transform:scale(1)} }
+  .typing-indicator{display:flex;align-items:center;gap:5px;padding:12px 0;}
+  .typing-dot{width:5px;height:5px;background:var(--text-3);border-radius:50%;animation:tdot 1.3s infinite;}
+  .typing-dot:nth-child(2){animation-delay:.2s} .typing-dot:nth-child(3){animation-delay:.4s}
+  @keyframes tdot{0%,60%,100%{opacity:.3;transform:scale(.9)}30%{opacity:1;transform:scale(1)}}
 
   /* ── WELCOME ── */
-  .welcome-state {
-    flex: 1; display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 60px 40px; text-align: center; gap: 16px;
-  }
-
-  .welcome-logo { font-family: var(--font-serif); font-size: 52px; color: var(--text); line-height: 1; margin-bottom: 4px; }
-  .welcome-logo span { color: var(--accent); font-style: italic; }
-  .welcome-sub { font-family: var(--font-mono); font-size: 11px; letter-spacing: 3px; color: var(--text-3); text-transform: uppercase; margin-bottom: 32px; }
-
-  .start-btn { background: var(--accent); color: #fff; border: none; font-family: var(--font-mono); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; padding: 14px 36px; cursor: pointer; transition: opacity 0.2s; }
-  .start-btn:hover { opacity: 0.85; }
-
-  .welcome-note { font-family: var(--font-mono); font-size: 10px; color: var(--text-3); margin-top: 8px; }
+  .welcome-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px;text-align:center;gap:16px;}
+  .welcome-logo{font-family:var(--font-serif);font-size:52px;color:var(--text);line-height:1;margin-bottom:4px;}
+  .welcome-logo span{color:var(--accent);font-style:italic;}
+  .welcome-sub{font-family:var(--font-mono);font-size:11px;letter-spacing:3px;color:var(--text-3);text-transform:uppercase;margin-bottom:32px;}
+  .start-btn{background:var(--accent);color:#fff;border:none;font-family:var(--font-mono);font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:14px 36px;cursor:pointer;transition:opacity .2s;}
+  .start-btn:hover{opacity:.85;}
+  .welcome-note{font-family:var(--font-mono);font-size:10px;color:var(--text-3);margin-top:8px;}
 
   /* ── INPUT ── */
-  .input-area { border-top: 1px solid var(--border); padding: 16px 40px 20px; background: var(--bg); flex-shrink: 0; }
+  .input-area{border-top:1px solid var(--border);padding:14px 36px 18px;background:var(--bg);flex-shrink:0;}
+  .input-row{display:flex;gap:10px;align-items:flex-end;}
+  #user-input{flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:var(--font-sans);font-size:14px;line-height:1.6;padding:12px 16px;resize:none;min-height:46px;max-height:160px;outline:none;transition:border-color .2s;}
+  #user-input:focus{border-color:rgba(232,98,42,.4);}
+  #user-input::placeholder{color:var(--text-3);}
+  .send-btn{background:var(--accent);color:#fff;border:none;width:46px;height:46px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .2s;}
+  .send-btn:hover{opacity:.85;} .send-btn:disabled{opacity:.3;cursor:not-allowed;}
+  .send-btn svg{width:16px;height:16px;}
+  .input-meta{display:flex;justify-content:space-between;margin-top:8px;}
+  .input-hint{font-family:var(--font-mono);font-size:10px;color:var(--text-3);}
 
-  .input-row { display: flex; gap: 10px; align-items: flex-end; }
-
-  #user-input {
-    flex: 1;
-    background: var(--card);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: var(--font-sans);
-    font-size: 14px;
-    line-height: 1.6;
-    padding: 12px 16px;
-    resize: none;
-    min-height: 46px;
-    max-height: 160px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  #user-input:focus { border-color: rgba(232,98,42,0.4); }
-  #user-input::placeholder { color: var(--text-3); }
-
-  .send-btn { background: var(--accent); color: #fff; border: none; width: 46px; height: 46px; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: opacity 0.2s; }
-  .send-btn:hover { opacity: 0.85; }
-  .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-  .send-btn svg { width: 16px; height: 16px; }
-
-  .input-meta { display: flex; justify-content: space-between; margin-top: 8px; }
-  .input-hint { font-family: var(--font-mono); font-size: 10px; color: var(--text-3); }
-
-  @media (max-width: 680px) {
-    .sidebar { display: none; }
-    .messages { padding: 20px 16px; }
-    .input-area { padding: 12px 16px 16px; }
-    .setup-card { padding: 32px 24px; }
-  }
+  @media(max-width:680px){.sidebar{display:none}.messages{padding:20px 16px}.input-area{padding:12px 16px 16px}.login-card{padding:32px 24px}}
 </style>
 </head>
 <body>
 
-<!-- PASSWORD SCREEN -->
-<div id="password-screen">
-  <div class="setup-card">
-    <div class="setup-logo">Kick<span>man</span></div>
-    <div class="setup-tagline">Crowdfunding Coach · Mission 1</div>
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">Kick<span>man</span></div>
+    <div class="login-tagline">Crowdfunding Coach · Mission 1</div>
 
-    <div class="setup-label">Access Password</div>
-    <input
-      type="password"
-      class="setup-input"
-      id="password-input"
-      placeholder="Enter password"
-      autocomplete="off"
-    >
-    <div class="setup-hint">Contact the team to get access.</div>
+    <div class="login-label">Your Name</div>
+    <input type="text" class="login-input" id="login-username" placeholder="e.g. john or john@email.com" autocomplete="username" autocapitalize="none">
 
-    <button class="setup-btn" id="pw-btn" onclick="checkPassword()">Enter →</button>
-    <div class="setup-error" id="pw-error">Wrong password. Try again.</div>
+    <div class="login-label">Access Password</div>
+    <input type="password" class="login-input" id="login-password" placeholder="••••••••" autocomplete="current-password">
+
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Enter →</button>
+    <div class="login-error" id="login-error">Wrong password. Try again.</div>
+    <div class="login-hint">Your name is used to save your projects across devices.<br>Use the same name on every device to sync your data.</div>
   </div>
 </div>
 
-<!-- MAIN APP -->
+<!-- APP -->
 <header>
   <div class="header-logo">Kick<span>man</span></div>
   <div class="header-right">
-    <div class="step-indicator" id="step-indicator">
+    <span class="header-user" id="header-user"></span>
+    <div class="step-indicator">
       <div class="step-dot active" id="dot-1"></div>
       <div class="step-dot" id="dot-2"></div>
       <div class="step-dot" id="dot-3"></div>
       <div class="step-dot" id="dot-4"></div>
       <div class="step-dot" id="dot-5"></div>
     </div>
-    <button class="header-btn" onclick="newSession()">New session</button>
     <button class="header-btn" onclick="exportChat()">Export</button>
+    <button class="header-btn" onclick="doLogout()">Log out</button>
   </div>
 </header>
 
 <div class="app-layout">
   <aside class="sidebar">
-    <div class="sidebar-section">
-      <div class="sidebar-label">Mission 1 — 14 Days</div>
-
-      <div class="sidebar-step active" id="step-1">
-        <div class="step-num" id="snum-1">01</div>
-        <div class="step-info">
-          <div class="step-name">Founder Input</div>
-          <div class="step-sub">Vision, product, costs, timeline</div>
-        </div>
-      </div>
-
-      <div class="sidebar-step idle" id="step-2">
-        <div class="step-num" id="snum-2">02</div>
-        <div class="step-info">
-          <div class="step-name">Product Alignment</div>
-          <div class="step-sub">Doc + Readiness Score</div>
-        </div>
-      </div>
-
-      <div class="sidebar-step idle" id="step-3">
-        <div class="step-num" id="snum-3">03</div>
-        <div class="step-info">
-          <div class="step-name">Marketing Approaches</div>
-          <div class="step-sub">3 angles, pick one</div>
-        </div>
-      </div>
-
-      <div class="sidebar-step idle" id="step-4">
-        <div class="step-num" id="snum-4">04</div>
-        <div class="step-info">
-          <div class="step-name">Landing Page Briefs</div>
-          <div class="step-sub">2 versions to test</div>
-        </div>
-      </div>
-
-      <div class="sidebar-step idle" id="step-5">
-        <div class="step-num" id="snum-5">05</div>
-        <div class="step-info">
-          <div class="step-name">Go / No-Go Report</div>
-          <div class="step-sub">Validation → verdict</div>
-        </div>
-      </div>
+    <div class="sidebar-top">
+      <button class="new-btn" onclick="createNewSession()">+ New Project</button>
     </div>
 
-    <div class="sidebar-divider"></div>
+    <div class="sessions-list" id="sessions-list">
+      <div class="sessions-label">Projects</div>
+    </div>
 
-    <div class="verdict-box" id="verdict-display">
-      <div class="verdict-box-label">Current Verdict</div>
-      <div class="verdict-box-value" id="verdict-value">—</div>
+    <div class="sync-status" id="sync-status"></div>
+
+    <div class="steps-section">
+      <div class="steps-label">Current Step</div>
+      <div class="sidebar-step active" id="step-1">
+        <div class="step-num" id="snum-1">01</div>
+        <div class="step-info"><div class="step-name">Founder Input</div></div>
+      </div>
+      <div class="sidebar-step idle" id="step-2">
+        <div class="step-num" id="snum-2">02</div>
+        <div class="step-info"><div class="step-name">Product Alignment</div></div>
+      </div>
+      <div class="sidebar-step idle" id="step-3">
+        <div class="step-num" id="snum-3">03</div>
+        <div class="step-info"><div class="step-name">Marketing Approaches</div></div>
+      </div>
+      <div class="sidebar-step idle" id="step-4">
+        <div class="step-num" id="snum-4">04</div>
+        <div class="step-info"><div class="step-name">Landing Page Briefs</div></div>
+      </div>
+      <div class="sidebar-step idle" id="step-5">
+        <div class="step-num" id="snum-5">05</div>
+        <div class="step-info"><div class="step-name">Go / No-Go Report</div></div>
+      </div>
     </div>
   </aside>
 
@@ -537,12 +241,10 @@
     <div class="welcome-state" id="welcome-state">
       <div class="welcome-logo">Kick<span>man</span></div>
       <div class="welcome-sub">Crowdfunding Coach · Mission 1</div>
-      <button class="start-btn" onclick="kickStart()">Begin →</button>
+      <button class="start-btn" onclick="startCurrentSession()">Begin →</button>
       <div class="welcome-note">14 days · Go / No-Go decision · Kickstarter-ready</div>
     </div>
-
     <div class="messages" id="messages" style="display:none"></div>
-
     <div class="input-area" id="input-area" style="display:none">
       <div class="input-row">
         <textarea id="user-input" placeholder="Your response..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
@@ -561,10 +263,15 @@
 </div>
 
 <script>
-let password = '';
-let history = [];
-let isLoading = false;
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let currentUser = null;
+let currentPw   = null;
+let sessions    = [];   // in-memory cache
+let activeId    = null;
+let isLoading   = false;
+let saveTimer   = null;
 
+// ── SYSTEM PROMPT ──────────────────────────────────────────────────────────────
 const SYSTEM = `# IDENTITY
 
 You are Kickman — a world-class crowdfunding coach trained on every Kickstarter campaign that raised over $1,000,000 USD. You know what separates campaigns that fund in 24 hours from ones that die quietly.
@@ -607,25 +314,12 @@ After they respond, ask 2–3 sharp follow-up questions if anything is unclear. 
 
 Output a structured document with these exact sections:
 
-**PRODUCT NAME & DEFINITION**
-One crisp sentence. What it is and who it's for.
-
-**INTERNAL DESCRIPTION**
-2–3 sentences. Functional, no spin.
-
-**ALL FEATURES**
-Bullet list. Concrete and specific.
-
-**BENEFITS**
-Reframe features as human outcomes.
-
-**WHAT MIGHT BACKERS FEAR OR DOUBT**
-Top 4–6 real objections.
-
-**WHAT WE WANT PEOPLE TO THINK AND FEEL**
-The emotional destination.
-
----
+**PRODUCT NAME & DEFINITION** — One crisp sentence.
+**INTERNAL DESCRIPTION** — 2–3 sentences. Functional, no spin.
+**ALL FEATURES** — Bullet list. Concrete and specific.
+**BENEFITS** — Reframe features as human outcomes.
+**WHAT MIGHT BACKERS FEAR OR DOUBT** — Top 4–6 real objections.
+**WHAT WE WANT PEOPLE TO THINK AND FEEL** — The emotional destination.
 
 **READINESS SCORE: X / 10**
 
@@ -637,46 +331,27 @@ The emotional destination.
 | Timeline Feasibility | /2 | |
 | Unit Economics | /2 | |
 
-2–3 sentences interpreting the total. End with: "Does this feel accurate? Correct anything I've got wrong — then we move to marketing approaches."
+End with: "Does this feel accurate? Correct anything I've got wrong — then we move to marketing approaches."
 
 # STEP 3 — THREE MARKETING APPROACHES
 
 Present exactly 3 approaches, each meaningfully different.
 
-For each:
-**APPROACH [A / B / C]: [Name]**
-- Core angle: one sentence
-- Why this works: reference 1–2 real $1M+ campaigns
-- Who it resonates with
-- Sample headline
-- Risk
+For each: **APPROACH [A/B/C]: [Name]** — Core angle, why it works (reference real campaigns), who it resonates with, sample headline, risk.
 
 End with: "Which approach feels most true to your product and story?"
 
 # STEP 4 — LANDING PAGE BRIEFS
 
-2 versions based on chosen approach.
+2 versions based on chosen approach. For each: headline, subheadline, hero visual, 3 core sections, CTA, what it tests.
 
-**LP VERSION [1 / 2]: [Name]**
-- Headline
-- Subheadline
-- Hero visual direction
-- 3 core sections
-- CTA
-- What this version tests
-
-Then: **VALIDATION PLAYBOOK** with budget, platform, ad ideas, metrics, duration.
-
-End with: "Set this up, run it 7–10 days, then bring me the numbers."
+Then: **VALIDATION PLAYBOOK** — budget, platform, ad ideas, metrics, duration.
 
 # STEP 5 — GO / NO-GO REPORT
 
-Ask for data: clicks, leads/reservations, CPL per version, qualitative signals.
-
-Output **KICKMAN MISSION 1 — FINAL REPORT** with:
-- Validation summary table
-- **VERDICT: GO ✅ / NO-GO ❌ / CONDITIONAL ⚠️**
-- WINNING ANGLE, WHAT THE DATA TELLS US, RISKS TO WATCH, NEXT STEP
+**KICKMAN MISSION 1 — FINAL REPORT**
+**VERDICT: GO ✅ / NO-GO ❌ / CONDITIONAL ⚠️**
+WINNING ANGLE, WHAT THE DATA TELLS US, RISKS TO WATCH, NEXT STEP
 
 # REFERENCE CAMPAIGNS
 
@@ -687,54 +362,201 @@ Output **KICKMAN MISSION 1 — FINAL REPORT** with:
 - Flow Hive 2015: one magic visual moment. Built entire campaign around 30 seconds of video.
 - Coolest Cooler 2014: $13M raised, FAILED TO SHIP. Unit economics wrong at scale. Always flag this risk.
 - Exploding Kittens 2015: creator audience (7M readers). Goal in 8 min. Low price, max backer count.
-- Snapmaker 2019: 3-in-1 value consolidation. Multiple audiences, technical spec storytelling.
+- Snapmaker 2019: 3-in-1 value consolidation. Technical spec storytelling.
 - Oculus Rift 2012: one expert endorser (Carmack) changed credibility overnight.
 - Gravity Blanket 2017: clinical tool → consumer product. Science-backed democratization.
 - Nebia Shower 2015: sustainability without sacrifice. Tim Cook = instant credibility.
 - Glowforge 2015: category democratization. Warning: 2-year delivery delays.
-- BauBax Jacket 2015: feature list as viral content. Each feature a GIF reveal.
+- BauBax Jacket 2015: feature list as viral content.
 - MVMT Watches 2013: DTC disruption. Perceived value gap was the entire pitch.
 - OUYA 2012: anti-establishment platform rally. Warning: ecosystem dependency killed it.
+- Loona Petbot 2022: emotional face expressions led. $3M. Gift-market at $299.
+- Yarbo Yard Robot 2022: modular year-round robot. $3.4M avg $3,296. Transparency as strategy.
+- eufyMake E1 2025: all-time KS record $46.7M. Parent brand + category creation + visual magic.
+- AnkerMake M5 2022: $8.9M, 5x speed claim. Warning: line discontinued post-campaign.
+- Bambu Lab X1 2022: specs that seemed impossible. Dominated market despite raising less than AnkerMake.
+- Valerion VisionMaster 2024: $10M projector. Pre-launch reviewer validation was key.
+- GoChess 2023: self-moving chess pieces = magic moment for traditional category. $2.1M.
+- HOVERAir X1 2023: no-controller drone under 250g. $4.6M. Regulatory advantage as marketing.
+- Lomi Composter 2021: sustainability without sacrifice. $7.3M. Razor-and-blade consumable model.
+- Zendure SuperBase V 2023: $5M home battery. Category follower with better specs.
 
 # RULES
-
 1. Never move to next step without explicit user confirmation
 2. Never invent campaign data
-3. Always show reasoning
-4. Call out structural problems clearly
+3. Always show reasoning — "I'm suggesting X because Y campaign did Z"
+4. If product has serious structural problems, say so clearly
 5. No filler, no cheerleading
 6. End every response with exactly one: deliverable, question, or decision point`;
 
-// ── PASSWORD CHECK ──
-function checkPassword() {
-  const pw = document.getElementById('password-input').value.trim();
-  if (!pw) return;
-  password = pw;
-  // We'll verify on first API call — just hide the screen
-  document.getElementById('password-screen').style.display = 'none';
+// ── LOGIN ──────────────────────────────────────────────────────────────────────
+async function doLogin() {
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value.trim();
+  const errEl = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+
+  if (!username || !password) { errEl.textContent = 'Please enter your name and password.'; errEl.style.display = 'block'; return; }
+
+  btn.disabled = true; btn.textContent = 'Connecting…';
+
+  try {
+    // Verify password by trying to load sessions
+    const res = await fetch(`/api/sessions?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`);
+    if (res.status === 401) {
+      errEl.textContent = 'Wrong password. Try again.';
+      errEl.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'Enter →';
+      return;
+    }
+
+    const data = await res.json();
+    currentUser = username;
+    currentPw = password;
+    sessions = data.sessions || [];
+
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('header-user').textContent = username;
+
+    if (sessions.length === 0) {
+      createNewSession(true); // silent create
+    } else {
+      loadSession(sessions[0].id);
+    }
+  } catch (e) {
+    errEl.textContent = 'Connection error. Try again.';
+    errEl.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Enter →';
+  }
 }
 
-document.getElementById('password-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') checkPassword();
-});
+document.getElementById('login-username').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('login-password').focus(); });
+document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
-// ── START ──
-async function kickStart() {
+function doLogout() {
+  currentUser = null; currentPw = null; sessions = []; activeId = null;
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-password').value = '';
+  document.getElementById('login-error').style.display = 'none';
+  document.getElementById('header-user').textContent = '';
+  document.getElementById('login-btn').disabled = false;
+  document.getElementById('login-btn').textContent = 'Enter →';
+}
+
+// ── SESSION CRUD ───────────────────────────────────────────────────────────────
+function generateId() { return 'km_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
+
+async function createNewSession(silent = false) {
+  const session = { id: generateId(), name: 'New Project', createdAt: Date.now(), updatedAt: Date.now(), history: [], step: 1, verdict: null, started: false };
+  sessions.unshift(session);
+  await saveSession(session);
+  loadSession(session.id);
+}
+
+function getSession(id) { return sessions.find(s => s.id === id) || null; }
+
+function updateSessionCache(session) {
+  const idx = sessions.findIndex(s => s.id === session.id);
+  if (idx >= 0) sessions[idx] = session;
+  else sessions.unshift(session);
+  // Re-sort by updatedAt
+  sessions.sort((a,b) => b.updatedAt - a.updatedAt);
+}
+
+// Debounced save to server
+function scheduleSave(session) {
+  updateSessionCache(session);
+  renderSessionList();
+  if (saveTimer) clearTimeout(saveTimer);
+  setSyncStatus('saving');
+  saveTimer = setTimeout(() => saveSession(session), 1000);
+}
+
+async function saveSession(session) {
+  try {
+    const res = await fetch('/api/sessions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: currentUser, password: currentPw, session })
+    });
+    if (res.ok) setSyncStatus('saved');
+    else setSyncStatus('error');
+  } catch { setSyncStatus('error'); }
+}
+
+async function deleteSessionRemote(id) {
+  await fetch('/api/sessions', {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: currentUser, password: currentPw, sessionId: id })
+  });
+}
+
+function setSyncStatus(state) {
+  const el = document.getElementById('sync-status');
+  el.className = 'sync-status ' + state;
+  if (state === 'saving') el.textContent = '● Saving…';
+  else if (state === 'saved') { el.textContent = '✓ Saved'; setTimeout(() => { el.textContent = ''; el.className = 'sync-status'; }, 2000); }
+  else if (state === 'error') el.textContent = '✕ Save failed';
+  else el.textContent = '';
+}
+
+// ── LOAD SESSION ───────────────────────────────────────────────────────────────
+function loadSession(id) {
+  activeId = id;
+  const session = getSession(id);
+  if (!session) return;
+
+  document.getElementById('messages').innerHTML = '';
+  updateStepUI(session.step);
+
+  if (!session.started || session.history.length === 0) {
+    document.getElementById('welcome-state').style.display = 'flex';
+    document.getElementById('messages').style.display = 'none';
+    document.getElementById('input-area').style.display = 'none';
+  } else {
+    document.getElementById('welcome-state').style.display = 'none';
+    document.getElementById('messages').style.display = 'flex';
+    document.getElementById('input-area').style.display = 'block';
+
+    session.history.forEach(msg => {
+      if (msg.role === 'user' && msg.content !== 'Begin.') addMessageDOM('user', msg.content);
+      else if (msg.role === 'assistant') addMessageDOM('km', msg.content);
+    });
+
+    setTimeout(() => {
+      const msgs = document.getElementById('messages');
+      msgs.scrollTop = msgs.scrollHeight;
+    }, 50);
+  }
+
+  renderSessionList();
+}
+
+// ── START ──────────────────────────────────────────────────────────────────────
+async function startCurrentSession() {
+  const session = getSession(activeId);
+  if (!session) return;
+  session.started = true;
+  session.updatedAt = Date.now();
+  scheduleSave(session);
+
   document.getElementById('welcome-state').style.display = 'none';
   document.getElementById('messages').style.display = 'flex';
   document.getElementById('input-area').style.display = 'block';
+
   await callKickman('start');
 }
 
-// ── API ──
+// ── API ────────────────────────────────────────────────────────────────────────
 async function callKickman(trigger) {
   if (isLoading) return;
-  isLoading = true;
-  setSendDisabled(true);
+  isLoading = true; setSendDisabled(true);
 
-  const messages = trigger === 'start'
-    ? [{ role: 'user', content: 'Begin.' }]
-    : history;
+  const session = getSession(activeId);
+  if (!session) { isLoading = false; setSendDisabled(false); return; }
+
+  const messages = trigger === 'start' ? [{ role:'user', content:'Begin.' }] : session.history;
 
   showTyping();
 
@@ -742,228 +564,229 @@ async function callKickman(trigger) {
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        messages,
-        system: SYSTEM,
-        password
-      })
+      body: JSON.stringify({ messages, system: SYSTEM, password: currentPw })
     });
 
     removeTyping();
 
-    if (res.status === 401) {
-      // Wrong password — show password screen again
-      document.getElementById('pw-error').textContent = 'Wrong password. Try again.';
-      document.getElementById('pw-error').style.display = 'block';
-      document.getElementById('password-screen').style.display = 'flex';
-      document.getElementById('messages').style.display = 'none';
-      document.getElementById('input-area').style.display = 'none';
-      document.getElementById('welcome-state').style.display = 'flex';
-      history = [];
-      isLoading = false;
-      setSendDisabled(false);
-      return;
-    }
-
+    if (res.status === 401) { doLogout(); return; }
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      addMessage('km', `Error: ${err.error || res.status}. Please try again.`);
-      isLoading = false;
-      setSendDisabled(false);
-      return;
+      addMessageDOM('km', `Error: ${err.error || res.status}. Please try again.`);
+      isLoading = false; setSendDisabled(false); return;
     }
 
     const data = await res.json();
     const text = data.content?.[0]?.text || '';
 
+    const fresh = getSession(activeId);
     if (trigger === 'start') {
-      history = [
-        { role: 'user', content: 'Begin.' },
-        { role: 'assistant', content: text }
-      ];
+      fresh.history = [{ role:'user', content:'Begin.' }, { role:'assistant', content:text }];
     } else {
-      history.push({ role: 'assistant', content: text });
+      fresh.history.push({ role:'assistant', content:text });
     }
 
-    addMessage('km', text);
-    detectStep(text);
+    // Auto-name
+    if (fresh.name === 'New Project') {
+      const firstUser = fresh.history.find(m => m.role === 'user' && m.content !== 'Begin.');
+      if (firstUser) fresh.name = firstUser.content.slice(0,40).replace(/\n/g,' ').trim() + (firstUser.content.length > 40 ? '…' : '');
+    }
+
+    const newStep = detectStep(text);
+    if (newStep > fresh.step) fresh.step = newStep;
+    const verdict = detectVerdict(text);
+    if (verdict) fresh.verdict = verdict;
+
+    fresh.updatedAt = Date.now();
+    scheduleSave(fresh);
+
+    addMessageDOM('km', text);
+    updateStepUI(fresh.step);
 
   } catch (e) {
     removeTyping();
-    addMessage('km', 'Network error. Check your connection and try again.');
+    addMessageDOM('km', 'Network error. Check your connection and try again.');
   }
 
-  isLoading = false;
-  setSendDisabled(false);
+  isLoading = false; setSendDisabled(false);
 }
 
-// ── SEND ──
+// ── SEND ───────────────────────────────────────────────────────────────────────
 async function sendMessage() {
   const input = document.getElementById('user-input');
   const text = input.value.trim();
   if (!text || isLoading) return;
-  input.value = '';
-  autoResize(input);
-  history.push({ role: 'user', content: text });
-  addMessage('user', text);
+  input.value = ''; autoResize(input);
+
+  const session = getSession(activeId);
+  if (!session) return;
+
+  if (session.name === 'New Project') {
+    session.name = text.slice(0,40).replace(/\n/g,' ').trim() + (text.length > 40 ? '…' : '');
+  }
+
+  session.history.push({ role:'user', content:text });
+  session.updatedAt = Date.now();
+  scheduleSave(session);
+
+  addMessageDOM('user', text);
   await callKickman('continue');
 }
 
-function handleKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-}
+function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
 
-// ── RENDER ──
-function addMessage(role, raw) {
-  const container = document.getElementById('messages');
-  const wrapper = document.createElement('div');
-  wrapper.className = `message ${role}`;
+// ── RENDER LIST ────────────────────────────────────────────────────────────────
+function renderSessionList() {
+  const container = document.getElementById('sessions-list');
+  let html = '<div class="sessions-label">Projects</div>';
 
-  const avatar = document.createElement('div');
-  avatar.className = 'msg-avatar';
-  avatar.textContent = role === 'km' ? 'KM' : 'YOU';
+  if (sessions.length === 0) {
+    html += '<div style="padding:10px 16px;font-family:var(--font-mono);font-size:10px;color:var(--text-3)">No projects yet</div>';
+  } else {
+    sessions.forEach(s => {
+      const isActive = s.id === activeId;
+      const date = new Date(s.updatedAt).toLocaleDateString('en',{month:'short',day:'numeric'});
+      let bClass = '', bText = `Step ${s.step}`;
+      if (s.verdict === 'go') { bClass='go'; bText='✅ GO'; }
+      else if (s.verdict === 'no-go') { bClass='no-go'; bText='❌ No-Go'; }
+      else if (s.verdict === 'conditional') { bClass='conditional'; bText='⚠️ Cond.'; }
 
-  const body = document.createElement('div');
-  body.className = 'msg-body';
-
-  const name = document.createElement('div');
-  name.className = 'msg-name';
-  name.textContent = role === 'km' ? 'Kickman' : 'You';
-
-  const content = document.createElement('div');
-  content.className = 'msg-content';
-  content.innerHTML = role === 'km' ? renderMarkdown(raw) : escapeHtml(raw);
-
-  body.appendChild(name);
-  body.appendChild(content);
-  wrapper.appendChild(avatar);
-  wrapper.appendChild(body);
-  container.appendChild(wrapper);
-  container.scrollTop = container.scrollHeight;
-}
-
-function escapeHtml(text) {
-  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-}
-
-function renderMarkdown(text) {
-  let html = text;
-
-  if (html.includes('VERDICT: GO') || html.includes('GO ✅')) {
-    html = html.replace(/\*\*VERDICT:.*?GO.*?\*\*/g, '<div class="verdict-go"><span class="verdict-icon">✅</span><span class="verdict-text">GO — Launch it</span></div>');
-    updateVerdict('go');
-  } else if (html.includes('VERDICT: NO-GO') || html.includes('NO-GO ❌')) {
-    html = html.replace(/\*\*VERDICT:.*?NO-GO.*?\*\*/g, '<div class="verdict-no"><span class="verdict-icon">❌</span><span class="verdict-text">No-Go — Not yet</span></div>');
-    updateVerdict('no-go');
-  } else if (html.includes('VERDICT: CONDITIONAL') || html.includes('CONDITIONAL ⚠️')) {
-    html = html.replace(/\*\*VERDICT:.*?CONDITIONAL.*?\*\*/g, '<div class="verdict-conditional"><span class="verdict-icon">⚠️</span><span class="verdict-text">Conditional</span></div>');
-    updateVerdict('conditional');
+      html += `<div class="session-row">
+        <div class="session-item ${isActive?'active':''}" onclick="loadSession('${s.id}')">
+          <div class="session-name" ondblclick="startRename('${s.id}',this)" title="Double-click to rename">${escHtml(s.name)}</div>
+          <div class="session-meta"><span>${date}</span><span class="badge ${bClass}">${bText}</span></div>
+        </div>
+        <button class="session-del" onclick="confirmDelete('${s.id}')" title="Delete">×</button>
+      </div>`;
+    });
   }
 
-  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-  html = html.replace(/^# (.+)$/gm, '<h2>$1</h2>');
-  html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-
-  html = html.replace(/(\|.+\|\n)((?:\|[-| ]+\|\n))((?:\|.+\|\n)*)/g, (match, header, sep, body) => {
-    const headerCells = header.split('|').filter(c => c.trim()).map(c => `<th>${c.trim()}</th>`).join('');
-    let t = `<table><thead><tr>${headerCells}</tr></thead><tbody>`;
-    body.trim().split('\n').filter(r => r.trim()).forEach(row => {
-      const cells = row.split('|').filter(c => c.trim()).map(c => `<td>${c.trim()}</td>`).join('');
-      t += `<tr>${cells}</tr>`;
-    });
-    return t + '</tbody></table>';
-  });
-
-  html = html.replace(/((?:^[-*] .+\n?)+)/gm, match => {
-    const items = match.trim().split('\n').filter(l => l.trim())
-      .map(l => `<li>${l.replace(/^[-*] /, '').trim()}</li>`).join('');
-    return `<ul>${items}</ul>`;
-  });
-
-  html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
-  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-  html = html.replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid var(--border);margin:16px 0;">');
-
-  html = html.split(/\n\n+/).map(block => {
-    block = block.trim();
-    if (!block) return '';
-    if (block.startsWith('<')) return block;
-    return `<p>${block.replace(/\n/g, '<br>')}</p>`;
-  }).join('\n');
-
-  return html;
+  container.innerHTML = html;
 }
 
-// ── STEP DETECTION ──
-function detectStep(text) {
-  if (text.includes('READINESS SCORE') || text.includes('PRODUCT NAME & DEFINITION')) setStep(3);
-  else if (text.includes('APPROACH A') || text.includes('APPROACH B')) setStep(4);
-  else if (text.includes('LP VERSION') || text.includes('VALIDATION PLAYBOOK')) setStep(5);
-  else if (text.includes('FINAL REPORT') || text.includes('VERDICT:')) setStep(6);
+function startRename(id, el) {
+  const cur = el.textContent;
+  el.innerHTML = '';
+  const inp = document.createElement('input');
+  inp.className = 'session-name-input'; inp.value = cur;
+  inp.onclick = e => e.stopPropagation();
+  inp.onblur = () => {
+    const name = inp.value.trim() || 'Untitled';
+    const s = getSession(id);
+    if (s) { s.name = name; scheduleSave(s); }
+    el.textContent = name;
+  };
+  inp.onkeydown = e => {
+    if (e.key === 'Enter') inp.blur();
+    if (e.key === 'Escape') { el.textContent = cur; }
+    e.stopPropagation();
+  };
+  el.appendChild(inp); inp.focus(); inp.select();
 }
 
-function setStep(next) {
-  for (let i = 1; i <= 5; i++) {
-    const el = document.getElementById(`step-${i}`);
-    const dot = document.getElementById(`dot-${i}`);
-    el.className = 'sidebar-step';
-    dot.className = 'step-dot';
-    if (i < next - 1) { el.classList.add('done'); dot.classList.add('done'); }
-    else if (i === next - 1) { el.classList.add('active'); dot.classList.add('active'); }
+async function confirmDelete(id) {
+  if (sessions.length <= 1) { alert('You need at least one project.'); return; }
+  if (!confirm('Delete this project? This cannot be undone.')) return;
+  sessions = sessions.filter(s => s.id !== id);
+  await deleteSessionRemote(id);
+  if (activeId === id) {
+    if (sessions.length > 0) loadSession(sessions[0].id);
+    else createNewSession(true);
+  } else {
+    renderSessionList();
+  }
+}
+
+// ── DOM RENDER ─────────────────────────────────────────────────────────────────
+function addMessageDOM(role, raw) {
+  const container = document.getElementById('messages');
+  const w = document.createElement('div'); w.className = `message ${role}`;
+  const av = document.createElement('div'); av.className = 'msg-avatar'; av.textContent = role==='km'?'KM':'YOU';
+  const b = document.createElement('div'); b.className = 'msg-body';
+  const n = document.createElement('div'); n.className = 'msg-name'; n.textContent = role==='km'?'Kickman':'You';
+  const c = document.createElement('div'); c.className = 'msg-content';
+  c.innerHTML = role==='km' ? renderMd(raw) : `<p>${escHtml(raw).replace(/\n/g,'<br>')}</p>`;
+  b.appendChild(n); b.appendChild(c); w.appendChild(av); w.appendChild(b);
+  container.appendChild(w); container.scrollTop = container.scrollHeight;
+}
+
+function escHtml(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderMd(text) {
+  let h = text;
+  if (h.includes('VERDICT: GO')||h.includes('GO ✅')) h=h.replace(/\*\*VERDICT:.*?GO.*?\*\*/g,'<div class="verdict-go"><span class="verdict-icon">✅</span><span class="verdict-text">GO — Launch it</span></div>');
+  if (h.includes('VERDICT: NO-GO')||h.includes('NO-GO ❌')) h=h.replace(/\*\*VERDICT:.*?NO-GO.*?\*\*/g,'<div class="verdict-no"><span class="verdict-icon">❌</span><span class="verdict-text">No-Go — Not yet</span></div>');
+  if (h.includes('VERDICT: CONDITIONAL')||h.includes('CONDITIONAL ⚠️')) h=h.replace(/\*\*VERDICT:.*?CONDITIONAL.*?\*\*/g,'<div class="verdict-conditional"><span class="verdict-icon">⚠️</span><span class="verdict-text">Conditional</span></div>');
+  h=h.replace(/^### (.+)$/gm,'<h3>$1</h3>');
+  h=h.replace(/^## (.+)$/gm,'<h2>$1</h2>');
+  h=h.replace(/^# (.+)$/gm,'<h2>$1</h2>');
+  h=h.replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>');
+  h=h.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  h=h.replace(/\*(.+?)\*/g,'<em>$1</em>');
+  h=h.replace(/(\|.+\|\n)((?:\|[-| ]+\|\n))((?:\|.+\|\n)*)/g,(_,hdr,sep,body)=>{
+    const hc=hdr.split('|').filter(c=>c.trim()).map(c=>`<th>${c.trim()}</th>`).join('');
+    let t=`<table><thead><tr>${hc}</tr></thead><tbody>`;
+    body.trim().split('\n').filter(r=>r.trim()).forEach(row=>{t+=`<tr>${row.split('|').filter(c=>c.trim()).map(c=>`<td>${c.trim()}</td>`).join('')}</tr>`;});
+    return t+'</tbody></table>';
+  });
+  h=h.replace(/((?:^[-*] .+\n?)+)/gm,m=>`<ul>${m.trim().split('\n').filter(l=>l.trim()).map(l=>`<li>${l.replace(/^[-*] /,'').trim()}</li>`).join('')}</ul>`);
+  h=h.replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>');
+  h=h.replace(/`([^`]+)`/g,'<code>$1</code>');
+  h=h.replace(/^---+$/gm,'<hr style="border:none;border-top:1px solid var(--border);margin:16px 0;">');
+  h=h.split(/\n\n+/).map(b=>{b=b.trim();if(!b)return '';if(b.startsWith('<'))return b;return `<p>${b.replace(/\n/g,'<br>')}</p>`;}).join('\n');
+  return h;
+}
+
+// ── STEP / VERDICT ─────────────────────────────────────────────────────────────
+function detectStep(t) {
+  if (t.includes('FINAL REPORT')||t.includes('VERDICT:')) return 5;
+  if (t.includes('LP VERSION')||t.includes('VALIDATION PLAYBOOK')) return 4;
+  if (t.includes('APPROACH A')||t.includes('APPROACH B')) return 3;
+  if (t.includes('READINESS SCORE')||t.includes('PRODUCT NAME & DEFINITION')) return 2;
+  return 1;
+}
+function detectVerdict(t) {
+  if (t.includes('VERDICT: GO')||t.includes('GO ✅')) return 'go';
+  if (t.includes('VERDICT: NO-GO')||t.includes('NO-GO ❌')) return 'no-go';
+  if (t.includes('VERDICT: CONDITIONAL')||t.includes('CONDITIONAL ⚠️')) return 'conditional';
+  return null;
+}
+function updateStepUI(step) {
+  for (let i=1;i<=5;i++) {
+    const el=document.getElementById(`step-${i}`); const dot=document.getElementById(`dot-${i}`);
+    if(!el) continue;
+    el.className='sidebar-step'; dot.className='step-dot';
+    if(i<step){el.classList.add('done');dot.classList.add('done');}
+    else if(i===step){el.classList.add('active');dot.classList.add('active');}
     else el.classList.add('idle');
   }
 }
 
-function updateVerdict(type) {
-  const box = document.getElementById('verdict-display');
-  const val = document.getElementById('verdict-value');
-  box.classList.add('visible');
-  if (type === 'go') { val.textContent = '✅ GO'; val.style.color = 'var(--green)'; }
-  else if (type === 'no-go') { val.textContent = '❌ No-Go'; val.style.color = 'var(--red)'; }
-  else { val.textContent = '⚠️ Conditional'; val.style.color = 'var(--yellow)'; }
-}
-
-// ── UTILS ──
+// ── TYPING ─────────────────────────────────────────────────────────────────────
 function showTyping() {
-  const container = document.getElementById('messages');
-  const w = document.createElement('div');
-  w.className = 'message km'; w.id = 'typing-indicator';
-  const av = document.createElement('div'); av.className = 'msg-avatar'; av.textContent = 'KM';
-  const b = document.createElement('div'); b.className = 'msg-body';
-  const n = document.createElement('div'); n.className = 'msg-name'; n.textContent = 'Kickman';
-  const ind = document.createElement('div'); ind.className = 'typing-indicator';
-  ind.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+  const c=document.getElementById('messages');
+  const w=document.createElement('div'); w.className='message km'; w.id='typing-indicator';
+  const av=document.createElement('div'); av.className='msg-avatar'; av.textContent='KM';
+  const b=document.createElement('div'); b.className='msg-body';
+  const n=document.createElement('div'); n.className='msg-name'; n.textContent='Kickman';
+  const ind=document.createElement('div'); ind.className='typing-indicator';
+  ind.innerHTML='<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
   b.appendChild(n); b.appendChild(ind); w.appendChild(av); w.appendChild(b);
-  container.appendChild(w); container.scrollTop = container.scrollHeight;
+  c.appendChild(w); c.scrollTop=c.scrollHeight;
 }
-
 function removeTyping() { document.getElementById('typing-indicator')?.remove(); }
-function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 160) + 'px'; }
-function setSendDisabled(v) { document.getElementById('send-btn').disabled = v; }
 
-function newSession() {
-  if (confirm('Start a new session? Current conversation will be lost.')) {
-    history = [];
-    document.getElementById('messages').innerHTML = '';
-    document.getElementById('messages').style.display = 'none';
-    document.getElementById('input-area').style.display = 'none';
-    document.getElementById('welcome-state').style.display = 'flex';
-    document.getElementById('verdict-display').classList.remove('visible');
-    for (let i = 1; i <= 5; i++) {
-      document.getElementById(`step-${i}`).className = i === 1 ? 'sidebar-step active' : 'sidebar-step idle';
-      document.getElementById(`dot-${i}`).className = i === 1 ? 'step-dot active' : 'step-dot';
-    }
-  }
-}
+// ── UTILS ───────────────────────────────────────────────────────────────────────
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,160)+'px';}
+function setSendDisabled(v){document.getElementById('send-btn').disabled=v;}
 
 function exportChat() {
-  const text = history.map(m => `[${m.role.toUpperCase()}]\n${m.content}`).join('\n\n---\n\n');
-  const blob = new Blob([text], { type: 'text/plain' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = `kickman-${new Date().toISOString().slice(0,10)}.txt`; a.click();
+  const s = getSession(activeId); if(!s) return;
+  const text = s.history.filter(m=>m.content!=='Begin.').map(m=>`[${m.role.toUpperCase()}]\n${m.content}`).join('\n\n---\n\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'}));
+  a.download=`kickman-${s.name.slice(0,30).replace(/[^a-z0-9]/gi,'-')}-${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
 }
 </script>
 </body>
