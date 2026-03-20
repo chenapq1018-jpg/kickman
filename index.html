@@ -207,11 +207,16 @@
   .tl-sub-edit{font-size:9px;color:var(--text-3);background:none;border:none;cursor:pointer;opacity:0;transition:opacity .15s;padding:0;font-family:var(--font-mono);}
   .tl-date-input{font-family:var(--font-mono);font-size:9px;background:var(--card);border:1px solid var(--accent);color:var(--text);padding:2px 4px;outline:none;width:100px;}
   /* Risk badges */
-  .tl-risk{font-family:var(--font-mono);font-size:8px;letter-spacing:.5px;padding:1px 5px;border-radius:2px;display:inline-flex;align-items:center;gap:3px;}
-  .tl-risk.high{background:var(--red-dim);color:var(--red);cursor:pointer;}
-  .tl-risk.high:hover{opacity:.8;text-decoration:underline;}
+  .tl-risk{font-family:var(--font-mono);font-size:8px;letter-spacing:.5px;padding:2px 6px;border-radius:3px;display:inline-flex;align-items:center;gap:3px;transition:all .15s;}
+  .tl-risk.clickable{cursor:pointer;}
+  .tl-risk.high{background:var(--red-dim);color:var(--red);}
+  .tl-risk.high:hover{filter:brightness(1.2);}
   .tl-risk.medium{background:var(--yellow-dim);color:var(--yellow);}
+  .tl-risk.medium:hover{filter:brightness(1.2);}
   .tl-risk.low{background:var(--green-dim);color:var(--green);}
+  .tl-risk.low:hover{filter:brightness(1.2);}
+  .tl-risk-edit{font-size:8px;opacity:0;transition:opacity .15s;margin-left:1px;}
+  .tl-ms-header:hover .tl-risk-edit{opacity:.7;}
   .tl-risk-row{margin-top:3px;}
   /* Hint text */
   .tl-hint{font-size:9px;color:var(--text-3);line-height:1.5;margin-bottom:2px;max-width:180px;}
@@ -658,11 +663,12 @@ function renderTimeline(){
     const dateClass  = ms.date ? (isOverdue(ms.date)?'overdue':isSoon(ms.date)?'soon':'has-date') : sugDate ? 'suggested' : '';
     const isSug      = !ms.date && !!sugDate;
 
-    const riskBadge = isHigh
-      ? `<span class="tl-risk high" onclick="event.stopPropagation();triggerRiskChat('${ms.id}')" title="Click to discuss risks">&#x26A0; High Risk</span>`
-      : isMed
-      ? `<span class="tl-risk medium">&#x25CF; Watch</span>`
-      : `<span class="tl-risk low">&#x2713; Low Risk</span>`;
+    const riskLabel = isHigh ? '&#x26A0; High Risk' : isMed ? '&#x25CF; Watch' : '&#x2713; Low Risk';
+    const riskTitle = isHigh ? 'Click to discuss · right-click or long-press to change' : 'Click to change risk level';
+    const riskBadge = `<span class="tl-risk ${ms.risk||'low'} clickable"
+      onclick="event.stopPropagation();${isHigh?`triggerRiskChat('${ms.id}')`:`cycleRisk('${ms.id}',event)`}"
+      oncontextmenu="event.preventDefault();cycleRisk('${ms.id}',event)"
+      title="${riskTitle}">${riskLabel} <span class="tl-risk-edit">&#x21BB;</span></span>`;
 
     const hintTip = ms.hint ? `<div class="tl-hint">${ms.hint}</div>` : '';
 
@@ -965,6 +971,19 @@ function applyTimelineUpdate(update){
   if(panel){ panel.style.transition='background .3s'; panel.style.background='rgba(232,98,42,0.06)'; setTimeout(()=>panel.style.background='',500); }
 }
 
+// Cycle risk level: low → medium → high → low
+function cycleRisk(msId, event){
+  event.stopPropagation();
+  const tl = getTimeline(); if(!tl) return;
+  const ms = tl.find(m => m.id === msId); if(!ms) return;
+  const cycle = {low:'medium', medium:'high', high:'low'};
+  ms.risk = cycle[ms.risk] || 'medium';
+  // Update riskNote hint text too if switching to low/medium
+  if(ms.risk==='low') ms.riskNote = null;
+  saveTimeline(tl);
+  renderTimeline();
+}
+
 // Auto-detect current active milestone based on step
 function syncTimelineToStep(step, mission){
   const tl = getTimeline(); if(!tl) return;
@@ -1172,7 +1191,7 @@ Embed this block ANYWHERE in your response (it will be parsed and hidden from th
 <!--TIMELINE_UPDATE:
 {
   "launch": {"date": "2026-05-01"},
-  "hardware-dev": {"status": "active"},
+  "hardware-dev": {"status": "active", "risk": "low"},
   "dvt": {"status": "done"},
   "evt": {"status": "done"}
 }
@@ -1182,15 +1201,28 @@ Rules:
 - Only include keys you want to change (omit everything else)
 - Dates use YYYY-MM-DD format
 - Status values: "pending", "active", "done"
+- Risk values: "low", "medium", "high" — update risk whenever user provides new information that changes the risk level
 - If user says "May 1st" without a year, ask: "Is that May 2026?" before setting the date
 - After setting launch date, the frontend auto-calculates suggested dates for all other milestones
 
 ## Risk assessment during conversation
 
+ALWAYS update risk when the user provides new context:
+- User says hardware is at DVT/EVT stage and on track → set hardware-dev risk to "medium" or "low"
+- User confirms PVT done → set hardware-dev risk to "low"
+- User says beta testers are lined up → set early-units risk to "medium"
+- User confirms beta feedback positive → set early-units risk to "low"
+- User says delivery timeline is padded with buffer → set fulfillment risk to "medium"
+- User says they don't have factory partner yet → set hardware-dev risk to "high"
+
+When user explicitly says something like "change hardware to low risk" or "硬件改成低风险":
+- Acknowledge the change, explain what would justify it in reality
+- ALWAYS output the risk update immediately: <!--TIMELINE_UPDATE:{"hardware-dev":{"risk":"low"}}-->
+
 When discussing hardware milestones:
-- If EVT+DVT are done → reduce hardware-dev risk in your language, update status to "active" or "done"
-- If PVT is not complete and launch is <3 months away → warn clearly, suggest delay
-- Output: <!--TIMELINE_UPDATE:{"hardware-dev":{"status":"active"},"evt":{"status":"done"},"dvt":{"status":"done"}}-->
+- If EVT+DVT are done → output: <!--TIMELINE_UPDATE:{"hardware-dev":{"status":"active","risk":"medium"},"evt":{"status":"done"},"dvt":{"status":"done"}}-->
+- If PVT is not complete and launch is <3 months away → warn clearly, suggest delay, keep risk "high"
+- If PVT complete → output: <!--TIMELINE_UPDATE:{"hardware-dev":{"risk":"low"},"pvt":{"status":"done"}}-->
 
 When user proposes a launch date:
 - Calculate backward: is there enough time for video (6 wks), warmup (6 wks), beta test (2 wks)?
