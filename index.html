@@ -343,7 +343,7 @@
 </div>
 
 <!-- MOBILE TIMELINE FAB -->
-<button class="tl-fab" id="tl-fab" onclick="openTimelineDrawer()" title="Campaign Timeline">
+<button class="tl-fab" id="tl-fab" onclick="openTimelineDrawer()" title="Campaign Timeline" style="display:none">
   &#x1F4C5;
   <span class="tl-fab-dot" id="tl-fab-dot"></span>
 </button>
@@ -1047,17 +1047,25 @@ async function doLogin() {
     currentUser=username; currentPw=password; sessions=data.sessions||[];
     document.getElementById('login-screen').style.display='none';
     document.getElementById('header-user').textContent=username;
+    // Show FAB on mobile after login
+    if(window.innerWidth <= 1080){ var fab=document.getElementById('tl-fab'); if(fab)fab.style.display='flex'; }
     if (sessions.length===0) createNewSession(true);
     else loadSession(sessions[0].id);
   } catch(e) { errEl.textContent='Connection error. Try again.'; errEl.style.display='block'; btn.disabled=false; btn.textContent='Enter →'; }
 }
-document.getElementById('login-username').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('login-password').focus();});
-document.getElementById('login-password').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+// Login key handlers - wrapped in DOMContentLoaded to ensure elements exist
+document.addEventListener('DOMContentLoaded', function() {
+  var lu = document.getElementById('login-username');
+  var lp = document.getElementById('login-password');
+  if(lu) lu.addEventListener('keydown',e=>{if(e.key==='Enter')lp.focus();});
+  if(lp) lp.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+});
 
 function doLogout() {
   currentUser=null; currentPw=null; sessions=[]; activeId=null; pendingImages=[];
   document.getElementById('login-screen').style.display='flex';
   document.getElementById('login-password').value='';
+  var fab=document.getElementById('tl-fab'); if(fab)fab.style.display='none';
   document.getElementById('login-error').style.display='none';
   document.getElementById('header-user').textContent='';
   document.getElementById('login-btn').disabled=false;
