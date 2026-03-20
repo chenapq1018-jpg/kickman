@@ -205,7 +205,30 @@
   .tl-sub-date{font-family:var(--font-mono);font-size:9px;color:var(--text-3);}
   .tl-sub-date.has-date{color:var(--text-3);}
   .tl-sub-edit{font-size:9px;color:var(--text-3);background:none;border:none;cursor:pointer;opacity:0;transition:opacity .15s;padding:0;font-family:var(--font-mono);}
-  .tl-date-input{font-family:var(--font-mono);font-size:9px;background:var(--card);border:1px solid var(--accent);color:var(--text);padding:2px 4px;outline:none;width:96px;}
+  .tl-date-input{font-family:var(--font-mono);font-size:9px;background:var(--card);border:1px solid var(--accent);color:var(--text);padding:2px 4px;outline:none;width:100px;}
+  /* Risk badges */
+  .tl-risk{font-family:var(--font-mono);font-size:8px;letter-spacing:.5px;padding:1px 5px;border-radius:2px;display:inline-flex;align-items:center;gap:3px;}
+  .tl-risk.high{background:var(--red-dim);color:var(--red);cursor:pointer;}
+  .tl-risk.high:hover{opacity:.8;text-decoration:underline;}
+  .tl-risk.medium{background:var(--yellow-dim);color:var(--yellow);}
+  .tl-risk.low{background:var(--green-dim);color:var(--green);}
+  .tl-risk-row{margin-top:3px;}
+  /* Hint text */
+  .tl-hint{font-size:9px;color:var(--text-3);line-height:1.5;margin-bottom:2px;max-width:180px;}
+  /* Suggested dates */
+  .tl-date.suggested{color:var(--text-3);font-style:italic;}
+  .tl-sub-date.suggested{color:var(--text-3);font-style:italic;}
+  /* Name row */
+  .tl-ms-name-row{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:2px;}
+  /* Clear button */
+  .tl-clear-btn{font-size:8px;color:var(--text-3);background:none;border:none;cursor:pointer;padding:0;opacity:0;transition:opacity .15s;font-family:var(--font-mono);}
+  .tl-ms-header:hover .tl-clear-btn{opacity:.7;}
+  .tl-clear-btn:hover{color:var(--red);opacity:1!important;}
+  .tl-sub-clear{font-size:8px;color:var(--text-3);background:none;border:none;cursor:pointer;padding:0;opacity:0;transition:opacity .15s;}
+  .tl-subtask:hover .tl-sub-clear{opacity:.7;}
+  .tl-sub-clear:hover{color:var(--red);opacity:1!important;}
+  /* Sub date row */
+  .tl-sub-date-row{display:flex;align-items:center;gap:3px;}
   .timeline-note{padding:8px 14px;font-family:var(--font-mono);font-size:9px;color:var(--text-3);line-height:1.7;border-top:1px solid var(--border);flex-shrink:0;}
   .tl-milestone.active-ms .tl-ms-header{background:var(--accent-dim2);}
 
@@ -381,83 +404,131 @@ let pendingImages = []; // [{base64, mediaType, name}]
 // Default milestone structure — dates start null (user fills in)
 const DEFAULT_TIMELINE = [
   {
-    id:'validation', name:'Validation 验证阶段', status:'pending', date:null,
+    id:'validation', name:'Validation', status:'pending', date:null,
+    duration:14, risk:'low',
+    hint:'2 weeks. Run LP test, collect 200+ clicks per version.',
     subtasks:[
-      {id:'lp-design', name:'Landing page 制作', status:'pending', date:null},
-      {id:'lp-launch', name:'Landing page 投放上线', status:'pending', date:null},
-      {id:'lp-end', name:'测试结束 / 数据收集完毕', status:'pending', date:null},
+      {id:'lp-design', name:'Landing page design', status:'pending', date:null},
+      {id:'lp-launch', name:'LP live + ads running', status:'pending', date:null},
+      {id:'lp-end', name:'Test ends / data collected', status:'pending', date:null},
     ]
   },
   {
-    id:'price-confirm', name:'众筹定价确认', status:'pending', date:null,
+    id:'price-confirm', name:'Pricing Confirmed', status:'pending', date:null,
+    duration:7, risk:'medium',
+    hint:'Confirm MSRP + Early Bird tiers before campaign build starts.',
+    riskNote:'Wrong pricing is hard to fix mid-campaign. Validate with real people.',
     subtasks:[
-      {id:'msrp', name:'MSRP / 众筹价格锁定', status:'pending', date:null},
-      {id:'tiers', name:'Early Bird 档位结构确定', status:'pending', date:null},
+      {id:'msrp', name:'MSRP / campaign price locked', status:'pending', date:null},
+      {id:'tiers', name:'Early Bird tier structure set', status:'pending', date:null},
     ]
   },
   {
-    id:'hardware-dev', name:'硬件开发节点', status:'pending', date:null,
+    id:'hardware-dev', name:'Hardware Milestones', status:'pending', date:null,
+    duration:null, risk:'high',
+    hint:'EVT → DVT → PVT → MP. Each stage can slip. Build buffer.',
+    riskNote:'Hardware delays are the #1 reason campaigns fail to deliver. If PVT isn\'t done before launch, you\'re taking a major risk.',
     subtasks:[
-      {id:'evt', name:'EVT（工程验证）完成', status:'pending', date:null},
-      {id:'dvt', name:'DVT（设计验证）完成', status:'pending', date:null},
-      {id:'pvt', name:'PVT（生产验证）完成', status:'pending', date:null},
-      {id:'mp', name:'MP（量产）启动', status:'pending', date:null},
+      {id:'evt', name:'EVT complete', status:'pending', date:null},
+      {id:'dvt', name:'DVT complete', status:'pending', date:null},
+      {id:'pvt', name:'PVT complete', status:'pending', date:null},
+      {id:'mp', name:'MP (mass production) starts', status:'pending', date:null},
     ]
   },
   {
-    id:'early-units', name:'早期样机可寄出', status:'pending', date:null,
+    id:'early-units', name:'Beta Units Ship', status:'pending', date:null,
+    duration:14, risk:'high',
+    hint:'Get real product into real hands before launch. If it fails here, stop the campaign.',
+    riskNote:'Skipping beta testing is a top-3 mistake. Even 5 real users can reveal critical flaws. If product can\'t satisfy testers, do not launch.',
     subtasks:[
-      {id:'beta-select', name:'筛选早期测试用户', status:'pending', date:null},
-      {id:'beta-ship', name:'样机寄出给测试用户', status:'pending', date:null},
-      {id:'beta-feedback', name:'收集反馈 / Go / No-Go 决定', status:'pending', date:null},
+      {id:'beta-select', name:'Select beta testers', status:'pending', date:null},
+      {id:'beta-ship', name:'Units shipped to testers', status:'pending', date:null},
+      {id:'beta-feedback', name:'Feedback collected / Go-No-Go', status:'pending', date:null},
     ]
   },
   {
-    id:'pre-campaign', name:'正式预热 Pre-Campaign', status:'pending', date:null,
+    id:'pre-campaign', name:'Pre-Launch Warmup', status:'pending', date:null,
+    duration:45, risk:'medium',
+    hint:'~6 weeks. Email list, social content, KOL outreach, early bird signups.',
+    riskNote:'Under-warming is common. Aim for 1,000+ email signups before launch day.',
     subtasks:[
-      {id:'pre-start', name:'预热启动（邮件 / 社媒 / KOL）', status:'pending', date:null},
-      {id:'pre-list', name:'目标预收邮件量达成', status:'pending', date:null},
+      {id:'pre-start', name:'Warmup kicks off', status:'pending', date:null},
+      {id:'pre-list', name:'Email list target reached', status:'pending', date:null},
     ]
   },
   {
-    id:'video-prod', name:'主视频制作', status:'pending', date:null,
+    id:'video-prod', name:'Main Video Production', status:'pending', date:null,
+    duration:42, risk:'medium',
+    hint:'~6 weeks: script → shoot → edit → final. Plan cutdowns on shoot day.',
+    riskNote:'Reshoots are expensive. Lock script and scene list before booking crew.',
     subtasks:[
-      {id:'script', name:'脚本 & 分镜确认', status:'pending', date:null},
-      {id:'shoot', name:'拍摄日', status:'pending', date:null},
-      {id:'edit', name:'剪辑 & 后期完成', status:'pending', date:null},
-      {id:'video-final', name:'成片锁定', status:'pending', date:null},
+      {id:'script', name:'Script + storyboard locked', status:'pending', date:null},
+      {id:'shoot', name:'Shoot day(s)', status:'pending', date:null},
+      {id:'edit', name:'Edit + color + sound done', status:'pending', date:null},
+      {id:'video-final', name:'Final video locked', status:'pending', date:null},
     ]
   },
   {
-    id:'launch', name:'众筹正式上线 🚀', status:'pending', date:null,
+    id:'launch', name:'🚀 Campaign Launch', status:'pending', date:null,
+    duration:null, risk:'low',
+    hint:'Launch day. First 48 hours determine momentum. Have email blast ready.',
     subtasks:[
-      {id:'page-live', name:'众筹页上线', status:'pending', date:null},
-      {id:'campaign-start', name:'众筹开始', status:'pending', date:null},
+      {id:'page-live', name:'Campaign page live', status:'pending', date:null},
+      {id:'campaign-start', name:'Campaign officially starts', status:'pending', date:null},
     ]
   },
   {
-    id:'campaign-end', name:'众筹结束', status:'pending', date:null,
+    id:'campaign-end', name:'Campaign Ends', status:'pending', date:null,
+    duration:37, risk:'low',
+    hint:'30–45 days is optimal. 30 days = urgency. 45 days = more time to build.',
     subtasks:[
-      {id:'funded-check', name:'达标确认', status:'pending', date:null},
-      {id:'backer-count', name:'支持者数量确认', status:'pending', date:null},
+      {id:'funded-check', name:'Funding goal confirmed', status:'pending', date:null},
+      {id:'backer-count', name:'Final backer count', status:'pending', date:null},
     ]
   },
   {
-    id:'fulfillment', name:'发货 Fulfillment', status:'pending', date:null,
+    id:'fulfillment', name:'Fulfillment', status:'pending', date:null,
+    duration:null, risk:'high',
+    hint:'Under-promise, over-deliver. Add 2–3 month buffer to your estimate.',
+    riskNote:'Late delivery is the #1 backer complaint. If shipping estimate is tight, add buffer. Transparency beats silence every time.',
     subtasks:[
-      {id:'ship-batch1', name:'第一批发货', status:'pending', date:null},
-      {id:'ship-batch2', name:'第二批发货（如有）', status:'pending', date:null},
-      {id:'ship-all', name:'全部发货完成', status:'pending', date:null},
+      {id:'ship-batch1', name:'Batch 1 ships', status:'pending', date:null},
+      {id:'ship-batch2', name:'Batch 2 ships (if any)', status:'pending', date:null},
+      {id:'ship-all', name:'All orders fulfilled', status:'pending', date:null},
     ]
   }
 ];
 
+// Chinese name map — used when user switches to ZH mode
+const TL_NAMES_ZH = {
+  'validation':'验证阶段','lp-design':'Landing Page 制作','lp-launch':'LP 上线投放','lp-end':'测试结束/数据收集',
+  'price-confirm':'众筹定价确认','msrp':'MSRP/众筹价格锁定','tiers':'Early Bird 档位确定',
+  'hardware-dev':'硬件开发节点','evt':'EVT 工程验证完成','dvt':'DVT 设计验证完成','pvt':'PVT 生产验证完成','mp':'MP 量产启动',
+  'early-units':'早期样机可寄出','beta-select':'筛选内测用户','beta-ship':'样机寄出','beta-feedback':'收集反馈/Go-No-Go 决定',
+  'pre-campaign':'正式预热','pre-start':'预热启动','pre-list':'预收邮件目标达成',
+  'video-prod':'主视频制作','script':'脚本&分镜确认','shoot':'拍摄日','edit':'剪辑&后期完成','video-final':'成片锁定',
+  'launch':'🚀 众筹正式上线','page-live':'众筹页上线','campaign-start':'众筹开始',
+  'campaign-end':'众筹结束','funded-check':'达标确认','backer-count':'支持者数量确认',
+  'fulfillment':'发货','ship-batch1':'第一批发货','ship-batch2':'第二批发货（如有）','ship-all':'全部发货完成'
+};
+
 let tlExpandedAll = false;
+let tlLang = 'en'; // 'en' or 'zh'
+
+function tlName(node){
+  if(tlLang==='zh' && TL_NAMES_ZH[node.id]) return TL_NAMES_ZH[node.id];
+  return node.name;
+}
 
 function getTimeline(){
   const s = getSession(activeId);
   if(!s) return null;
   if(!s.timeline) s.timeline = JSON.parse(JSON.stringify(DEFAULT_TIMELINE));
+  // Migrate old timelines missing risk/hint fields
+  s.timeline.forEach((ms,i) => {
+    const def = DEFAULT_TIMELINE[i];
+    if(def && !ms.risk) { ms.risk=def.risk; ms.hint=def.hint; ms.duration=def.duration; if(def.riskNote)ms.riskNote=def.riskNote; }
+  });
   return s.timeline;
 }
 
@@ -467,91 +538,155 @@ function saveTimeline(tl){
   scheduleSave(s);
 }
 
+// Auto-calculate suggested dates from launch date (backward) or from any anchor date
+function calcSuggestedDates(tl){
+  const launchMs = tl.find(m=>m.id==='launch');
+  const campaignEndMs = tl.find(m=>m.id==='campaign-end');
+  const fulfillMs = tl.find(m=>m.id==='fulfillment');
+
+  if(launchMs && launchMs.date){
+    const launch = new Date(launchMs.date+'T00:00:00');
+    const suggested = {};
+    // Backward from launch
+    suggested['video-prod'] = offsetDate(launch, -42);
+    suggested['script']     = offsetDate(launch, -42);
+    suggested['shoot']      = offsetDate(launch, -28);
+    suggested['edit']       = offsetDate(launch, -14);
+    suggested['video-final']= offsetDate(launch, -7);
+    suggested['pre-campaign']= offsetDate(launch, -45);
+    suggested['pre-start']  = offsetDate(launch, -45);
+    suggested['pre-list']   = offsetDate(launch, -7);
+    suggested['early-units']= offsetDate(launch, -60);
+    suggested['beta-select']= offsetDate(launch, -70);
+    suggested['beta-ship']  = offsetDate(launch, -60);
+    suggested['beta-feedback']= offsetDate(launch, -45);
+    suggested['validation'] = offsetDate(launch, -90);
+    suggested['lp-design']  = offsetDate(launch, -90);
+    suggested['lp-launch']  = offsetDate(launch, -84);
+    suggested['lp-end']     = offsetDate(launch, -76);
+    suggested['price-confirm']= offsetDate(launch, -70);
+    suggested['page-live']  = offsetDate(launch, -1);
+    suggested['campaign-start'] = launchMs.date;
+    // Forward from launch
+    if(campaignEndMs && !campaignEndMs.date) suggested['campaign-end'] = offsetDate(launch, 37);
+    suggested['funded-check'] = offsetDate(launch, 37);
+    if(fulfillMs && !fulfillMs.date) suggested['fulfillment'] = offsetDate(launch, 120);
+    suggested['ship-batch1'] = offsetDate(launch, 120);
+    suggested['ship-batch2'] = offsetDate(launch, 150);
+    suggested['ship-all']    = offsetDate(launch, 180);
+    return suggested;
+  }
+  return {};
+}
+
+function offsetDate(base, days){
+  const d = new Date(base);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0,10);
+}
+
 function renderTimeline(){
   const tl = getTimeline();
   const body = document.getElementById('timeline-body');
-  const empty = document.getElementById('timeline-empty');
   const note = document.getElementById('timeline-note');
-  if(!tl){ if(empty)empty.style.display='block'; if(note)note.style.display='none'; return; }
+  if(!tl){ return; }
 
-  // Check if session has started at all
   const s = getSession(activeId);
-  const hasAnyDate = tl.some(m => m.date || m.subtasks.some(st => st.date));
   const sessionStarted = s && s.started && s.history && s.history.length > 2;
 
+  const emptyHTML = '<div class="timeline-empty"><span class="timeline-empty-icon">&#x1F4C5;</span>Timeline will appear<br>after product alignment<br>is complete.</div>';
+
   if(!sessionStarted){
-    if(empty)empty.style.display='block'; if(note)note.style.display='none';
-    body.innerHTML = '<div class="timeline-empty" id="timeline-empty"><span class="timeline-empty-icon">📅</span>Timeline will appear after<br>your product alignment<br>is complete.</div>';
+    if(body) body.innerHTML = emptyHTML;
+    if(note) note.style.display='none';
+    syncDrawer(emptyHTML, false);
     return;
   }
 
-  if(empty)empty.style.display='none'; if(note)note.style.display='block';
+  if(note) note.style.display='block';
 
+  const suggested = calcSuggestedDates(tl);
   let html = '';
+
   tl.forEach((ms, mi) => {
-    const isActive = ms.status === 'active';
-    const isDone = ms.status === 'done';
-    const dotClass = isDone ? 'done' : isActive ? 'active' : 'pending';
-    const msClass = isDone ? 'done-ms' : isActive ? 'active-ms' : '';
-    const dateStr = ms.date ? formatDate(ms.date) : '—';
-    const dateClass = ms.date ? (isOverdue(ms.date) ? 'overdue' : isSoon(ms.date) ? 'soon' : 'has-date') : '';
+    const isActive = ms.status==='active';
+    const isDone   = ms.status==='done';
+    const isHigh   = ms.risk==='high';
+    const isMed    = ms.risk==='medium';
+    const dotClass = isDone?'done':isActive?'active':'pending';
+    const msClass  = isDone?'done-ms':isActive?'active-ms':'';
+
+    const hasDate    = !!ms.date;
+    const sugDate    = !hasDate && suggested[ms.id] ? suggested[ms.id] : null;
+    const displayDate= ms.date || sugDate;
+    const dateLabel  = displayDate ? formatDate(displayDate) : (ms.duration ? `~${ms.duration}d` : '—');
+    const dateClass  = ms.date ? (isOverdue(ms.date)?'overdue':isSoon(ms.date)?'soon':'has-date') : sugDate ? 'suggested' : '';
+    const isSug      = !ms.date && !!sugDate;
+
+    const riskBadge = isHigh
+      ? `<span class="tl-risk high" onclick="event.stopPropagation();triggerRiskChat('${ms.id}')" title="Click to discuss risks">&#x26A0; High Risk</span>`
+      : isMed
+      ? `<span class="tl-risk medium">&#x25CF; Watch</span>`
+      : `<span class="tl-risk low">&#x2713; Low Risk</span>`;
+
+    const hintTip = ms.hint ? `<div class="tl-hint">${ms.hint}</div>` : '';
 
     html += `<div class="tl-milestone ${msClass}" id="tl-ms-${ms.id}">
-      <div class="tl-milestone-header" onclick="toggleSubtasks('${ms.id}')">
-        <div class="tl-dot-col">
-          <div class="tl-dot ${dotClass}"></div>
-        </div>
-        <div class="tl-milestone-body">
-          <div class="tl-milestone-name">${ms.name}${isActive?` <span class="tl-status-badge active">NOW</span>`:isDone?` <span class="tl-status-badge done">✓</span>`:''}</div>
-          <div class="tl-date-row">
-            <span class="tl-date ${dateClass}" id="tl-date-${ms.id}">${dateStr}</span>
-            <button class="tl-edit-btn" onclick="event.stopPropagation();editDate('${ms.id}',false)" title="Edit date">✏</button>
+      <div class="tl-ms-header" onclick="toggleSubtasks('${ms.id}')">
+        <div class="tl-dot-col"><div class="tl-dot ${dotClass}"></div></div>
+        <div class="tl-ms-info">
+          <div class="tl-ms-name-row">
+            <span class="tl-ms-name">${tlName(ms)}</span>
+            ${isActive?'<span class="tl-now-badge">NOW</span>':isDone?'<span class="tl-done-badge">&#x2713;</span>':''}
           </div>
+          ${hintTip}
+          <div class="tl-date-row">
+            <span class="tl-date ${dateClass}" id="tl-date-${ms.id}" title="${isSug?'Suggested — click ✏ to confirm':''}">${isSug?'~ ':''}<span class="tl-date-val">${dateLabel}</span></span>
+            <button class="tl-edit-btn" onclick="event.stopPropagation();editDate('${ms.id}',false)" title="Set date">&#x270F;</button>
+            ${ms.date?`<button class="tl-clear-btn" onclick="event.stopPropagation();clearDate('${ms.id}',false)" title="Clear">&#x2715;</button>`:''}
+          </div>
+          <div class="tl-risk-row">${riskBadge}</div>
         </div>
       </div>`;
 
     // Subtasks
-    const openClass = (isActive || tlExpandedAll) ? 'open' : '';
+    const openClass = (isActive||tlExpandedAll)?'open':'';
     html += `<div class="tl-subtasks ${openClass}" id="tl-sub-${ms.id}">`;
     ms.subtasks.forEach(st => {
-      const stDone = st.status === 'done';
-      const stActive = st.status === 'active';
-      const stClass = stDone ? 'done-sub' : stActive ? 'active-sub' : '';
-      const stDate = st.date ? formatDate(st.date) : '—';
-      const stDateClass = st.date ? 'has-date' : '';
-      html += `<div class="tl-subtask ${stClass}" id="tl-st-${st.id}">
+      const stDone=st.status==='done', stActive=st.status==='active';
+      const stClass=stDone?'done-sub':stActive?'active-sub':'';
+      const stSug = !st.date && suggested[st.id] ? suggested[st.id] : null;
+      const stDisplay = st.date || stSug;
+      const stLabel = stDisplay ? formatDate(stDisplay) : '—';
+      const stDateClass = st.date?'has-date':stSug?'suggested':'';
+      html += `<div class="tl-subtask ${stClass}">
         <div class="tl-sub-dot"></div>
-        <div class="tl-sub-body">
-          <div class="tl-sub-name">${st.name}</div>
-          <div style="display:flex;align-items:center;gap:4px;">
-            <span class="tl-sub-date ${stDateClass}" id="tl-date-${st.id}">${stDate}</span>
-            <button class="tl-sub-edit" onclick="editDate('${st.id}',true)" title="Edit">✏</button>
+        <div class="tl-sub-info">
+          <div class="tl-sub-name">${tlName(st)}</div>
+          <div class="tl-sub-date-row">
+            <span class="tl-sub-date ${stDateClass}" id="tl-date-${st.id}">${stSug&&!st.date?'~ ':''}<span class="tl-date-val">${stLabel}</span></span>
+            <button class="tl-sub-edit" onclick="editDate('${st.id}',true)" title="Set">&#x270F;</button>
+            ${st.date?`<button class="tl-sub-clear" onclick="clearDate('${st.id}',true)" title="Clear">&#x2715;</button>`:''}
           </div>
         </div>
       </div>`;
     });
-    html += `</div>`;
-    if(mi < tl.length - 1) html += `<div class="tl-connector"></div>`;
-    html += `</div>`;
+    html += '</div>';
+    if(mi < tl.length-1) html += '<div class="tl-connector"></div>';
+    html += '</div>';
   });
 
-  body.innerHTML = html;
+  if(body) body.innerHTML = html;
+  syncDrawer(html, true);
+}
 
-  // Also render into mobile drawer
+function syncDrawer(html, started){
   const drawerBody = document.getElementById('tl-drawer-body');
   const drawerNote = document.getElementById('tl-drawer-note');
   const fabDot = document.getElementById('tl-fab-dot');
-  if(drawerBody){
-    if(!sessionStarted){
-      drawerBody.innerHTML='<div class="timeline-empty"><span class="timeline-empty-icon">&#x1F4C5;</span>Timeline will appear<br>after product alignment<br>is complete.</div>';
-      if(drawerNote)drawerNote.style.display='none';
-      if(fabDot)fabDot.classList.remove('show');
-    } else {
-      drawerBody.innerHTML = html;
-      if(drawerNote)drawerNote.style.display='block';
-      if(fabDot)fabDot.classList.add('show');
-    }
-  }
+  if(drawerBody) drawerBody.innerHTML = html;
+  if(drawerNote) drawerNote.style.display = started ? 'block' : 'none';
+  if(fabDot){ if(started) fabDot.classList.add('show'); else fabDot.classList.remove('show'); }
 }
 
 function openTimelineDrawer(){
@@ -559,7 +694,6 @@ function openTimelineDrawer(){
   document.getElementById('tl-drawer').classList.add('open');
   document.body.style.overflow='hidden';
 }
-
 function closeTimelineDrawer(){
   document.getElementById('tl-overlay').classList.remove('open');
   document.getElementById('tl-drawer').classList.remove('open');
@@ -567,56 +701,81 @@ function closeTimelineDrawer(){
 }
 
 function toggleSubtasks(msId){
-  const el = document.getElementById(`tl-sub-${msId}`);
-  if(el) el.classList.toggle('open');
+  // Toggle in both sidebar and drawer
+  ['tl-sub-'+msId].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.classList.toggle('open');
+  });
 }
 
 function toggleAllSubtasks(){
   tlExpandedAll = !tlExpandedAll;
-  const label = tlExpandedAll ? 'collapse all' : 'expand all';
-  const btn1 = document.getElementById('tl-toggle-btn');
-  const btn2 = document.getElementById('tl-drawer-expand');
-  if(btn1) btn1.textContent = label;
-  if(btn2) btn2.textContent = label;
+  const label = tlExpandedAll?'collapse all':'expand all';
+  ['tl-toggle-btn','tl-drawer-expand'].forEach(id=>{ const el=document.getElementById(id); if(el)el.textContent=label; });
   const tl = getTimeline(); if(!tl) return;
   tl.forEach(ms => {
-    const el = document.getElementById(`tl-sub-${ms.id}`);
-    if(el){ if(tlExpandedAll) el.classList.add('open'); else el.classList.remove('open'); }
+    const el = document.getElementById('tl-sub-'+ms.id);
+    if(el){ if(tlExpandedAll)el.classList.add('open'); else el.classList.remove('open'); }
   });
 }
 
 function editDate(nodeId, isSub){
   const tl = getTimeline(); if(!tl) return;
-  const spanId = `tl-date-${nodeId}`;
-  const span = document.getElementById(spanId);
+  // Find element in sidebar or drawer
+  const span = document.getElementById('tl-date-'+nodeId);
   if(!span) return;
 
-  // Find current date value
   let currentVal = '';
-  if(isSub){
-    tl.forEach(ms => ms.subtasks.forEach(st => { if(st.id === nodeId && st.date) currentVal = st.date; }));
-  } else {
-    const ms = tl.find(m => m.id === nodeId);
-    if(ms && ms.date) currentVal = ms.date;
-  }
+  if(isSub){ tl.forEach(ms=>ms.subtasks.forEach(st=>{ if(st.id===nodeId&&st.date)currentVal=st.date; })); }
+  else { const ms=tl.find(m=>m.id===nodeId); if(ms&&ms.date)currentVal=ms.date; }
 
   const input = document.createElement('input');
-  input.type = 'date'; input.className = 'tl-date-input'; input.value = currentVal;
+  input.type='date'; input.className='tl-date-input'; input.value=currentVal;
+  // Replace the whole span
   span.replaceWith(input); input.focus();
 
   function save(){
     const newDate = input.value || null;
-    if(isSub){
-      tl.forEach(ms => ms.subtasks.forEach(st => { if(st.id === nodeId) st.date = newDate; }));
-    } else {
-      const ms = tl.find(m => m.id === nodeId);
-      if(ms) ms.date = newDate;
-    }
+    if(isSub){ tl.forEach(ms=>ms.subtasks.forEach(st=>{ if(st.id===nodeId)st.date=newDate; })); }
+    else { const ms=tl.find(m=>m.id===nodeId); if(ms)ms.date=newDate; }
     saveTimeline(tl); renderTimeline();
   }
   input.onblur = save;
-  input.onkeydown = e => { if(e.key === 'Enter') input.blur(); if(e.key === 'Escape'){ renderTimeline(); } };
+  input.onkeydown = e => { if(e.key==='Enter')input.blur(); if(e.key==='Escape')renderTimeline(); };
 }
+
+function clearDate(nodeId, isSub){
+  const tl = getTimeline(); if(!tl) return;
+  if(isSub){ tl.forEach(ms=>ms.subtasks.forEach(st=>{ if(st.id===nodeId)st.date=null; })); }
+  else { const ms=tl.find(m=>m.id===nodeId); if(ms)ms.date=null; }
+  saveTimeline(tl); renderTimeline();
+}
+
+// High-risk node clicked → inject Kickman message into chat
+function triggerRiskChat(msId){
+  const tl = getTimeline(); if(!tl) return;
+  const ms = tl.find(m=>m.id===msId); if(!ms||!ms.riskNote) return;
+
+  const riskMessages = {
+    'hardware-dev': `⚠️ **Hardware milestone risk flagged.**\n\n${ms.riskNote}\n\nA few things I want to make sure we've covered:\n1. Do you have a confirmed factory partner and tooling timeline?\n2. What's your current stage — EVT, DVT, or PVT?\n3. What's your buffer between PVT completion and your planned launch date?\n\nIf PVT isn't locked before your Kickstarter goes live, we need to talk about how you'll communicate manufacturing risk to backers.`,
+    'early-units': `⚠️ **Beta testing risk flagged.**\n\n${ms.riskNote}\n\nKey questions:\n1. Do you have 5–10 real users lined up to test the product before launch?\n2. What's your honest assessment of the product's current reliability?\n3. What would need to be true for you to decide NOT to launch after beta testing?\n\nThe beta test is your last honest check. The campaign can be paused — a failed delivery cannot.`,
+    'fulfillment': `⚠️ **Fulfillment risk flagged.**\n\n${ms.riskNote}\n\nLet's pressure-test your delivery plan:\n1. What's your current estimated ship date to backers?\n2. Is that estimate based on a confirmed production schedule, or a best guess?\n3. Have you built in 2–3 months of buffer for customs, logistics, or manufacturing delays?\n\nI'd rather we set a later date that you hit than an optimistic one that you miss.`
+  };
+
+  const msg = riskMessages[msId] || `⚠️ **${ms.name} — Risk Alert**\n\n${ms.riskNote}`;
+
+  // Show in chat
+  const container = document.getElementById('messages');
+  if(!container) return;
+  addMessageDOM('km', msg);
+
+  // If mobile drawer is open, close it so user sees the chat
+  closeTimelineDrawer();
+
+  // Scroll to bottom
+  setTimeout(()=>{ container.scrollTop = container.scrollHeight; }, 100);
+}
+
 
 function formatDate(dateStr){
   if(!dateStr) return '—';
