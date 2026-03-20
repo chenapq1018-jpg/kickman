@@ -216,6 +216,9 @@
   .tl-risk.low{background:var(--green-dim);color:var(--green);}
   .tl-risk.low:hover{filter:brightness(1.2);}
   .tl-risk-edit{font-size:8px;opacity:0;transition:opacity .15s;margin-left:1px;}
+  .tl-risk-discuss{background:none;border:none;cursor:pointer;font-size:11px;padding:0 2px;opacity:0;transition:opacity .15s;vertical-align:middle;line-height:1;}
+  .tl-ms-header:hover .tl-risk-discuss{opacity:.8;}
+  .tl-risk-discuss:hover{opacity:1!important;}
   .tl-ms-header:hover .tl-risk-edit{opacity:.7;}
   .tl-risk-row{margin-top:3px;}
   /* Hint text */
@@ -664,11 +667,13 @@ function renderTimeline(){
     const isSug      = !ms.date && !!sugDate;
 
     const riskLabel = isHigh ? '&#x26A0; High Risk' : isMed ? '&#x25CF; Watch' : '&#x2713; Low Risk';
-    const riskTitle = isHigh ? 'Click to discuss · right-click or long-press to change' : 'Click to change risk level';
+    // Badge always cycles risk level on click
+    // High risk gets an extra "discuss" button next to it
     const riskBadge = `<span class="tl-risk ${ms.risk||'low'} clickable"
-      onclick="event.stopPropagation();${isHigh?`triggerRiskChat('${ms.id}')`:`cycleRisk('${ms.id}',event)`}"
-      oncontextmenu="event.preventDefault();cycleRisk('${ms.id}',event)"
-      title="${riskTitle}">${riskLabel} <span class="tl-risk-edit">&#x21BB;</span></span>`;
+      onclick="event.stopPropagation();cycleRisk('${ms.id}',event)"
+      title="Click to change risk level">${riskLabel} <span class="tl-risk-edit">&#x21BB;</span></span>${isHigh
+      ? ` <button class="tl-risk-discuss" onclick="event.stopPropagation();triggerRiskChat('${ms.id}')" title="Discuss this risk with Kickman">&#x1F4AC;</button>`
+      : ''}`;
 
     const hintTip = ms.hint ? `<div class="tl-hint">${ms.hint}</div>` : '';
 
