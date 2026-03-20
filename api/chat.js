@@ -5,7 +5,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { messages, system, password } = req.body;
+  const { messages, system, password, max_tokens } = req.body;
 
   const ACCESS_PASSWORD = process.env.ACCESS_PASSWORD;
   if (ACCESS_PASSWORD && password !== ACCESS_PASSWORD) {
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 2048,
+        max_tokens: max_tokens || 2048,
         system,
         messages,
       }),
