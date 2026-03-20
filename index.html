@@ -260,7 +260,94 @@
   .tl-milestone.active-ms .tl-ms-header{background:var(--accent-dim2);}
 
   @media(max-width:1080px){.timeline-panel{display:none}}
-  @media(max-width:680px){.sidebar{display:none}.messages{padding:20px 16px}.input-area{padding:10px 16px 14px}.login-card{padding:32px 24px}}
+  /* ── MOBILE ── */
+  @media(max-width:680px){
+    /* Fix content overflow */
+    .messages{padding:12px 14px;overflow-x:hidden;}
+    .message{max-width:100%;min-width:0;}
+    .msg-content{word-break:break-word;overflow-wrap:anywhere;}
+    .msg-content table{font-size:11px;display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    .msg-content pre,.msg-content code{white-space:pre-wrap;word-break:break-all;}
+
+    /* Hide desktop sidebar */
+    .sidebar{display:none;}
+
+    /* Simplified header: just logo + step dots */
+    header{padding:0 14px;height:48px;}
+    .header-user{display:none;}
+    .header-btn{display:none;}
+    .step-indicator{gap:4px;}
+
+    /* Mobile bottom nav bar */
+    .mobile-nav{display:flex;}
+
+    /* Input area */
+    .input-area{padding:8px 12px 12px;}
+    .input-hint{display:none;}
+
+    /* FAB higher to clear bottom nav */
+    .tl-fab{bottom:72px;}
+
+    /* Login card */
+    .login-card{padding:32px 20px;}
+  }
+
+  /* Mobile bottom navigation bar */
+  .mobile-nav{
+    display:none;
+    position:fixed;bottom:0;left:0;right:0;
+    height:56px;background:var(--surface);
+    border-top:1px solid var(--border);
+    z-index:40;
+    align-items:stretch;
+  }
+  .mobile-nav-btn{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:3px;background:none;border:none;cursor:pointer;
+    font-family:var(--font-mono);font-size:8px;letter-spacing:1px;
+    color:var(--text-3);text-transform:uppercase;transition:color .15s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .mobile-nav-btn:active{background:rgba(255,255,255,.04);}
+  .mobile-nav-btn.active{color:var(--accent);}
+  .mobile-nav-btn svg{width:20px;height:20px;}
+  .mobile-nav-dot{width:5px;height:5px;border-radius:50%;background:var(--green);
+    position:absolute;top:8px;right:calc(50% - 18px);}
+
+  /* Mobile projects drawer */
+  .mob-projects-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:80;}
+  .mob-projects-overlay.open{display:block;}
+  .mob-projects-drawer{position:fixed;bottom:0;left:0;right:0;
+    max-height:72vh;background:var(--surface);border-top:1px solid var(--border);
+    z-index:90;border-radius:16px 16px 0 0;display:flex;flex-direction:column;
+    transform:translateY(100%);transition:transform .28s cubic-bezier(.32,0,.15,1);}
+  .mob-projects-drawer.open{transform:translateY(0);}
+  .mob-proj-head{padding:16px 18px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;}
+  .mob-proj-title{font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--text-3);text-transform:uppercase;}
+  .mob-proj-actions{display:flex;gap:10px;align-items:center;}
+  .mob-proj-new{font-family:var(--font-mono);font-size:10px;color:var(--accent);background:none;border:none;cursor:pointer;letter-spacing:1px;}
+  .mob-proj-close{width:28px;height:28px;background:var(--card);border:1px solid var(--border);color:var(--text-2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:2px;}
+  .mob-proj-list{overflow-y:auto;flex:1;padding:6px 0 env(safe-area-inset-bottom,0);}
+  .mob-proj-item{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);}
+  .mob-proj-item:active{background:rgba(255,255,255,.04);}
+  .mob-proj-item.active{background:var(--accent-dim2);}
+  .mob-proj-dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0;}
+  .mob-proj-item.active .mob-proj-dot{background:var(--accent);}
+  .mob-proj-info{flex:1;min-width:0;}
+  .mob-proj-name{font-size:14px;font-weight:500;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .mob-proj-item.active .mob-proj-name{color:var(--text);}
+  .mob-proj-meta{font-family:var(--font-mono);font-size:10px;color:var(--text-3);margin-top:2px;display:flex;gap:8px;}
+  .mob-proj-badge{font-size:9px;padding:1px 5px;border-radius:2px;}
+  .mob-proj-badge.go{background:var(--green-dim);color:var(--green);}
+  .mob-proj-badge.no-go{background:var(--red-dim);color:var(--red);}
+  .mob-proj-del{font-size:16px;color:var(--text-3);background:none;border:none;cursor:pointer;padding:4px;}
+  .mob-proj-del:active{color:var(--red);}
+
+  /* Push chat content above bottom nav on mobile */
+  @media(max-width:680px){
+    .chat-container{padding-bottom:56px;}
+    body{padding-bottom:env(safe-area-inset-bottom,0);}
+  }
 
   /* MOBILE TIMELINE FAB + DRAWER */
   .tl-fab{display:none;position:fixed;bottom:84px;right:16px;width:46px;height:46px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:18px;cursor:pointer;z-index:50;box-shadow:0 4px 20px rgba(0,0,0,.5);align-items:center;justify-content:center;transition:transform .2s;}
@@ -290,7 +377,7 @@
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo">Kick<span>man</span></div>
-    <div class="login-tagline">Crowdfunding Coach · Mission 1</div>
+    <div class="login-tagline">Crowdfunding Coach</div>
     <div class="login-label">Your Name</div>
     <input type="text" class="login-input" id="login-username" placeholder="e.g. john or john@email.com" autocomplete="username" autocapitalize="none">
     <div class="login-label">Access Password</div>
@@ -317,6 +404,57 @@
     <button class="header-btn" onclick="doLogout()">Log out</button>
   </div>
 </header>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav" id="mobile-nav" style="display:none;">
+  <!-- Projects -->
+  <button class="mobile-nav-btn" id="mob-nav-projects" onclick="openMobProjects()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+    </svg>
+    Projects
+  </button>
+  <!-- Chat -->
+  <button class="mobile-nav-btn active" id="mob-nav-chat" onclick="showMobChat()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+    Chat
+  </button>
+  <!-- Timeline -->
+  <button class="mobile-nav-btn" id="mob-nav-timeline" onclick="openTimelineDrawer()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+    </svg>
+    Timeline
+  </button>
+  <!-- Menu (export / logout) -->
+  <button class="mobile-nav-btn" id="mob-nav-menu" onclick="toggleMobMenu()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+    </svg>
+    More
+  </button>
+</nav>
+
+<!-- MOBILE MENU POPUP -->
+<div id="mob-menu-popup" style="display:none;position:fixed;bottom:64px;right:12px;background:var(--surface);border:1px solid var(--border);z-index:100;min-width:140px;">
+  <button onclick="exportChat();toggleMobMenu()" style="display:block;width:100%;padding:14px 18px;background:none;border:none;color:var(--text-2);font-family:var(--font-mono);font-size:11px;letter-spacing:1px;text-align:left;cursor:pointer;">Export</button>
+  <button onclick="doLogout();toggleMobMenu()" style="display:block;width:100%;padding:14px 18px;background:none;border:none;color:var(--red);font-family:var(--font-mono);font-size:11px;letter-spacing:1px;text-align:left;cursor:pointer;">Log out</button>
+</div>
+
+<!-- MOBILE PROJECTS DRAWER -->
+<div class="mob-projects-overlay" id="mob-projects-overlay" onclick="closeMobProjects()"></div>
+<div class="mob-projects-drawer" id="mob-projects-drawer">
+  <div class="mob-proj-head">
+    <span class="mob-proj-title">Projects</span>
+    <div class="mob-proj-actions">
+      <button class="mob-proj-new" onclick="createNewSession();closeMobProjects()">+ New</button>
+      <button class="mob-proj-close" onclick="closeMobProjects()">&#x2715;</button>
+    </div>
+  </div>
+  <div class="mob-proj-list" id="mob-proj-list"></div>
+</div>
 
 <div class="app-layout">
 
@@ -750,11 +888,13 @@ function openTimelineDrawer(){
   document.getElementById('tl-overlay').classList.add('open');
   document.getElementById('tl-drawer').classList.add('open');
   document.body.style.overflow='hidden';
+  setMobNavActive('timeline');
 }
 function closeTimelineDrawer(){
   document.getElementById('tl-overlay').classList.remove('open');
   document.getElementById('tl-drawer').classList.remove('open');
   document.body.style.overflow='';
+  setMobNavActive('chat');
 }
 
 function toggleSubtasks(msId){
@@ -1688,8 +1828,8 @@ async function doLogin() {
     currentUser=username; currentPw=password; sessions=data.sessions||[];
     document.getElementById('login-screen').style.display='none';
     document.getElementById('header-user').textContent=username;
-    // Show FAB on mobile after login
-    if(window.innerWidth <= 1080){ var fab=document.getElementById('tl-fab'); if(fab)fab.style.display='flex'; }
+    // Init mobile nav after login
+    initMobileNav();
     if (sessions.length===0) createNewSession(true);
     else loadSession(sessions[0].id);
   } catch(e) { errEl.textContent='Connection error. Try again.'; errEl.style.display='block'; btn.disabled=false; btn.textContent='Enter →'; }
@@ -1707,6 +1847,7 @@ function doLogout() {
   document.getElementById('login-screen').style.display='flex';
   document.getElementById('login-password').value='';
   var fab=document.getElementById('tl-fab'); if(fab)fab.style.display='none';
+  var nav=document.getElementById('mobile-nav'); if(nav)nav.style.display='none';
   document.getElementById('login-error').style.display='none';
   document.getElementById('header-user').textContent='';
   document.getElementById('login-btn').disabled=false;
@@ -2039,6 +2180,99 @@ function removeTyping(){document.getElementById('typing-indicator')?.remove();}
 // ── UTILS ───────────────────────────────────────────────────────────────────────
 function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,200)+'px';}
 function setSendDisabled(v){document.getElementById('send-btn').disabled=v;}
+
+// ── MOBILE NAV ────────────────────────────────────────────────────────────────
+function initMobileNav(){
+  if(window.innerWidth > 680) return;
+  const nav = document.getElementById('mobile-nav');
+  if(nav) nav.style.display = 'flex';
+  const fab = document.getElementById('tl-fab');
+  if(fab) fab.style.display = 'none';
+}
+
+function openMobProjects(){
+  renderMobProjectList();
+  document.getElementById('mob-projects-overlay').classList.add('open');
+  document.getElementById('mob-projects-drawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setMobNavActive('projects');
+}
+
+function closeMobProjects(){
+  document.getElementById('mob-projects-overlay').classList.remove('open');
+  document.getElementById('mob-projects-drawer').classList.remove('open');
+  document.body.style.overflow = '';
+  setMobNavActive('chat');
+}
+
+function showMobChat(){
+  closeMobProjects();
+  closeTimelineDrawer();
+  closeMobMenu();
+  setMobNavActive('chat');
+}
+
+function toggleMobMenu(){
+  const popup = document.getElementById('mob-menu-popup');
+  if(!popup) return;
+  const isOpen = popup.style.display !== 'none';
+  popup.style.display = isOpen ? 'none' : 'block';
+  if(!isOpen){
+    setTimeout(() => document.addEventListener('click', closeMobMenu, {once:true}), 10);
+  }
+}
+
+function closeMobMenu(){
+  const popup = document.getElementById('mob-menu-popup');
+  if(popup) popup.style.display = 'none';
+}
+
+function setMobNavActive(tab){
+  ['projects','chat','timeline','menu'].forEach(t => {
+    const btn = document.getElementById('mob-nav-'+t);
+    if(btn) btn.classList.toggle('active', t===tab);
+  });
+}
+
+function renderMobProjectList(){
+  const list = document.getElementById('mob-proj-list');
+  if(!list) return;
+  if(sessions.length === 0){
+    list.innerHTML = '<div style="padding:20px 18px;font-family:var(--font-mono);font-size:10px;color:var(--text-3)">No projects yet</div>';
+    return;
+  }
+  list.innerHTML = sessions.map(s => {
+    const isActive = s.id === activeId;
+    const date = new Date(s.updatedAt).toLocaleDateString('en',{month:'short',day:'numeric'});
+    let badgeHtml = '';
+    if(s.verdict==='go') badgeHtml = '<span class="mob-proj-badge go">GO</span>';
+    else if(s.verdict==='no-go') badgeHtml = '<span class="mob-proj-badge no-go">No-Go</span>';
+    else badgeHtml = '<span style="font-family:var(--font-mono);font-size:9px;color:var(--text-3)">Step '+(s.step||1)+'</span>';
+    return '<div class="mob-proj-item '+(isActive?'active':'')+'" onclick="loadSession(\''+s.id+'\');closeMobProjects()">'
+      +'<div class="mob-proj-dot"></div>'
+      +'<div class="mob-proj-info">'
+      +'<div class="mob-proj-name">'+escHtml(s.name)+'</div>'
+      +'<div class="mob-proj-meta"><span>'+date+'</span>'+badgeHtml+'</div>'
+      +'</div>'
+      +'<button class="mob-proj-del" onclick="event.stopPropagation();confirmDeleteMob(\''+s.id+'\')">&#x2715;</button>'
+      +'</div>';
+  }).join('');
+}
+
+function confirmDeleteMob(id){
+  if(sessions.length <= 1){ alert('You need at least one project.'); return; }
+  if(!confirm('Delete this project?')) return;
+  sessions = sessions.filter(s => s.id !== id);
+  fetch('/api/sessions',{method:'DELETE',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({username:currentUser,password:currentPw,sessionId:id})});
+  if(activeId === id){
+    if(sessions.length > 0) loadSession(sessions[0].id);
+    else createNewSession();
+  }
+  renderMobProjectList();
+  renderList();
+  closeMobProjects();
+}
 
 function exportChat(){
   const s=getSession(activeId);if(!s)return;
