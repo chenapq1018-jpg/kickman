@@ -229,6 +229,25 @@
   .tl-sub-clear:hover{color:var(--red);opacity:1!important;}
   /* Sub date row */
   .tl-sub-date-row{display:flex;align-items:center;gap:3px;}
+  /* Date chip — the main clickable date element */
+  .tl-date-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:3px;font-family:var(--font-mono);font-size:10px;transition:all .15s;border:1px dashed var(--border);}
+  .tl-date-chip:hover,.tl-date-row:hover .tl-date-chip{border-color:var(--accent);background:var(--accent-dim2);}
+  .tl-date-chip.set{border-style:solid;border-color:var(--border);}
+  .tl-date-chip.set:hover{border-color:var(--accent);}
+  .tl-date-chip.suggested{border-style:dashed;border-color:var(--text-3);color:var(--text-3);}
+  .tl-date-chip.overdue{border-color:var(--red);color:var(--red);}
+  .tl-date-chip.soon{border-color:var(--yellow);color:var(--yellow);}
+  .tl-date-chip.has-date .tl-date-val{color:var(--text-2);}
+  .tl-date-placeholder{color:var(--text-3);font-size:9px;letter-spacing:.5px;}
+  .tl-date-chip:hover .tl-date-placeholder{color:var(--accent);}
+  .tl-date-cal-icon{font-size:10px;opacity:.7;}
+  .tl-date-sug-icon{font-size:9px;opacity:.7;}
+  .tl-date-sug-label{font-size:8px;color:var(--text-3);font-style:italic;letter-spacing:.3px;}
+  .tl-sub-placeholder{font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:.3px;}
+  .tl-sub-date-row:hover .tl-sub-placeholder{color:var(--accent);}
+  /* Remove old separate edit button since whole row is now clickable */
+  .tl-edit-btn{display:none;}
+  .tl-sub-edit{display:none;}
   .timeline-note{padding:8px 14px;font-family:var(--font-mono);font-size:9px;color:var(--text-3);line-height:1.7;border-top:1px solid var(--border);flex-shrink:0;}
   .tl-milestone.active-ms .tl-ms-header{background:var(--accent-dim2);}
 
@@ -640,10 +659,14 @@ function renderTimeline(){
             ${isActive?'<span class="tl-now-badge">NOW</span>':isDone?'<span class="tl-done-badge">&#x2713;</span>':''}
           </div>
           ${hintTip}
-          <div class="tl-date-row">
-            <span class="tl-date ${dateClass}" id="tl-date-${ms.id}" title="${isSug?'Suggested — click ✏ to confirm':''}">${isSug?'~ ':''}<span class="tl-date-val">${dateLabel}</span></span>
-            <button class="tl-edit-btn" onclick="event.stopPropagation();editDate('${ms.id}',false)" title="Set date">&#x270F;</button>
-            ${ms.date?`<button class="tl-clear-btn" onclick="event.stopPropagation();clearDate('${ms.id}',false)" title="Clear">&#x2715;</button>`:''}
+          <div class="tl-date-row" onclick="event.stopPropagation();editDate('${ms.id}',false)" title="${isSug?'Suggested — click to confirm':'Click to set date'}" style="cursor:pointer;">
+            <span class="tl-date-chip ${dateClass} ${isSug?'suggested':ms.date?'set':''}" id="tl-date-${ms.id}">
+              ${!ms.date && !sugDate ? '<span class="tl-date-placeholder">+ Set date</span>' : ''}
+              ${isSug ? '<span class="tl-date-sug-icon">&#x1F4A1;</span>' : ms.date ? '<span class="tl-date-cal-icon">&#x1F4C5;</span>' : ''}
+              <span class="tl-date-val">${ms.date||sugDate ? dateLabel : ''}</span>
+              ${isSug ? '<span class="tl-date-sug-label">suggested</span>' : ''}
+            </span>
+            ${ms.date?`<button class="tl-clear-btn" onclick="event.stopPropagation();clearDate('${ms.id}',false)" title="Clear date">&#x2715;</button>`:''}
           </div>
           <div class="tl-risk-row">${riskBadge}</div>
         </div>
@@ -663,10 +686,12 @@ function renderTimeline(){
         <div class="tl-sub-dot"></div>
         <div class="tl-sub-info">
           <div class="tl-sub-name">${tlName(st)}</div>
-          <div class="tl-sub-date-row">
-            <span class="tl-sub-date ${stDateClass}" id="tl-date-${st.id}">${stSug&&!st.date?'~ ':''}<span class="tl-date-val">${stLabel}</span></span>
-            <button class="tl-sub-edit" onclick="editDate('${st.id}',true)" title="Set">&#x270F;</button>
-            ${st.date?`<button class="tl-sub-clear" onclick="clearDate('${st.id}',true)" title="Clear">&#x2715;</button>`:''}
+          <div class="tl-sub-date-row" onclick="editDate('${st.id}',true)" style="cursor:pointer;" title="Click to set date">
+            <span class="tl-sub-date ${stDateClass}" id="tl-date-${st.id}">
+              ${!st.date&&!stSug?'<span class="tl-sub-placeholder">+ date</span>':''}
+              <span class="tl-date-val">${stSug&&!st.date?'~ ':''}</span><span class="tl-date-val">${stLabel!=='—'?stLabel:''}</span>
+            </span>
+            ${st.date?`<button class="tl-sub-clear" onclick="event.stopPropagation();clearDate('${st.id}',true)" title="Clear">&#x2715;</button>`:''}
           </div>
         </div>
       </div>`;
@@ -804,16 +829,43 @@ function parseTimelineUpdate(text){
   try { return JSON.parse(match[1].trim()); } catch(e){ return null; }
 }
 
+// Build a compact timeline summary to inject into system prompt context
+function buildTimelineContext(){
+  const tl = getTimeline();
+  if(!tl) return '';
+  const lines = ['\n\n# CURRENT CAMPAIGN TIMELINE'];
+  tl.forEach(ms => {
+    const statusIcon = ms.status==='done'?'[DONE]':ms.status==='active'?'[ACTIVE]':'[PENDING]';
+    const dateStr = ms.date ? ms.date : 'TBD';
+    const riskStr = ms.risk==='high'?'⚠HIGH':ms.risk==='medium'?'●MED':'✓LOW';
+    lines.push(`${statusIcon} ${ms.name} | Date: ${dateStr} | Risk: ${riskStr}`);
+    ms.subtasks.forEach(st => {
+      const stIcon = st.status==='done'?'  ✓':st.status==='active'?'  →':'  -';
+      lines.push(`${stIcon} ${st.name}: ${st.date||'TBD'}`);
+    });
+  });
+  lines.push('\n(To update timeline, output a <!--TIMELINE_UPDATE:{...}--> block anywhere in your response.)');
+  return lines.join('\n');
+}
+
 function applyTimelineUpdate(update){
-  const tl = getTimeline(); if(!tl || !update) return;
-  // Update can be: { milestoneId: { date, status }, subtaskId: { date, status } }
+  if(!update) return;
+  // Handle language switch
+  if(update.__lang__){
+    tlLang = update.__lang__;
+    renderTimeline();
+    return;
+  }
+  const tl = getTimeline(); if(!tl) return;
   Object.keys(update).forEach(id => {
+    if(id==='__lang__') return;
     const val = update[id];
     // Try milestone first
     const ms = tl.find(m => m.id === id);
     if(ms){
       if(val.date !== undefined) ms.date = val.date;
       if(val.status !== undefined) ms.status = val.status;
+      if(val.risk !== undefined) ms.risk = val.risk;
       return;
     }
     // Try subtask
@@ -827,6 +879,9 @@ function applyTimelineUpdate(update){
   });
   saveTimeline(tl);
   renderTimeline();
+  // Flash the timeline panel to signal update
+  const panel = document.getElementById('timeline-body');
+  if(panel){ panel.style.transition='background .3s'; panel.style.background='rgba(232,98,42,0.06)'; setTimeout(()=>panel.style.background='',500); }
 }
 
 // Auto-detect current active milestone based on step
@@ -1018,29 +1073,57 @@ Output **KICKMAN MISSION 1 — FINAL REPORT** with:
 
 # TIMELINE SYSTEM
 
-After completing Step 2 (Readiness Score delivered and confirmed by user), generate a timeline update JSON block embedded in your response. Use this exact format:
+You have access to the founder's live campaign timeline (shown at the end of this system prompt as CURRENT CAMPAIGN TIMELINE). You must actively use it, update it during conversation, and flag risks.
+
+## When to output a TIMELINE_UPDATE block
+
+Output a <!--TIMELINE_UPDATE:{...}--> block whenever:
+- User mentions a date, deadline, or time goal ("I want to launch in May", "we're targeting Q3")
+- User shares hardware progress ("DVT is done", "PVT starts next month")
+- User confirms or changes any milestone status
+- You detect a timeline that is too tight and needs flagging
+- After Step 2 scoring — set "validation" to active
+
+## How to output updates
+
+Embed this block ANYWHERE in your response (it will be parsed and hidden from the user):
 
 <!--TIMELINE_UPDATE:
 {
-  "validation": {"status": "active", "date": null},
-  "lp-design": {"status": "active", "date": null},
-  "price-confirm": {"status": "pending", "date": null},
-  "launch": {"date": "YYYY-MM-DD or null"},
-  "campaign-end": {"date": null},
-  "ship-batch1": {"date": null}
+  "launch": {"date": "2026-05-01"},
+  "hardware-dev": {"status": "active"},
+  "dvt": {"status": "done"},
+  "evt": {"status": "done"}
 }
 -->
 
-Rules for timeline updates:
-- Only include keys you want to update (don't include all keys)
-- Set status to "active" for the milestone the founder is currently working on
-- Set status to "done" for completed milestones
-- Set status to "pending" for future milestones
-- Use YYYY-MM-DD date format if a date is known from conversation
-- Set date to null if unknown/not yet planned
-- Include this JSON block ONLY after Step 2 scoring AND whenever the user discusses dates or timeline changes
-- You can suggest dates based on typical hardware development timelines
-- Valid milestone IDs: validation, lp-design, lp-launch, lp-end, price-confirm, msrp, tiers, hardware-dev, evt, dvt, pvt, mp, early-units, beta-select, beta-ship, beta-feedback, pre-campaign, pre-start, pre-list, video-prod, script, shoot, edit, video-final, launch, page-live, campaign-start, campaign-end, funded-check, backer-count, fulfillment, ship-batch1, ship-batch2, ship-all`;
+Rules:
+- Only include keys you want to change (omit everything else)
+- Dates use YYYY-MM-DD format
+- Status values: "pending", "active", "done"
+- If user says "May 1st" without a year, ask: "Is that May 2026?" before setting the date
+- After setting launch date, the frontend auto-calculates suggested dates for all other milestones
+
+## Risk assessment during conversation
+
+When discussing hardware milestones:
+- If EVT+DVT are done → reduce hardware-dev risk in your language, update status to "active" or "done"
+- If PVT is not complete and launch is <3 months away → warn clearly, suggest delay
+- Output: <!--TIMELINE_UPDATE:{"hardware-dev":{"status":"active"},"evt":{"status":"done"},"dvt":{"status":"done"}}-->
+
+When user proposes a launch date:
+- Calculate backward: is there enough time for video (6 wks), warmup (6 wks), beta test (2 wks)?
+- If timeline is too tight, say so directly and suggest a safer date
+- Example: "May 1st leaves you 8 weeks from today. That's tight — video alone takes 6 weeks minimum. I'd suggest June 15th instead. Want me to set that?"
+
+## Language rule for timeline
+
+The timeline panel defaults to English. If the user says "把时间轴改成中文" or similar, output:
+<!--TIMELINE_UPDATE:{"__lang__":"zh"}-->
+
+## Valid milestone IDs
+Milestones: validation, price-confirm, hardware-dev, early-units, pre-campaign, video-prod, launch, campaign-end, fulfillment
+Subtasks: lp-design, lp-launch, lp-end, msrp, tiers, evt, dvt, pvt, mp, beta-select, beta-ship, beta-feedback, pre-start, pre-list, script, shoot, edit, video-final, page-live, campaign-start, funded-check, backer-count, ship-batch1, ship-batch2, ship-all`;
 
 const SYSTEM_M2 = `# IDENTITY
 
@@ -1332,7 +1415,10 @@ async function callKickman(trigger){
   }
 
   const curSess=getSession(activeId);
-  const sysPrompt=getSystemPrompt(curSess?curSess.mission||1:1);
+  const baseSysPrompt=getSystemPrompt(curSess?curSess.mission||1:1);
+  // Append current timeline state so Kickman can reference and update it
+  const tlContext = (trigger!=='start') ? buildTimelineContext() : '';
+  const sysPrompt = baseSysPrompt + tlContext;
   const apiMessages=trigger==='m2start'?[{role:'user',content:'Begin Mission 2.'}]:messages;
   showTyping();
   try{
