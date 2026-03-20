@@ -917,21 +917,136 @@ function parseTimelineUpdate(text){
 }
 
 // Build a compact timeline summary to inject into system prompt context
+// ── CONTEXT MANAGEMENT ────────────────────────────────────────────────────────
+
+// How many recent messages to always keep verbatim
+const RECENT_MSGS_KEEP = 14;
+// Trigger summarization when history exceeds this
+const SUMMARIZE_THRESHOLD = 22;
+
+// Build the message array to send to API
+// Strategy: project memory in system prompt + recent N messages verbatim
+function buildMessageHistory(session){
+  const hist = session.history;
+  // If short enough, send everything
+  if(hist.length <= RECENT_MSGS_KEEP + 2){
+    return convertHistoryToAPI(hist);
+  }
+  // Keep the most recent RECENT_MSGS_KEEP messages
+  // Earlier messages are captured in session.projectMemory (built by summarizeEarlyHistory)
+  const recent = hist.slice(-RECENT_MSGS_KEEP);
+  return convertHistoryToAPI(recent);
+}
+
+function convertHistoryToAPI(hist){
+  return hist.map(msg => {
+    if(msg.role==='user' && msg.images && msg.images.length>0){
+      const content=[{type:'text',text:msg.content||''}];
+      msg.images.forEach(img=>{
+        content.push({type:'image',source:{type:'base64',media_type:img.mediaType,data:img.base64}});
+      });
+      return {role:'user',content};
+    }
+    // Strip TIMELINE_UPDATE blocks from assistant messages to save tokens
+    const text = typeof msg.content==='string'
+      ? msg.content.replace(/<!--TIMELINE_UPDATE:[\s\S]*?-->/g,'').trim()
+      : msg.content;
+    return {role:msg.role, content:text};
+  });
+}
+
+// Build project memory context to inject into system prompt
+// This is the "permanent memory" that never gets dropped
+function buildMemoryContext(session){
+  if(!session) return '';
+  const parts = [];
+
+  // If we have a saved summary, include it
+  if(session.projectMemory){
+    parts.push('\n\n# PROJECT MEMORY (summarized from earlier conversation)\n' + session.projectMemory);
+  }
+
+  return parts.join('');
+}
+
+// Summarize early history into project memory using Claude API
+// Called automatically when history gets long
+async function summarizeEarlyHistory(sessionId){
+  const session = getSession(sessionId);
+  if(!session || session.history.length < SUMMARIZE_THRESHOLD) return;
+  // Don't re-summarize if we just did it recently (within last 4 messages)
+  if(session.lastSummarizedAt && session.history.length - session.lastSummarizedAt < 4) return;
+
+  // Messages to summarize: everything except the last RECENT_MSGS_KEEP
+  const toSummarize = session.history.slice(0, -RECENT_MSGS_KEEP);
+  if(toSummarize.length < 4) return;
+
+  const summaryPrompt = `You are summarizing a conversation between a crowdfunding coach (Kickman) and a founder.
+Extract and preserve ALL key facts as a structured memory block. Be thorough — this summary replaces the original messages.
+
+Include:
+- Product name, description, what it does
+- Target customer and market
+- COGS, target price, margins
+- Hardware stage (EVT/DVT/PVT/MP status)
+- Launch timeline and shipping timeline
+- Existing community, audience, social presence
+- Competitors and differentiation
+- Key risks or concerns raised
+- Decisions already made (marketing angle chosen, pricing confirmed, etc.)
+- Readiness score and reasoning if given
+- Any other facts the founder shared
+
+Format as a clean bullet list under clear headers. Be specific — include actual numbers, dates, and names mentioned.`;
+
+  const msgs = convertHistoryToAPI(toSummarize);
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        messages: [{role:'user', content: summaryPrompt + '\n\nConversation to summarize:\n---\n' +
+          msgs.map(m => `[${m.role.toUpperCase()}]: ${typeof m.content==='string'?m.content:m.content[0]?.text||''}`).join('\n\n')}],
+        system: 'You are a precise assistant that extracts key facts from conversations. Output only the structured summary, no preamble.',
+        password: currentPw,
+        max_tokens: 800
+      })
+    });
+    if(!res.ok) return;
+    const data = await res.json();
+    const summary = data.content?.[0]?.text || '';
+    if(summary.length > 50){
+      const fresh = getSession(sessionId);
+      if(fresh){
+        fresh.projectMemory = summary;
+        fresh.lastSummarizedAt = fresh.history.length;
+        fresh.updatedAt = Date.now();
+        scheduleSave(fresh);
+      }
+    }
+  } catch(e){ console.warn('Summarization failed:', e); }
+}
+
 function buildTimelineContext(){
   const tl = getTimeline();
   if(!tl) return '';
-  const lines = ['\n\n# CURRENT CAMPAIGN TIMELINE'];
+  const lines = ['\n\n# CURRENT CAMPAIGN TIMELINE (update via <!--TIMELINE_UPDATE:{...}-->)'];
   tl.forEach(ms => {
-    const statusIcon = ms.status==='done'?'[DONE]':ms.status==='active'?'[ACTIVE]':'[PENDING]';
-    const dateStr = ms.date ? ms.date : 'TBD';
-    const riskStr = ms.risk==='high'?'⚠HIGH':ms.risk==='medium'?'●MED':'✓LOW';
-    lines.push(`${statusIcon} ${ms.name} | Date: ${dateStr} | Risk: ${riskStr}`);
+    // Only include milestones that have a date or non-pending status — skip empty pending ones
+    const hasInfo = ms.date || ms.status !== 'pending' || ms.subtasks.some(s => s.date || s.status !== 'pending');
+    if(!hasInfo) return;
+    const s = ms.status==='done'?'✓':ms.status==='active'?'→':'-';
+    const r = ms.risk==='high'?'HIGH':ms.risk==='medium'?'MED':'LOW';
+    lines.push(`${s} ${ms.id}: ${ms.date||'TBD'} [${r}]`);
     ms.subtasks.forEach(st => {
-      const stIcon = st.status==='done'?'  ✓':st.status==='active'?'  →':'  -';
-      lines.push(`${stIcon} ${st.name}: ${st.date||'TBD'}`);
+      if(st.date || st.status !== 'pending'){
+        const ss = st.status==='done'?'✓':st.status==='active'?'→':'-';
+        lines.push(`  ${ss} ${st.id}: ${st.date||'TBD'}`);
+      }
     });
   });
-  lines.push('\n(To update timeline, output a <!--TIMELINE_UPDATE:{...}--> block anywhere in your response.)');
+  if(lines.length <= 1) return ''; // nothing meaningful to add
   return lines.join('\n');
 }
 
@@ -1675,30 +1790,26 @@ async function callKickman(trigger){
   if(isLoading)return; isLoading=true; setSendDisabled(true);
   const session=getSession(activeId); if(!session){isLoading=false;setSendDisabled(false);return;}
 
-  // Build messages array — include images in the last user message if present
+  // Build messages array — smart context management to prevent token overflow
   let messages;
   if(trigger==='start'){
     messages=[{role:'user',content:'Begin.'}];
   } else {
-    // Convert history to API format, handling images
-    messages=session.history.map(msg=>{
-      if(msg.role==='user'&&msg.images&&msg.images.length>0){
-        // Multi-modal content
-        const content=[{type:'text',text:msg.content||''}];
-        msg.images.forEach(img=>{
-          content.push({type:'image',source:{type:'base64',media_type:img.mediaType,data:img.base64}});
-        });
-        return {role:'user',content};
-      }
-      return {role:msg.role,content:msg.content};
-    });
+    messages = buildMessageHistory(session);
   }
 
   const curSess=getSession(activeId);
   const baseSysPrompt=getSystemPrompt(curSess?curSess.mission||1:1);
-  // Append current timeline state so Kickman can reference and update it
-  const tlContext = (trigger!=='start') ? buildTimelineContext() : '';
-  const sysPrompt = baseSysPrompt + tlContext;
+  // Append project memory + timeline context into system prompt
+  const memoryContext = buildMemoryContext(curSess);
+  let tlContext = '';
+  if(trigger !== 'start'){
+    const tl = getTimeline();
+    const hasAnyDate = tl && tl.some(m => m.date || m.subtasks.some(s => s.date));
+    const hasActiveMs = tl && tl.some(m => m.status !== 'pending');
+    if(hasAnyDate || hasActiveMs) tlContext = buildTimelineContext();
+  }
+  const sysPrompt = baseSysPrompt + memoryContext + tlContext;
   const apiMessages=trigger==='m2start'?[{role:'user',content:'Begin Mission 2.'}]:messages;
   showTyping();
   try{
@@ -1721,6 +1832,10 @@ async function callKickman(trigger){
     const tlUpdate=parseTimelineUpdate(text); if(tlUpdate)applyTimelineUpdate(tlUpdate);
     syncTimelineToStep(fresh.step,fresh.mission||1);
     renderTimeline();
+    // Background summarization — fires after long conversations to build project memory
+    if(fresh.history.length >= SUMMARIZE_THRESHOLD){
+      setTimeout(()=>summarizeEarlyHistory(fresh.id), 2000);
+    }
   } catch(e){removeTyping();addMessageDOM('km','Network error. Check your connection and try again.');}
   isLoading=false; setSendDisabled(false);
 }
