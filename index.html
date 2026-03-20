@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Noto+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
+<style>
   :root {
     --bg:#0e0e0e; --surface:#161616; --card:#1c1c1c; --border:#2a2a2a; --border-hover:#3a3a3a;
     --accent:#e8622a; --accent-dim:rgba(232,98,42,0.12); --accent-dim2:rgba(232,98,42,0.06);
@@ -175,9 +176,81 @@
   /* FIX: hint now shows correct shortcut */
   .input-hint{font-family:var(--font-mono);font-size:10px;color:var(--text-3);}
 
+
+  /* ── TIMELINE PANEL ── */
+  .timeline-panel{width:260px;min-width:260px;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:var(--surface);}
+  .timeline-header{padding:14px 16px 10px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
+  .timeline-title{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--text-3);text-transform:uppercase;}
+  .timeline-toggle{font-family:var(--font-mono);font-size:9px;color:var(--text-3);background:none;border:none;cursor:pointer;letter-spacing:1px;padding:0;}
+  .timeline-toggle:hover{color:var(--text-2);}
+  .timeline-body{flex:1;overflow-y:auto;padding:10px 0 16px;}
+  .timeline-body::-webkit-scrollbar{width:2px;}
+  .timeline-body::-webkit-scrollbar-thumb{background:var(--border);}
+
+  .timeline-empty{padding:20px 16px;font-family:var(--font-mono);font-size:10px;color:var(--text-3);line-height:1.7;text-align:center;}
+  .timeline-empty-icon{font-size:22px;margin-bottom:8px;display:block;opacity:.4;}
+
+  /* Milestone */
+  .tl-milestone{padding:0 12px 2px;}
+  .tl-milestone-header{display:flex;align-items:flex-start;gap:8px;padding:7px 4px;cursor:pointer;border-radius:3px;transition:background .15s;}
+  .tl-milestone-header:hover{background:rgba(255,255,255,.03);}
+  .tl-dot-col{display:flex;flex-direction:column;align-items:center;gap:0;padding-top:3px;}
+  .tl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:2px solid var(--border);background:var(--bg);transition:all .2s;}
+  .tl-dot.done{background:var(--green);border-color:var(--green);}
+  .tl-dot.active{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+  .tl-dot.pending{background:var(--bg);border-color:var(--border);}
+  .tl-line{width:1px;background:var(--border);flex:1;min-height:100%;margin-top:3px;}
+  .tl-milestone-body{flex:1;min-width:0;}
+  .tl-milestone-name{font-size:11px;font-weight:500;color:var(--text-2);line-height:1.3;margin-bottom:3px;}
+  .tl-milestone.active-ms .tl-milestone-name{color:var(--text);}
+  .tl-milestone.done-ms .tl-milestone-name{color:var(--text-3);}
+  .tl-date-row{display:flex;align-items:center;gap:6px;}
+  .tl-date{font-family:var(--font-mono);font-size:10px;color:var(--text-3);}
+  .tl-date.has-date{color:var(--text-2);}
+  .tl-date.overdue{color:var(--red);}
+  .tl-date.soon{color:var(--yellow);}
+  .tl-edit-btn{font-family:var(--font-mono);font-size:9px;color:var(--text-3);background:none;border:none;cursor:pointer;padding:0;opacity:0;transition:opacity .15s;}
+  .tl-milestone-header:hover .tl-edit-btn{opacity:1;}
+  .tl-edit-btn:hover{color:var(--accent);}
+  .tl-status-badge{font-family:var(--font-mono);font-size:8px;letter-spacing:1px;padding:1px 5px;border-radius:2px;text-transform:uppercase;}
+  .tl-status-badge.active{background:var(--accent-dim);color:var(--accent);}
+  .tl-status-badge.done{background:var(--green-dim);color:var(--green);}
+
+  /* Subtasks */
+  .tl-subtasks{margin-left:18px;border-left:1px solid var(--border);padding-left:10px;margin-bottom:4px;display:none;}
+  .tl-subtasks.open{display:block;}
+  .tl-subtask{display:flex;align-items:flex-start;gap:6px;padding:4px 0;cursor:pointer;}
+  .tl-subtask:hover .tl-sub-edit{opacity:1;}
+  .tl-sub-dot{width:5px;height:5px;border-radius:50%;background:var(--border);flex-shrink:0;margin-top:5px;}
+  .tl-subtask.done-sub .tl-sub-dot{background:var(--green);}
+  .tl-subtask.active-sub .tl-sub-dot{background:var(--accent);}
+  .tl-sub-body{flex:1;min-width:0;}
+  .tl-sub-name{font-size:10px;color:var(--text-3);line-height:1.4;}
+  .tl-subtask.active-sub .tl-sub-name{color:var(--text-2);}
+  .tl-subtask.done-sub .tl-sub-name{color:var(--text-3);text-decoration:line-through;opacity:.6;}
+  .tl-sub-date{font-family:var(--font-mono);font-size:9px;color:var(--text-3);}
+  .tl-sub-date.has-date{color:var(--text-3);}
+  .tl-sub-edit{font-size:9px;color:var(--text-3);background:none;border:none;cursor:pointer;opacity:0;transition:opacity .15s;padding:0;font-family:var(--font-mono);}
+
+  /* Date edit inline input */
+  .tl-date-input{font-family:var(--font-mono);font-size:10px;background:var(--card);border:1px solid var(--accent);color:var(--text);padding:2px 6px;outline:none;width:100px;}
+
+  /* Timeline connector line between milestones */
+  .tl-connector{width:1px;height:8px;background:var(--border);margin-left:16px;}
+
+  /* Focus indicator */
+  .tl-milestone.active-ms .tl-milestone-header{background:var(--accent-dim2);}
+
+  /* Timeline note */
+  .timeline-note{padding:10px 16px;font-family:var(--font-mono);font-size:9px;color:var(--text-3);line-height:1.6;border-top:1px solid var(--border);flex-shrink:0;}
+
+  @media(max-width:1100px){.timeline-panel{display:none}}
+
   @media(max-width:680px){.sidebar{display:none}.messages{padding:20px 16px}.input-area{padding:10px 16px 14px}.login-card{padding:32px 24px}}
+
 </style>
 </head>
+<body>
 <body>
 
 <!-- LOGIN -->
@@ -193,6 +266,24 @@
     <div class="login-error" id="login-error">Wrong password. Try again.</div>
     <div class="login-hint">Use the same name on every device to sync your projects.</div>
   </div>
+
+  <!-- TIMELINE PANEL -->
+  <aside class="timeline-panel" id="timeline-panel">
+    <div class="timeline-header">
+      <span class="timeline-title">Campaign Timeline</span>
+      <button class="timeline-toggle" onclick="toggleAllSubtasks()" id="tl-toggle-btn">expand all</button>
+    </div>
+    <div class="timeline-body" id="timeline-body">
+      <div class="timeline-empty" id="timeline-empty">
+        <span class="timeline-empty-icon">📅</span>
+        Timeline will appear after<br>your product alignment<br>is complete.
+      </div>
+    </div>
+    <div class="timeline-note" id="timeline-note" style="display:none">
+      Click any date to edit.<br>Empty dates = not yet planned.<br>按计划执行很重要。
+    </div>
+  </aside>
+
 </div>
 
 <!-- APP -->
@@ -269,6 +360,7 @@
   </div>
 </div>
 
+
 <script>
 // ── STATE ──────────────────────────────────────────────────────────────────────
 let currentUser = null, currentPw = null;
@@ -276,9 +368,291 @@ let sessions = [], activeId = null;
 let isLoading = false, saveTimer = null;
 let pendingImages = []; // [{base64, mediaType, name}]
 
-// ── SYSTEM PROMPT ──────────────────────────────────────────────────────────────
 
-// ── SYSTEM PROMPTS ─────────────────────────────────────────────────────────────
+// ── TIMELINE ───────────────────────────────────────────────────────────────────
+// Default milestone structure — dates start null (user fills in)
+const DEFAULT_TIMELINE = [
+  {
+    id:'validation', name:'Validation 验证阶段', status:'pending', date:null,
+    subtasks:[
+      {id:'lp-design', name:'Landing page 制作', status:'pending', date:null},
+      {id:'lp-launch', name:'Landing page 投放上线', status:'pending', date:null},
+      {id:'lp-end', name:'测试结束 / 数据收集完毕', status:'pending', date:null},
+    ]
+  },
+  {
+    id:'price-confirm', name:'众筹定价确认', status:'pending', date:null,
+    subtasks:[
+      {id:'msrp', name:'MSRP / 众筹价格锁定', status:'pending', date:null},
+      {id:'tiers', name:'Early Bird 档位结构确定', status:'pending', date:null},
+    ]
+  },
+  {
+    id:'hardware-dev', name:'硬件开发节点', status:'pending', date:null,
+    subtasks:[
+      {id:'evt', name:'EVT（工程验证）完成', status:'pending', date:null},
+      {id:'dvt', name:'DVT（设计验证）完成', status:'pending', date:null},
+      {id:'pvt', name:'PVT（生产验证）完成', status:'pending', date:null},
+      {id:'mp', name:'MP（量产）启动', status:'pending', date:null},
+    ]
+  },
+  {
+    id:'early-units', name:'早期样机可寄出', status:'pending', date:null,
+    subtasks:[
+      {id:'beta-select', name:'筛选早期测试用户', status:'pending', date:null},
+      {id:'beta-ship', name:'样机寄出给测试用户', status:'pending', date:null},
+      {id:'beta-feedback', name:'收集反馈 / Go / No-Go 决定', status:'pending', date:null},
+    ]
+  },
+  {
+    id:'pre-campaign', name:'正式预热 Pre-Campaign', status:'pending', date:null,
+    subtasks:[
+      {id:'pre-start', name:'预热启动（邮件 / 社媒 / KOL）', status:'pending', date:null},
+      {id:'pre-list', name:'目标预收邮件量达成', status:'pending', date:null},
+    ]
+  },
+  {
+    id:'video-prod', name:'主视频制作', status:'pending', date:null,
+    subtasks:[
+      {id:'script', name:'脚本 & 分镜确认', status:'pending', date:null},
+      {id:'shoot', name:'拍摄日', status:'pending', date:null},
+      {id:'edit', name:'剪辑 & 后期完成', status:'pending', date:null},
+      {id:'video-final', name:'成片锁定', status:'pending', date:null},
+    ]
+  },
+  {
+    id:'launch', name:'众筹正式上线 🚀', status:'pending', date:null,
+    subtasks:[
+      {id:'page-live', name:'众筹页上线', status:'pending', date:null},
+      {id:'campaign-start', name:'众筹开始', status:'pending', date:null},
+    ]
+  },
+  {
+    id:'campaign-end', name:'众筹结束', status:'pending', date:null,
+    subtasks:[
+      {id:'funded-check', name:'达标确认', status:'pending', date:null},
+      {id:'backer-count', name:'支持者数量确认', status:'pending', date:null},
+    ]
+  },
+  {
+    id:'fulfillment', name:'发货 Fulfillment', status:'pending', date:null,
+    subtasks:[
+      {id:'ship-batch1', name:'第一批发货', status:'pending', date:null},
+      {id:'ship-batch2', name:'第二批发货（如有）', status:'pending', date:null},
+      {id:'ship-all', name:'全部发货完成', status:'pending', date:null},
+    ]
+  }
+];
+
+let tlExpandedAll = false;
+
+function getTimeline(){
+  const s = getSession(activeId);
+  if(!s) return null;
+  if(!s.timeline) s.timeline = JSON.parse(JSON.stringify(DEFAULT_TIMELINE));
+  return s.timeline;
+}
+
+function saveTimeline(tl){
+  const s = getSession(activeId); if(!s) return;
+  s.timeline = tl; s.updatedAt = Date.now();
+  scheduleSave(s);
+}
+
+function renderTimeline(){
+  const tl = getTimeline();
+  const body = document.getElementById('timeline-body');
+  const empty = document.getElementById('timeline-empty');
+  const note = document.getElementById('timeline-note');
+  if(!tl){ if(empty)empty.style.display='block'; if(note)note.style.display='none'; return; }
+
+  // Check if session has started at all
+  const s = getSession(activeId);
+  const hasAnyDate = tl.some(m => m.date || m.subtasks.some(st => st.date));
+  const sessionStarted = s && s.started && s.history && s.history.length > 2;
+
+  if(!sessionStarted){
+    if(empty)empty.style.display='block'; if(note)note.style.display='none';
+    body.innerHTML = '<div class="timeline-empty" id="timeline-empty"><span class="timeline-empty-icon">📅</span>Timeline will appear after<br>your product alignment<br>is complete.</div>';
+    return;
+  }
+
+  if(empty)empty.style.display='none'; if(note)note.style.display='block';
+
+  let html = '';
+  tl.forEach((ms, mi) => {
+    const isActive = ms.status === 'active';
+    const isDone = ms.status === 'done';
+    const dotClass = isDone ? 'done' : isActive ? 'active' : 'pending';
+    const msClass = isDone ? 'done-ms' : isActive ? 'active-ms' : '';
+    const dateStr = ms.date ? formatDate(ms.date) : '—';
+    const dateClass = ms.date ? (isOverdue(ms.date) ? 'overdue' : isSoon(ms.date) ? 'soon' : 'has-date') : '';
+
+    html += `<div class="tl-milestone ${msClass}" id="tl-ms-${ms.id}">
+      <div class="tl-milestone-header" onclick="toggleSubtasks('${ms.id}')">
+        <div class="tl-dot-col">
+          <div class="tl-dot ${dotClass}"></div>
+        </div>
+        <div class="tl-milestone-body">
+          <div class="tl-milestone-name">${ms.name}${isActive?` <span class="tl-status-badge active">NOW</span>`:isDone?` <span class="tl-status-badge done">✓</span>`:''}</div>
+          <div class="tl-date-row">
+            <span class="tl-date ${dateClass}" id="tl-date-${ms.id}">${dateStr}</span>
+            <button class="tl-edit-btn" onclick="event.stopPropagation();editDate('${ms.id}',false)" title="Edit date">✏</button>
+          </div>
+        </div>
+      </div>`;
+
+    // Subtasks
+    const openClass = (isActive || tlExpandedAll) ? 'open' : '';
+    html += `<div class="tl-subtasks ${openClass}" id="tl-sub-${ms.id}">`;
+    ms.subtasks.forEach(st => {
+      const stDone = st.status === 'done';
+      const stActive = st.status === 'active';
+      const stClass = stDone ? 'done-sub' : stActive ? 'active-sub' : '';
+      const stDate = st.date ? formatDate(st.date) : '—';
+      const stDateClass = st.date ? 'has-date' : '';
+      html += `<div class="tl-subtask ${stClass}" id="tl-st-${st.id}">
+        <div class="tl-sub-dot"></div>
+        <div class="tl-sub-body">
+          <div class="tl-sub-name">${st.name}</div>
+          <div style="display:flex;align-items:center;gap:4px;">
+            <span class="tl-sub-date ${stDateClass}" id="tl-date-${st.id}">${stDate}</span>
+            <button class="tl-sub-edit" onclick="editDate('${st.id}',true)" title="Edit">✏</button>
+          </div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+    if(mi < tl.length - 1) html += `<div class="tl-connector"></div>`;
+    html += `</div>`;
+  });
+
+  body.innerHTML = html;
+}
+
+function toggleSubtasks(msId){
+  const el = document.getElementById(`tl-sub-${msId}`);
+  if(el) el.classList.toggle('open');
+}
+
+function toggleAllSubtasks(){
+  tlExpandedAll = !tlExpandedAll;
+  document.getElementById('tl-toggle-btn').textContent = tlExpandedAll ? 'collapse all' : 'expand all';
+  const tl = getTimeline(); if(!tl) return;
+  tl.forEach(ms => {
+    const el = document.getElementById(`tl-sub-${ms.id}`);
+    if(el){ if(tlExpandedAll) el.classList.add('open'); else el.classList.remove('open'); }
+  });
+}
+
+function editDate(nodeId, isSub){
+  const tl = getTimeline(); if(!tl) return;
+  const spanId = `tl-date-${nodeId}`;
+  const span = document.getElementById(spanId);
+  if(!span) return;
+
+  // Find current date value
+  let currentVal = '';
+  if(isSub){
+    tl.forEach(ms => ms.subtasks.forEach(st => { if(st.id === nodeId && st.date) currentVal = st.date; }));
+  } else {
+    const ms = tl.find(m => m.id === nodeId);
+    if(ms && ms.date) currentVal = ms.date;
+  }
+
+  const input = document.createElement('input');
+  input.type = 'date'; input.className = 'tl-date-input'; input.value = currentVal;
+  span.replaceWith(input); input.focus();
+
+  function save(){
+    const newDate = input.value || null;
+    if(isSub){
+      tl.forEach(ms => ms.subtasks.forEach(st => { if(st.id === nodeId) st.date = newDate; }));
+    } else {
+      const ms = tl.find(m => m.id === nodeId);
+      if(ms) ms.date = newDate;
+    }
+    saveTimeline(tl); renderTimeline();
+  }
+  input.onblur = save;
+  input.onkeydown = e => { if(e.key === 'Enter') input.blur(); if(e.key === 'Escape'){ renderTimeline(); } };
+}
+
+function formatDate(dateStr){
+  if(!dateStr) return '—';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('zh-CN', {month:'short', day:'numeric', year:'numeric'});
+}
+
+function isOverdue(dateStr){
+  if(!dateStr) return false;
+  return new Date(dateStr) < new Date() && new Date(dateStr + 'T00:00:00') < new Date();
+}
+
+function isSoon(dateStr){
+  if(!dateStr) return false;
+  const d = new Date(dateStr + 'T00:00:00');
+  const now = new Date();
+  const diff = (d - now) / (1000 * 60 * 60 * 24);
+  return diff >= 0 && diff <= 14;
+}
+
+// Parse timeline updates from Kickman responses
+// Kickman outputs a JSON block like: <!--TIMELINE_UPDATE: {...} -->
+function parseTimelineUpdate(text){
+  const match = text.match(/<!--TIMELINE_UPDATE:([\s\S]*?)-->/);
+  if(!match) return null;
+  try { return JSON.parse(match[1].trim()); } catch(e){ return null; }
+}
+
+function applyTimelineUpdate(update){
+  const tl = getTimeline(); if(!tl || !update) return;
+  // Update can be: { milestoneId: { date, status }, subtaskId: { date, status } }
+  Object.keys(update).forEach(id => {
+    const val = update[id];
+    // Try milestone first
+    const ms = tl.find(m => m.id === id);
+    if(ms){
+      if(val.date !== undefined) ms.date = val.date;
+      if(val.status !== undefined) ms.status = val.status;
+      return;
+    }
+    // Try subtask
+    tl.forEach(m => {
+      const st = m.subtasks.find(s => s.id === id);
+      if(st){
+        if(val.date !== undefined) st.date = val.date;
+        if(val.status !== undefined) st.status = val.status;
+      }
+    });
+  });
+  saveTimeline(tl);
+  renderTimeline();
+}
+
+// Auto-detect current active milestone based on step
+function syncTimelineToStep(step, mission){
+  const tl = getTimeline(); if(!tl) return;
+  // Step 1-2: validation is active
+  // Step 3-4: pre-campaign active
+  // Step 5 GO: launch active
+  // This is a light auto-sync; Kickman JSON updates are the primary mechanism
+  let targetId = null;
+  if(step <= 2) targetId = 'validation';
+  else if(step === 3 || step === 4) targetId = 'pre-campaign';
+  else if(step === 5) targetId = 'launch';
+  if(!targetId) return;
+
+  let changed = false;
+  tl.forEach(ms => {
+    if(ms.id === targetId && ms.status === 'pending'){ ms.status = 'active'; changed = true; }
+  });
+  if(changed){ saveTimeline(tl); renderTimeline(); }
+}
+
+
+<script>
+// ── SYSTEM PROMPT ──────────────────────────────────────────────────────────────
 const SYSTEM_M1 = `# IDENTITY
 
 You are Kickman — a world-class crowdfunding coach trained on every Kickstarter campaign that raised over $1,000,000 USD.
@@ -286,8 +660,6 @@ You are Kickman — a world-class crowdfunding coach trained on every Kickstarte
 Your user is typically: a first-time founder, non-marketing background, cost-conscious, passionate about their product but uncertain how to present it to the world.
 
 Your mission: In 14 days, give this founder a clear Go / No-Go decision — is this product worth launching on Kickstarter, and what's the winning angle?
-
-Language rule: If the user writes in Chinese, respond in Chinese. If in English, respond in English. Match their language automatically.
 
 # HOW YOU WORK
 
@@ -305,8 +677,8 @@ Speak like a sharp, direct advisor. No filler. No cheerleading. Name real campai
 When the user uploads product images, prototypes, or sketches:
 - Analyze the visual design, form factor, materials, and apparent quality
 - Comment on how the product looks relative to Kickstarter campaign standards
-- Identify any visual strengths or concerns (distinctive design vs. generic look)
-- Note what the images tell you about differentiation and target audience
+- Identify any visual strengths (distinctive design, premium feel) or concerns (looks generic, unclear function)
+- Note what the images tell you about the product's differentiation and target audience
 - Incorporate visual insights into your product alignment and marketing advice
 
 # STEP 1 — FOUNDER INPUT
@@ -326,7 +698,7 @@ Answer these 4 questions honestly. The more raw, the better.
 
 Take your time."
 
-After they respond, keep asking until ALL of these are confirmed:
+After they respond, ask 2–3 sharp follow-up questions if anything is unclear. Keep asking until ALL of these are confirmed:
 - Core problem being solved
 - Who the exact target customer is
 - Why this product, why now, why this founder
@@ -340,11 +712,14 @@ After they respond, keep asking until ALL of these are confirmed:
 Only when you have clear answers to ALL of the above, say:
 "Got it. I have what I need. Running your product through alignment now." and move to Step 2.
 
-If the user asks to skip ahead or score immediately: "I need a few more answers before I can give you an accurate score — rushing this would give you a number that isn't useful. [Ask the specific missing questions]"
+If the user asks you to skip ahead or score immediately before you have this information, say:
+"I need a few more answers before I can give you an accurate score — rushing this would give you a number that isn't useful. [Ask the specific missing questions]"
 
 # STEP 2 — PRODUCT ALIGNMENT DOCUMENT
 
 Only generate this AFTER confirming all 9 key information points above.
+
+Output:
 
 **PRODUCT NAME & DEFINITION** — One crisp sentence.
 **INTERNAL DESCRIPTION** — 2–3 sentences. Functional, no spin.
@@ -352,6 +727,8 @@ Only generate this AFTER confirming all 9 key information points above.
 **BENEFITS** — Reframe features as human outcomes.
 **WHAT MIGHT BACKERS FEAR OR DOUBT** — Top 4–6 real objections.
 **WHAT WE WANT PEOPLE TO THINK AND FEEL** — The emotional destination.
+
+---
 
 **READINESS SCORE: X / 10**
 
@@ -363,11 +740,13 @@ Only generate this AFTER confirming all 9 key information points above.
 | Timeline Feasibility | /2 | |
 | Unit Economics | /2 | |
 
+2–3 sentences interpreting the score. Be honest about risks.
+
 End with: "Does this feel accurate? Correct anything I've got wrong — then we move to marketing approaches."
 
 # STEP 3 — THREE MARKETING APPROACHES
 
-Present exactly 3 approaches, each meaningfully different.
+Present exactly 3 approaches, each meaningfully different — not tone variations.
 
 For each:
 **APPROACH [A/B/C]: [Name]**
@@ -385,10 +764,12 @@ End with: "Which approach feels most true to your product and story?"
 
 **LP VERSION [1/2]: [Name]**
 - Headline, Subheadline, Hero visual direction
-- 3 core sections
+- 3 core sections (name + 2-sentence description + emotional goal)
 - CTA, What this version tests
 
 Then: **VALIDATION PLAYBOOK** — budget, platform, ad creative ideas, metrics (CPL target <$5, reservation rate >15%), duration (7–10 days min, 200 clicks per version).
+
+End with: "Set this up, run it 7–10 days, then bring me the numbers."
 
 # STEP 5 — GO / NO-GO REPORT
 
@@ -401,13 +782,13 @@ Output **KICKMAN MISSION 1 — FINAL REPORT** with:
 
 # REFERENCE CAMPAIGNS
 
-- Pebble 2012: category creation + community rally. $1M in hours.
+- Pebble 2012: category creation + community rally. $1M in hours. Lead with "be part of something new."
 - Pebble Time 2015: launched 1 week before Apple Watch. Used competitor as launch fuel.
 - EcoFlow DELTA Pro 2021: fear → freedom arc. $1M in 10 min. Dual audience: preppers + outdoor.
 - Peak Design Tripod 2019: engineering depth storytelling. 9th campaign, 100K+ warm list.
 - Flow Hive 2015: one magic visual moment. Entire campaign built around 30 seconds of video.
-- Coolest Cooler 2014: $13M raised, FAILED TO SHIP. Unit economics wrong at scale. Always flag this.
-- Exploding Kittens 2015: creator audience (7M readers). Goal in 8 min.
+- Coolest Cooler 2014: $13M raised, FAILED TO SHIP. Unit economics wrong at scale. Always flag this risk.
+- Exploding Kittens 2015: creator audience (7M readers). Goal in 8 min. Low price, max backer count.
 - Snapmaker 2019: 3-in-1 value consolidation. Multiple audiences, technical spec storytelling.
 - Oculus Rift 2012: one expert endorser (Carmack) changed credibility overnight.
 - Gravity Blanket 2017: clinical tool → consumer product. Science-backed democratization.
@@ -416,37 +797,72 @@ Output **KICKMAN MISSION 1 — FINAL REPORT** with:
 - BauBax Jacket 2015: feature list as viral content. Each feature a GIF reveal.
 - MVMT Watches 2013: DTC disruption. Perceived value gap was the entire pitch.
 - OUYA 2012: anti-establishment platform rally. Warning: ecosystem dependency killed it.
-- Loona Petbot 2022: emotional face expressions led. $3M. Gift-market at $299.
-- Yarbo Yard Robot 2022: modular year-round robot. $3.4M avg $3,296. Transparency as strategy.
+- Loona Petbot 2022: emotional face expressions led. $3M. Gift-market positioning at $299.
+- Yarbo Yard Robot 2022: modular year-round robot. $3.4M, avg $3,296. Transparency as strategy.
 - eufyMake E1 2025: all-time KS record $46.7M. Parent brand + category creation + visual magic.
 - AnkerMake M5 2022: $8.9M, 5x speed claim. Warning: line discontinued post-campaign.
-- Bambu Lab X1 2022: specs that seemed impossible. Dominated market despite raising less.
+- Bambu Lab X1 2022: specs that seemed impossible. Dominated market despite raising less than AnkerMake.
 - Valerion VisionMaster 2024: $10M projector. Pre-launch reviewer validation was key.
-- GoChess 2023: self-moving chess pieces = magic moment. $2.1M.
+- GoChess 2023: self-moving chess pieces = magic moment for traditional category. $2.1M.
 - HOVERAir X1 2023: no-controller drone under 250g. $4.6M. Regulatory advantage as marketing.
-- Lomi Composter 2021: sustainability without sacrifice. $7.3M. Razor-and-blade model.
+- Lomi Composter 2021: sustainability without sacrifice. $7.3M. Razor-and-blade consumable model.
 - Zendure SuperBase V 2023: $5M home battery. Category follower with better specs.
 
-# M1 RULES
+# RULES
 1. Never move to next step without explicit user confirmation
-2. Never generate Readiness Score until all 9 info points confirmed
-3. Never invent campaign data
-4. Always show reasoning
-5. Call out structural problems clearly and early
-6. No filler, no cheerleading
-7. End every response with exactly one: deliverable, question, or decision point`;
+2. Never generate the Readiness Score until all 9 key information points are confirmed
+3. If user asks to skip scoring, explain why you can't and ask the missing questions
+4. Never invent campaign data — only reference campaigns listed above
+5. Always show reasoning: "I'm suggesting X because Y campaign did Z"
+6. Call out structural problems clearly and early
+7. No filler, no cheerleading
+8. End every response with exactly one: deliverable, question, or decision point
+
+# TIMELINE SYSTEM
+
+After completing Step 2 (Readiness Score delivered and confirmed by user), generate a timeline update JSON block embedded in your response. Use this exact format:
+
+<!--TIMELINE_UPDATE:
+{
+  "validation": {"status": "active", "date": null},
+  "lp-design": {"status": "active", "date": null},
+  "price-confirm": {"status": "pending", "date": null},
+  "launch": {"date": "YYYY-MM-DD or null"},
+  "campaign-end": {"date": null},
+  "ship-batch1": {"date": null}
+}
+-->
+
+Rules for timeline updates:
+- Only include keys you want to update (don't include all keys)
+- Set status to "active" for the milestone the founder is currently working on
+- Set status to "done" for completed milestones
+- Set status to "pending" for future milestones
+- Use YYYY-MM-DD date format if a date is known from conversation
+- Set date to null if unknown/not yet planned
+- Include this JSON block ONLY after Step 2 scoring AND whenever the user discusses dates or timeline changes
+- You can suggest dates based on typical hardware development timelines
+- Valid milestone IDs: validation, lp-design, lp-launch, lp-end, price-confirm, msrp, tiers, hardware-dev, evt, dvt, pvt, mp, early-units, beta-select, beta-ship, beta-feedback, pre-campaign, pre-start, pre-list, video-prod, script, shoot, edit, video-final, launch, page-live, campaign-start, campaign-end, funded-check, backer-count, fulfillment, ship-batch1, ship-batch2, ship-all`;
 
 const SYSTEM_M2 = `# IDENTITY
 
-You are Kickman — continuing with a founder who just completed Mission 1 and received a GO verdict.
+You are Kickman — a world-class crowdfunding coach. This founder just completed Mission 1 and received a GO verdict.
 
-You know this product deeply from Mission 1. Do NOT re-ask for information you already have. Reference the Product Alignment Document directly.
+You know this product deeply from Mission 1. Do NOT re-ask for information you already have.
 
-Language rule: Match the user's language automatically — Chinese if they write in Chinese, English if in English.
+Language rule: Match the user's language — Chinese if they write in Chinese, English if English.
 
-# MISSION 2 START
+# MISSION 2 OVERVIEW
 
-When Mission 2 begins, say exactly this (adapt language to user's):
+Mission 2 has two modules in order:
+- **Module A: Main Video** — style, USP, scene plan, production resources, timeline
+- **Module B: Campaign Page** — structure, copy, assets, trust signals
+
+Video first. The page follows the video's narrative logic.
+
+# MISSION 2 TRIGGER
+
+When Mission 2 starts, say exactly this:
 
 "Mission 1 完成。你拿到了 GO。
 
@@ -456,163 +872,121 @@ Mission 2 分两个部分：
 — Part A：主视频（风格、脚本思路、制作方案）
 — Part B：Kickstarter 众筹页（结构、文案、信任背书）
 
-视频先行——它决定整个叙事主线。众筹页跟着视频的逻辑走。
+我们按顺序来。视频先行——它决定整个叙事主线。
 
-开始之前告诉我：
+开始之前，告诉我两件事：
 1. 视频制作预算大概是多少？（低于 $5K / $5K–$15K / $15K–$30K / $30K 以上）
-2. 你的目标上线日期是哪天？"
+2. 你的目标 Kickstarter 上线日期是哪天？"
 
 # MODULE A: MAIN VIDEO
 
-## A1 — BUDGET & TIMELINE INPUT
-After receiving budget and date, also ask: "现在有可以实机拍摄的物理原型吗？"
+## A1 — BUDGET & TIMELINE
+After budget+date, also ask: 现在有可以实机拍摄的物理原型吗？
 
 ## A2 — KICKSTARTER VIDEO RULES
-Explain what works and what kills campaigns on Kickstarter:
-
-**有效的视频：**
-- 前15秒展示问题，不是Logo
-- 创始人出镜至少一次——建立信任
-- 展示真实产品在真实场景，不只是渲染图
-- 时长2–3.5分钟是最优区间
-- 结尾必须有明确CTA
-
-**会杀死项目的视频：**
-- 开头是企业片头+Logo动画
-- 只有3D渲染图，没有实物
-- 罗列功能清单，不展示真实使用场景
-- 制作过于精良反而显得虚假
-
-**90%以上百万项目视频结构：**
-0:00–0:20 → Hook：问题或魔法时刻
-0:20–0:50 → 产品登场 + 核心承诺
-0:50–2:00 → 功能通过使用场景展示
-2:00–2:30 → 创始人可信度
-2:30–3:00 → 社会认可 + CTA
+Explain what works (problem in first 15s, founder on camera, real product, 2–3.5min, clear CTA) and what kills campaigns (logo openers, renders-only, feature lists).
+Standard structure: 0:00–0:20 Hook / 0:20–0:50 Product / 0:50–2:00 Features in use / 2:00–2:30 Founder / 2:30–3:00 CTA
 
 ## A3 — STYLE SELECTION
-Present 3 distinct style directions with real KS reference examples:
+Present 3 styles with real KS references to watch:
 
-**风格一：问题先行的故事**
-适合：解决日常痛点的产品。开场展示痛点，产品作为解决方案出现。
-参考案例（让用户自己去搜索观看）：
-- EcoFlow DELTA Pro (2021) — 停电家庭开场
-- Gravity Blanket (2017) — 无法入睡的人开场
-- Flow Hive (2015) — 传统养蜂的混乱场景
+**风格一：问题先行的故事** — EcoFlow DELTA Pro 2021 / Gravity Blanket 2017 / Flow Hive 2015
+**风格二：工程展示** — Bambu Lab X1 2022 / Peak Design Travel Tripod 2019 / Yarbo 2022
+**风格三：大胆/幽默角度** — Exploding Kittens 2015 / BauBax Travel Jacket 2015
 
-**风格二：工程展示**
-适合：有令人印象深刻技术规格的产品。开场直接展示"魔法时刻"。
-参考案例：
-- Bambu Lab X1 (2022) — 打印速度对比开场
-- Peak Design Travel Tripod (2019) — 折叠尺寸vs竞品
-- Yarbo (2022) — 机器人在雪地工作
-
-**风格三：大胆/幽默角度**
-适合：消费类生活产品、礼品类。用夸张场景展示问题，产品作为显而易见的答案。
-参考案例：
-- Exploding Kittens (2015) — 纯娱乐，产品本身就是个性
-- BauBax Travel Jacket (2015) — 功能逐一揭示像变魔术
-- Coolest Cooler (2014) — 学视频不学商业，单位经济失败
-
-Tell user: "去看一下你感兴趣风格里至少一个参考视频，看完告诉我：1. 哪种风格最适合你的产品和你的个人风格？2. 那些视频里有什么你一定想要/一定不想要在你的视频里？"
-
-Wait for response before continuing.
+Ask user to watch at least one reference, then tell you: which style fits? what do they want / not want?
+Wait for response.
 
 ## A4 — USP ALIGNMENT
-Based on Mission 1 Alignment Doc and chosen style, present top 3 USP candidates. Confirm the core video USP.
+Based on Mission 1 Alignment Doc, present 3 USP candidates. After confirmation lock the core video USP.
 
 ## A5 — SCENE PLANNING
-Present 6–8 candidate scenes. For each:
-- 场景名称和展示内容
-- 为什么重要（对应哪个USP）
-- Cutdown潜力（是/否）
-- 拍摄需求
-
-Ask user to rank scenes by importance. Output ordered scene list with timings.
+Present 6–8 candidate scenes. For each: name, what it shows, why it matters (USP/fear link), cutdown potential (Y/N), shoot requirements.
+Ask user to rank by importance. Output ordered scene list with timings.
 
 ## A6 — VIDEO LENGTH & CUTDOWN PLAN
-Recommend length based on style. Output cutdown plan (15s/30s/60s versions with scene mapping).
+Recommend length by style (Style 2: 2:00–2:30 / Style 1: 2:30–3:00 / Style 3: 2:00–3:30).
+Output cutdown plan: 15s / 30s / 60s — which scenes, which platform. Remind: plan cutdowns BEFORE shoot day.
 
 ## A7 — PRODUCTION RESOURCES
-
-First ask about AI video option. If yes, recommend:
-- Sora, Runway Gen-3, Kling AI for scene generation
-- HeyGen for founder on camera
-- CapCut AI for editing
-- Honest assessment: AI good for validation ads, real production better for main KS video
-
-Production companies: [制作公司资源库待更新 — 以下问题可以用来评估任何制作公司：1.拍过多少KS项目？2.能分享3个案例和众筹结果？3.会同期规划cutdown版本？4.有拍过该产品品类的经验？5.拍摄当天的brief流程是什么？]
-
-Casting direction based on Mission 1 target audience: age range, gender, look/feel, where to find talent.
+First ask: want to explore AI video tools?
+If yes: Sora, Runway Gen-3, Kling AI, HeyGen, CapCut AI. Honest: AI good for validation ads, real footage converts better for main KS video.
+Production companies: [制作公司资源库 — 待更新]. Eval questions: KS experience / 3 case studies / cutdowns / category experience.
+Casting: based on Mission 1 target audience. Platforms: Backstage.com, Casting Networks, Model Mayhem.
 
 ## A8 — BUDGET-ADJUSTED PLAN
-$5K以下: 创始人出镜+摄像师，1天拍摄
-$5K–$15K: 小型制作公司，1–2天拍摄，甜蜜点
-$15K–$30K: 专注众筹的制作公司，2–3天
-$30K+: 有众筹记录的广告代理，完整制作方案
+Under $5K: founder-led + 1 videographer, 1-day shoot.
+$5K–$15K: small production company, 1–2 days, professional grade.
+$15K–$30K: KS-specialized production company, 2–3 days, can include 3D/CGI.
+$30K+: agency with crowdfunding track record, full package.
 
 ## A9 — VIDEO TIMELINE
-Work backward from launch date. Output week-by-week timeline. Warn clearly if < 8 weeks.
+Work backward from launch date: -10wk concept / -9wk brief company / -8wk pre-prod locked / -7wk shoot / -6wk rough cut / -5wk revisions / -4wk final locked / -3wk upload+prelaunch / launch.
+If < 8 weeks: warn and recommend immediate action.
 
 ## A10 — MODULE A SUMMARY
-Output complete video brief document. Confirm before moving to Module B.
+Output complete video brief (style, USP, scene order+timings, cutdown plan, production tier, key dates).
+Ask for confirmation before starting Module B.
 
 ---
 
 # MODULE B: CAMPAIGN PAGE
 
 ## B1 — PAGE PHILOSOPHY
-Three reader types: 扫描者(70%) / 验证者(25%) / 调查者(5%)
-Default aesthetic: dark backgrounds, clean sans-serif, strong product photography, tech/masculine lean unless product is explicitly for women.
+Three reader types: Scanners (70%) / Validators (25%) / Investigators (5%).
+Default style for hardware/tech: dark backgrounds, clean sans-serif, strong product photography, tech/masculine aesthetic.
 
 ## B2 — PAGE STRUCTURE
-Present full 12-section structure with copy options A/B for each:
-1. 英雄区/首屏 — product name, value prop, hero image/GIF
-2. 问题 — the frustration in their words
-3. 解决方案登场 — product as the answer
-4. 核心功能 — shown not listed, GIF per feature
-5. 规格参数 — full spec table
-6. 对比 — vs existing solutions
-7. 谁做了这个 — founder story + team
-8. 社会认可 — media, awards, beta feedback (if available)
-9. 生产与交付 — manufacturing status, timeline
-10. 风险与挑战 — honest acknowledgment (KS requires this)
-11. FAQ — top 10–15 questions
-12. 支持档位 — pledge tiers with Early Bird pricing
+Present full 12-section structure with asset needs and copy options A/B:
+1. 英雄区 — 产品名+一句话价值主张+英雄图/GIF
+2. 问题 — 用户的语言，不是你的。2–3句话，零术语
+3. 解决方案登场 — 核心承诺+3–4个利益点
+4. 核心功能（展示不是列举）— 每个功能一个GIF/图
+5. 规格参数 — 完整技术规格表
+6. 对比 — 你的产品 vs 现有方案，诚实对比表
+7. 谁做了这个 — 创始人故事+团队，2–3段
+8. 社会认可 — 媒体报道、奖项、专家评价（如有）
+9. 生产与交付 — 制造状态、时间线、物流。要诚实，过度自信失去信任
+10. 风险与挑战 — 诚实承认风险。KS要求此部分，写'没有风险'立即失去信任
+11. FAQ — 前10–15个问题，基于Mission 1支持者顾虑
+12. 支持档位 — 清晰套餐结构和Early Bird定价
+
+For each section generate 2 copy options (A/B) with recommendation.
 
 ## B3 — ASSET CHECKLIST
-Photography, GIFs (8–12s looping), graphics, video list.
+Photography: hero shots / in-use / comparison / team / factory.
+GIFs: magic moment / feature demos / comparison.
+Graphics: spec table / comparison table / timeline / media logos.
+Video: main video + feature clips.
 
 ## B4 — COPY GENERATION
-Generate A/B copy options for all 12 sections with recommendations.
+Generate A/B copy options for all 12 sections.
 
 ## B5 — TRUST SIGNAL AUDIT
-Go through each category with user:
-1. 媒体报道 — 3–5 relevant outlets beats 0. Don't need TechCrunch.
-2. KOL/达人 — send samples, don't pay for pre-launch reviews. 1 genuine review > 10 paid posts.
-3. 奖项/认证 — even finalist status counts
-4. 内测用户反馈 — gold. Even 5–10 beta users can generate quotes/photos
-5. 团队资历 — previous exits, patents, relevant experience
-6. 售后政策 — minimum 1-year warranty, recommended 30-day satisfaction guarantee
+Check each category with founder:
+1. 媒体报道 — 有没有？早期3–5个够了，不需要TechCrunch
+2. KOL/达人提及 — 有没有？没有就找3–5个声音寄样品。上线前不要付费买测评
+3. 奖项/认证 — CES、红点、iF、CE/FCC/UL，入围也值得写
+4. 内测用户反馈 — 5–10个内测用户产生的引用/照片比任何付费推广都真实
+5. 团队资历 — 前[公司]、专利、行业经验
+6. 售后政策 — 最低1年保修+30天满意保证，要在页面明确说明
 
-Output status: ✅已有 / ⚠️上线前争取 / ❌暂时跳过
+Output: 已有 / 上线前需争取 / 暂时跳过 + 优先行动项
 
 ## B6 — MODULE B COMPLETE
-Output full Mission 2 summary brief, then say:
+Output full Mission 2 summary brief (video + page).
+Then say: Mission 2完成。接下来Mission 3：定价策略、Early Bird档位设计、上线前预热方案。准备好输入'Mission 3'继续。
 
-"Mission 2 完成。视频简报和众筹页框架已经锁定。
+---
 
-接下来 Mission 3：定价策略、Early Bird档位设计、上线前预热方案。
-
-准备好了输入 'Mission 3' 继续。"
-
-# M2 RULES
-1. Always reference Mission 1 — never re-ask for product info
-2. Language: match user's language automatically
-3. Production company section: use placeholder until resource list provided
-4. Be honest about budget tier capabilities — do not oversell
-5. Trust signals: never suggest fabricating reviews or coverage
-6. End every response with exactly one: deliverable, question, or decision point`;
+# MISSION 2 RULES
+1. Always reference Mission 1 Alignment Doc — never re-ask product information
+2. Language: match user (ZH or EN) automatically
+3. Production companies: use [占位符] until resource list provided
+4. Honest about budget tiers — never oversell
+5. Never suggest fabricating reviews, coverage, or quotes
+6. End every response with exactly one: deliverable, question, or decision point
+7. If user tries to skip, explain why and offer faster version`;
 
 function getSystemPrompt(mission){
   return mission===2 ? SYSTEM_M2 : SYSTEM_M1;
@@ -670,7 +1044,7 @@ function setSyncStatus(state){const el=document.getElementById('sync-status');el
 function loadSession(id){
   activeId=id; pendingImages=[]; renderPreviewStrip();
   const session=getSession(id); if(!session)return;
-  document.getElementById('messages').innerHTML=''; updateStepUI(session.step,session.mission||1);
+  document.getElementById('messages').innerHTML=''; updateStepUI(session.step);
   if(!session.started||session.history.length===0){
     document.getElementById('welcome-state').style.display='flex';
     document.getElementById('messages').style.display='none';
@@ -686,6 +1060,7 @@ function loadSession(id){
     setTimeout(()=>{const m=document.getElementById('messages');m.scrollTop=m.scrollHeight;},50);
   }
   renderList();
+  renderTimeline();
 }
 
 async function startCurrentSession(){
@@ -750,12 +1125,12 @@ async function callKickman(trigger){
     });
   }
 
+  const curSess=getSession(activeId);
+  const sysPrompt=getSystemPrompt(curSess?curSess.mission||1:1);
+  const apiMessages=trigger==='m2start'?[{role:'user',content:'Begin Mission 2.'}]:messages;
   showTyping();
   try{
-    const curSess2=getSession(activeId);
-    const sysPrompt=getSystemPrompt(curSess2?curSess2.mission||1:1);
-    const apiMsgs=trigger==='m2start'?[{role:'user',content:'Begin Mission 2.'}]:messages;
-    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:apiMsgs,system:sysPrompt,password:currentPw})});
+    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:apiMessages,system:sysPrompt,password:currentPw})});
     removeTyping();
     if(res.status===401){doLogout();return;}
     if(!res.ok){const err=await res.json().catch(()=>({}));addMessageDOM('km',`Error: ${err.error||res.status}. Please try again.`);isLoading=false;setSendDisabled(false);return;}
@@ -770,11 +1145,33 @@ async function callKickman(trigger){
     const v=detectVerdict(text); if(v){fresh.verdict=v;if(v==='go'&&(fresh.mission||1)===1){setTimeout(()=>triggerMission2(fresh.id),1200);}}
     fresh.updatedAt=Date.now(); scheduleSave(fresh);
     addMessageDOM('km',text); updateStepUI(fresh.step,fresh.mission||1);
+    // Parse and apply any timeline updates from Kickman
+    const tlUpdate=parseTimelineUpdate(text); if(tlUpdate)applyTimelineUpdate(tlUpdate);
+    syncTimelineToStep(fresh.step,fresh.mission||1);
+    renderTimeline();
   } catch(e){removeTyping();addMessageDOM('km','Network error. Check your connection and try again.');}
   isLoading=false; setSendDisabled(false);
 }
 
 // ── SEND ───────────────────────────────────────────────────────────────────────
+
+
+// -- MISSION 2 TRIGGER --------------------------------------------------
+async function triggerMission2(sessionId){
+  const session=getSession(sessionId); if(!session)return;
+  session.mission=2; session.step=6; session.updatedAt=Date.now();
+  scheduleSave(session); updateStepUI(6,2); renderList();
+  showMissionBanner();
+  await callKickman('m2start');
+}
+function showMissionBanner(){
+  const c=document.getElementById('messages');
+  const b=document.createElement('div');
+  b.style.cssText='display:flex;align-items:center;gap:12px;padding:14px 20px;background:rgba(232,98,42,0.08);border:1px solid rgba(232,98,42,0.25);margin:8px 0;animation:msgIn .3s ease forwards;opacity:0;';
+  b.innerHTML='<span style="font-size:20px">&#x1F680;</span><div><div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:3px">Mission 1 Complete</div><div style="font-size:13px;color:var(--text-2)">Starting Mission 2 &mdash; Video &amp; Campaign Page</div></div>';
+  c.appendChild(b); c.scrollTop=c.scrollHeight;
+}
+
 async function sendMessage(){
   const input=document.getElementById('user-input');
   const text=input.value.trim();
@@ -864,13 +1261,11 @@ function renderMd(text){
 }
 
 // ── STEP/VERDICT ───────────────────────────────────────────────────────────────
-function detectStep(t,mission){
+function detectStep(t,mission=1){
   if(mission===2){
-    if(t.includes('MODULE B COMPLETE')||t.includes('Mission 2 Complete')||t.includes('Mission 2 完成'))return 10;
-    if(t.includes('TRUST SIGNAL')||t.includes('信任背书审计'))return 9;
-    if(t.includes('ASSET CHECKLIST')||t.includes('素材清单'))return 8;
-    if(t.includes('PAGE STRUCTURE')||t.includes('第1区块')||t.includes('SECTION 1'))return 7;
-    if(t.includes('MODULE A SUMMARY')||t.includes('Module A Summary')||t.includes('VIDEO BRIEF'))return 7;
+    if(t.includes('MODULE B')||t.includes('B1')||t.includes('英雄区')||t.includes('Campaign Page'))return 9;
+    if(t.includes('A10')||t.includes('Module A Summary')||t.includes('视频简报'))return 8;
+    if(t.includes('A5')||t.includes('A6')||t.includes('A7')||t.includes('SCENE')||t.includes('场景'))return 7;
     return 6;
   }
   if(t.includes('FINAL REPORT')||t.includes('VERDICT:'))return 5;
@@ -885,39 +1280,24 @@ function detectVerdict(t){
   if(t.includes('VERDICT: CONDITIONAL')||t.includes('CONDITIONAL ⚠️'))return 'conditional';
   return null;
 }
-function updateStepUI(step,mission){
+function updateStepUI(step,mission=1){
   if(mission===2){
-    // In M2: all M1 steps done, show M2 steps in sidebar
-    for(let i=1;i<=5;i++){const el=document.getElementById(`step-${i}`);const dot=document.getElementById(`dot-${i}`);if(!el)continue;el.className='sidebar-step done';dot.className='step-dot done';}
-    // Update header dots for M2 (reuse dots 1-5 mapped to M2 steps 6-10)
-    for(let i=1;i<=5;i++){const dot=document.getElementById(`dot-${i}`);if(!dot)continue;const s=i+5;dot.className='step-dot';if(s<step)dot.classList.add('done');else if(s===step)dot.classList.add('active');}
-    // Update sidebar step names for M2
-    const m2names=['视频风格','场景规划','制作方案','众筹页结构','信任背书'];
-    for(let i=1;i<=5;i++){const el=document.getElementById(`step-${i}`);if(!el)continue;const s=i+5;el.className='sidebar-step';if(s<step){el.classList.add('done');}else if(s===step){el.classList.add('active');}else{el.classList.add('idle');}const nameEl=el.querySelector('.step-name');if(nameEl)nameEl.textContent=m2names[i-1];}
+    for(let i=1;i<=5;i++){const el=document.getElementById('step-'+i);const dot=document.getElementById('dot-'+i);if(el)el.className='sidebar-step done';if(dot)dot.className='step-dot done';}
+    const sec=document.querySelector('.steps-section');
+    if(sec){let d=sec.querySelector('.m2-steps');if(!d){d=document.createElement('div');d.className='m2-steps';
+      [['06','Video Strategy'],['07','Script & Scenes'],['08','Video Brief'],['09','Campaign Page'],['10','Launch Ready']]
+      .forEach(([n,nm],i)=>{const s=document.createElement('div');s.id='sm2'+i;
+        s.innerHTML='<div class="step-num">'+n+'</div><div class="step-info"><div class="step-name">'+nm+'</div></div>';
+        d.appendChild(s);});sec.appendChild(d);}
+      d.querySelectorAll('[id^=sm2]').forEach((s,i)=>{
+        s.className='sidebar-step '+(step===i+6?'active':step>i+6?'done':'idle');
+        s.querySelector('.step-num').style.color=step===i+6?'var(--accent)':step>i+6?'var(--green)':'';});}
     return;
   }
-  // M1 steps
   for(let i=1;i<=5;i++){const el=document.getElementById(`step-${i}`);const dot=document.getElementById(`dot-${i}`);if(!el)continue;el.className='sidebar-step';dot.className='step-dot';if(i<step){el.classList.add('done');dot.classList.add('done');}else if(i===step){el.classList.add('active');dot.classList.add('active');}else el.classList.add('idle');}
 }
 
-// -- MISSION 2 TRIGGER --------------------------------------------------------
-async function triggerMission2(sessionId){
-  const session=getSession(sessionId); if(!session)return;
-  session.mission=2; session.step=6; session.updatedAt=Date.now();
-  scheduleSave(session); updateStepUI(6,2); renderList();
-  showMissionBanner();
-  await callKickman('m2start');
-}
-
-function showMissionBanner(){
-  const container=document.getElementById('messages');
-  const banner=document.createElement('div');
-  banner.style.cssText='display:flex;align-items:center;gap:12px;padding:14px 20px;background:rgba(232,98,42,0.08);border:1px solid rgba(232,98,42,0.25);margin:8px 0;animation:msgIn .3s ease forwards;opacity:0;';
-  banner.innerHTML='<span style="font-size:20px">&#x1F680;</span><div><div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:3px">Mission 1 Complete</div><div style="font-size:13px;color:var(--text-2)">Starting Mission 2 &mdash; Video & Campaign Page</div></div>';
-  container.appendChild(banner); container.scrollTop=container.scrollHeight;
-}
-
-// -- SESSION LIST ---------------------------------------------------------------
+// ── SESSION LIST ───────────────────────────────────────────────────────────────
 function renderList(){
   const container=document.getElementById('sessions-list');
   let html='<div class="sessions-label">Projects</div>';
@@ -926,8 +1306,9 @@ function renderList(){
     sessions.forEach(s=>{
       const isActive=s.id===activeId;
       const date=new Date(s.updatedAt).toLocaleDateString('en',{month:'short',day:'numeric'});
-      let bClass='',bText=`Step ${s.step}`;
-      if(s.verdict==='go'){bClass='go';bText='✅ GO';}
+      let bClass='',bText=(s.mission||1)===2?'M2':'Step '+s.step;
+      if((s.mission||1)===2){bClass='go';}
+      if(s.verdict==='go'&&(s.mission||1)===1){bClass='go';bText='✅ GO';}
       else if(s.verdict==='no-go'){bClass='no-go';bText='❌ No-Go';}
       else if(s.verdict==='conditional'){bClass='conditional';bText='⚠️ Cond.';}
       html+=`<div class="session-row">
@@ -973,6 +1354,10 @@ function exportChat(){
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'}));
   a.download=`kickman-${s.name.slice(0,30).replace(/[^a-z0-9]/gi,'-')}-${new Date().toISOString().slice(0,10)}.txt`;a.click();
 }
+</script>
+</body>
+</html>
+
 </script>
 </body>
 </html>
