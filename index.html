@@ -604,6 +604,22 @@ function offsetDate(base, days){
   return d.toISOString().slice(0,10);
 }
 
+function getOpenSubtasks(){
+  const open = [];
+  document.querySelectorAll('.tl-subtasks.open').forEach(el => {
+    // id format: tl-sub-{msId}
+    const msId = el.id.replace('tl-sub-','');
+    if(msId) open.push(msId);
+  });
+  return open;
+}
+
+function restoreOpenSubtasks(openIds){
+  openIds.forEach(msId => {
+    document.querySelectorAll('#tl-sub-'+msId).forEach(el => el.classList.add('open'));
+  });
+}
+
 function renderTimeline(){
   const tl = getTimeline();
   const body = document.getElementById('timeline-body');
@@ -701,8 +717,13 @@ function renderTimeline(){
     html += '</div>';
   });
 
+  // Preserve which subtask groups are expanded
+  const wasOpen = getOpenSubtasks();
   if(body) body.innerHTML = html;
+  restoreOpenSubtasks(wasOpen);
   syncDrawer(html, true);
+  // Re-restore in drawer too
+  restoreOpenSubtasks(wasOpen);
 }
 
 function syncDrawer(html, started){
