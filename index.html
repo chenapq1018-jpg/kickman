@@ -767,7 +767,6 @@ function toggleAllSubtasks(){
 
 function editDate(nodeId, isSub){
   const tl = getTimeline(); if(!tl) return;
-  // Find element in sidebar or drawer
   const span = document.getElementById('tl-date-'+nodeId);
   if(!span) return;
 
@@ -777,17 +776,78 @@ function editDate(nodeId, isSub){
 
   const input = document.createElement('input');
   input.type='date'; input.className='tl-date-input'; input.value=currentVal;
-  // Replace the whole span
   span.replaceWith(input); input.focus();
 
+  let saved = false;
   function save(){
+    if(saved) return; saved=true;
     const newDate = input.value || null;
     if(isSub){ tl.forEach(ms=>ms.subtasks.forEach(st=>{ if(st.id===nodeId)st.date=newDate; })); }
     else { const ms=tl.find(m=>m.id===nodeId); if(ms)ms.date=newDate; }
-    saveTimeline(tl); renderTimeline();
+    saveTimeline(tl);
+    // Update only this node's display — do NOT call renderTimeline()
+    // so other expanded subtask groups stay open
+    updateDateDisplay(nodeId, newDate, isSub, tl);
+  }
+  function cancel(){
+    if(saved) return; saved=true;
+    // Restore original display without full re-render
+    const existing = document.getElementById('tl-date-'+nodeId);
+    if(existing) return; // already restored by updateDateDisplay
+    const frag = buildDateSpan(nodeId, currentVal, isSub, tl);
+    input.replaceWith(frag);
   }
   input.onblur = save;
-  input.onkeydown = e => { if(e.key==='Enter')input.blur(); if(e.key==='Escape')renderTimeline(); };
+  input.onkeydown = e => {
+    if(e.key==='Enter'){ e.preventDefault(); save(); input.remove(); }
+    if(e.key==='Escape'){ saved=true; cancel(); }
+  };
+}
+
+// Update just the date display for one node without full re-render
+function updateDateDisplay(nodeId, newDate, isSub, tl){
+  const input = document.querySelector(`input.tl-date-input`);
+  const frag = buildDateSpan(nodeId, newDate, isSub, tl);
+  if(input) input.replaceWith(frag);
+  // Also update in drawer if it exists
+  const drawerSpan = document.querySelector('#tl-drawer-body #tl-date-'+nodeId);
+  if(drawerSpan){
+    const frag2 = buildDateSpan(nodeId, newDate, isSub, tl);
+    drawerSpan.replaceWith(frag2);
+  }
+  // Trigger a background save + full re-render only after a delay
+  // so focus has moved to the next input before DOM changes
+  clearTimeout(window._tlRenderTimer);
+  window._tlRenderTimer = setTimeout(()=>renderTimeline(), 800);
+}
+
+function buildDateSpan(nodeId, date, isSub, tl){
+  const suggested = calcSuggestedDates(tl);
+  const sugDate = !date && suggested[nodeId] ? suggested[nodeId] : null;
+  const displayDate = date || sugDate;
+  const dateLabel = displayDate ? formatDate(displayDate) : '';
+  const isSugg = !date && !!sugDate;
+
+  const span = document.createElement('span');
+  span.id = 'tl-date-'+nodeId;
+
+  if(isSub){
+    span.className = 'tl-sub-date' + (date?' has-date':sugDate?' suggested':'');
+    span.innerHTML = (!date&&!sugDate?'<span class="tl-sub-placeholder">+ date</span>':'') +
+      `<span class="tl-date-val">${isSugg?'~ ':''}</span><span class="tl-date-val">${dateLabel}</span>`;
+  } else {
+    const dateClass = date?(isOverdue(date)?'overdue':isSoon(date)?'soon':'has-date'):sugDate?'suggested':'';
+    span.className = `tl-date-chip ${dateClass} ${isSugg?'suggested':date?'set':''}`;
+    span.style.cursor='pointer';
+    span.title = isSugg?'Suggested — click to confirm':'Click to set date';
+    span.setAttribute('onclick', `event.stopPropagation();editDate('${nodeId}',false)`);
+    span.innerHTML =
+      (!date&&!sugDate?'<span class="tl-date-placeholder">+ Set date</span>':'') +
+      (isSugg?'<span class="tl-date-sug-icon">&#x1F4A1;</span>':date?'<span class="tl-date-cal-icon">&#x1F4C5;</span>':'') +
+      `<span class="tl-date-val">${dateLabel}</span>` +
+      (isSugg?'<span class="tl-date-sug-label">suggested</span>':'');
+  }
+  return span;
 }
 
 function clearDate(nodeId, isSub){
