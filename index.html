@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Noto+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-<style>
   :root {
     --bg:#0e0e0e; --surface:#161616; --card:#1c1c1c; --border:#2a2a2a; --border-hover:#3a3a3a;
     --accent:#e8622a; --accent-dim:rgba(232,98,42,0.12); --accent-dim2:rgba(232,98,42,0.06);
@@ -22,7 +21,7 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--text);font-family:var(--font-sans);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 
-  /* ── LOGIN ── */
+  /* LOGIN */
   #login-screen{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;align-items:center;justify-content:center;padding:24px;}
   .login-card{width:100%;max-width:440px;background:var(--surface);border:1px solid var(--border);padding:48px;}
   .login-logo{font-family:var(--font-serif);font-size:44px;color:var(--text);margin-bottom:6px;line-height:1;}
@@ -37,7 +36,7 @@
   .login-error{font-family:var(--font-mono);font-size:11px;color:var(--red);margin-top:12px;display:none;}
   .login-hint{font-family:var(--font-mono);font-size:10px;color:var(--text-3);margin-top:10px;line-height:1.6;}
 
-  /* ── HEADER ── */
+  /* HEADER */
   header{height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;background:var(--bg);}
   .header-logo{font-family:var(--font-serif);font-size:22px;color:var(--text);}
   .header-logo span{color:var(--accent);font-style:italic;}
@@ -50,11 +49,11 @@
   .header-btn{font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);background:none;border:1px solid var(--border);padding:6px 12px;cursor:pointer;transition:all .2s;}
   .header-btn:hover{border-color:var(--border-hover);color:var(--text-2);}
 
-  /* ── LAYOUT ── */
+  /* LAYOUT */
   .app-layout{display:flex;flex:1;overflow:hidden;}
 
-  /* ── SIDEBAR ── */
-  .sidebar{width:240px;min-width:240px;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+  /* LEFT SIDEBAR */
+  .sidebar{width:220px;min-width:220px;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
   .sidebar-top{padding:14px;border-bottom:1px solid var(--border);flex-shrink:0;}
   .new-btn{width:100%;background:var(--accent);color:#fff;border:none;font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:10px;cursor:pointer;transition:opacity .2s;display:flex;align-items:center;justify-content:center;gap:6px;}
   .new-btn:hover{opacity:.85;}
@@ -90,12 +89,12 @@
   .sidebar-step.active .step-name{color:var(--text);}
   .sidebar-step.done .step-name{color:var(--text-2);}
 
-  /* ── CHAT ── */
+  /* CHAT */
   .chat-container{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
-  .messages{flex:1;overflow-y:auto;padding:28px 36px;display:flex;flex-direction:column;gap:24px;scroll-behavior:smooth;}
+  .messages{flex:1;overflow-y:auto;padding:28px 32px;display:flex;flex-direction:column;gap:24px;scroll-behavior:smooth;}
   .messages::-webkit-scrollbar{width:3px;}
   .messages::-webkit-scrollbar-thumb{background:var(--border);}
-  .message{display:flex;gap:14px;max-width:740px;animation:msgIn .25s ease forwards;opacity:0;}
+  .message{display:flex;gap:14px;max-width:680px;animation:msgIn .25s ease forwards;opacity:0;}
   .message.user{flex-direction:row-reverse;align-self:flex-end;}
   .message.km{align-self:flex-start;}
   @keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -114,7 +113,7 @@
   .msg-content h3{font-family:var(--font-mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin:18px 0 8px;}
   .msg-content ul{padding-left:0;list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:12px;}
   .msg-content ul li{padding-left:18px;position:relative;font-size:13.5px;line-height:1.65;color:var(--text-2);}
-  .msg-content ul li::before{content:'→';position:absolute;left:0;color:var(--accent);font-size:11px;top:2px;}
+  .msg-content ul li::before{content:'\2192';position:absolute;left:0;color:var(--accent);font-size:11px;top:2px;}
   .msg-content table{width:100%;border-collapse:collapse;font-size:12.5px;margin:12px 0;font-family:var(--font-mono);}
   .msg-content table th{background:rgba(255,255,255,.04);padding:8px 12px;text-align:left;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);border-bottom:1px solid var(--border);}
   .msg-content table td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text-2);vertical-align:top;}
@@ -126,18 +125,12 @@
   .verdict-text{font-family:var(--font-serif);font-size:22px;color:var(--text);}
   .msg-content blockquote{border-left:2px solid var(--accent);padding:10px 16px;margin:14px 0;background:var(--accent-dim2);color:var(--text-2);font-style:italic;font-size:13.5px;line-height:1.7;}
   .msg-content code{font-family:var(--font-mono);font-size:12px;background:rgba(255,255,255,.06);padding:2px 6px;color:var(--accent);}
-
-  /* ── IMAGE in message ── */
   .msg-images{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
   .msg-img{width:80px;height:80px;object-fit:cover;border:1px solid var(--border);border-radius:2px;}
-
-  /* ── TYPING ── */
   .typing-indicator{display:flex;align-items:center;gap:5px;padding:12px 0;}
   .typing-dot{width:5px;height:5px;background:var(--text-3);border-radius:50%;animation:tdot 1.3s infinite;}
   .typing-dot:nth-child(2){animation-delay:.2s} .typing-dot:nth-child(3){animation-delay:.4s}
   @keyframes tdot{0%,60%,100%{opacity:.3;transform:scale(.9)}30%{opacity:1;transform:scale(1)}}
-
-  /* ── WELCOME ── */
   .welcome-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px;text-align:center;gap:16px;}
   .welcome-logo{font-family:var(--font-serif);font-size:52px;color:var(--text);line-height:1;margin-bottom:4px;}
   .welcome-logo span{color:var(--accent);font-style:italic;}
@@ -145,112 +138,102 @@
   .start-btn{background:var(--accent);color:#fff;border:none;font-family:var(--font-mono);font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:14px 36px;cursor:pointer;transition:opacity .2s;}
   .start-btn:hover{opacity:.85;}
   .welcome-note{font-family:var(--font-mono);font-size:10px;color:var(--text-3);margin-top:8px;}
-
-  /* ── INPUT AREA ── */
-  .input-area{border-top:1px solid var(--border);padding:12px 36px 16px;background:var(--bg);flex-shrink:0;}
-
-  /* Image preview strip */
+  .input-area{border-top:1px solid var(--border);padding:12px 32px 16px;background:var(--bg);flex-shrink:0;}
   .image-preview-strip{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
   .preview-thumb{position:relative;width:56px;height:56px;}
   .preview-thumb img{width:100%;height:100%;object-fit:cover;border:1px solid var(--border);border-radius:2px;}
   .preview-thumb .remove-img{position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;line-height:1;}
-
   .input-row{display:flex;gap:8px;align-items:flex-end;}
   .input-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
-
-  /* Image upload button */
   .img-btn{width:40px;height:40px;background:var(--card);border:1px solid var(--border);color:var(--text-3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
   .img-btn:hover{border-color:var(--border-hover);color:var(--text-2);}
   .img-btn svg{width:16px;height:16px;}
   #file-input{display:none;}
-
   #user-input{flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:var(--font-sans);font-size:14px;line-height:1.6;padding:12px 16px;resize:none;min-height:46px;max-height:200px;outline:none;transition:border-color .2s;}
   #user-input:focus{border-color:rgba(232,98,42,.4);}
   #user-input::placeholder{color:var(--text-3);}
-
   .send-btn{background:var(--accent);color:#fff;border:none;width:40px;height:40px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .2s;}
   .send-btn:hover{opacity:.85;} .send-btn:disabled{opacity:.3;cursor:not-allowed;}
   .send-btn svg{width:15px;height:15px;}
-
   .input-meta{display:flex;justify-content:flex-end;margin-top:6px;}
-  /* FIX: hint now shows correct shortcut */
   .input-hint{font-family:var(--font-mono);font-size:10px;color:var(--text-3);}
 
-
-  /* ── TIMELINE PANEL ── */
-  .timeline-panel{width:260px;min-width:260px;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:var(--surface);}
-  .timeline-header{padding:14px 16px 10px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
+  /* TIMELINE PANEL */
+  .timeline-panel{width:240px;min-width:240px;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:var(--surface);}
+  .timeline-header{padding:12px 14px 10px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
   .timeline-title{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--text-3);text-transform:uppercase;}
   .timeline-toggle{font-family:var(--font-mono);font-size:9px;color:var(--text-3);background:none;border:none;cursor:pointer;letter-spacing:1px;padding:0;}
-  .timeline-toggle:hover{color:var(--text-2);}
-  .timeline-body{flex:1;overflow-y:auto;padding:10px 0 16px;}
+  .timeline-toggle:hover{color:var(--accent);}
+  .timeline-body{flex:1;overflow-y:auto;padding:8px 0 16px;}
   .timeline-body::-webkit-scrollbar{width:2px;}
   .timeline-body::-webkit-scrollbar-thumb{background:var(--border);}
-
-  .timeline-empty{padding:20px 16px;font-family:var(--font-mono);font-size:10px;color:var(--text-3);line-height:1.7;text-align:center;}
-  .timeline-empty-icon{font-size:22px;margin-bottom:8px;display:block;opacity:.4;}
-
-  /* Milestone */
-  .tl-milestone{padding:0 12px 2px;}
-  .tl-milestone-header{display:flex;align-items:flex-start;gap:8px;padding:7px 4px;cursor:pointer;border-radius:3px;transition:background .15s;}
-  .tl-milestone-header:hover{background:rgba(255,255,255,.03);}
-  .tl-dot-col{display:flex;flex-direction:column;align-items:center;gap:0;padding-top:3px;}
-  .tl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:2px solid var(--border);background:var(--bg);transition:all .2s;}
+  .timeline-empty{padding:28px 16px;font-family:var(--font-mono);font-size:10px;color:var(--text-3);line-height:1.8;text-align:center;}
+  .timeline-empty-icon{font-size:22px;margin-bottom:10px;display:block;opacity:.5;}
+  .tl-milestone{padding:0 10px 0;}
+  .tl-ms-header{display:flex;align-items:flex-start;gap:8px;padding:6px 4px;cursor:pointer;border-radius:3px;transition:background .15s;}
+  .tl-ms-header:hover{background:rgba(255,255,255,.03);}
+  .tl-ms-header:hover .tl-edit-btn{opacity:1;}
+  .tl-dot-col{display:flex;flex-direction:column;align-items:center;padding-top:2px;}
+  .tl-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;border:2px solid var(--border);background:var(--bg);transition:all .2s;}
   .tl-dot.done{background:var(--green);border-color:var(--green);}
   .tl-dot.active{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
-  .tl-dot.pending{background:var(--bg);border-color:var(--border);}
-  .tl-line{width:1px;background:var(--border);flex:1;min-height:100%;margin-top:3px;}
-  .tl-milestone-body{flex:1;min-width:0;}
-  .tl-milestone-name{font-size:11px;font-weight:500;color:var(--text-2);line-height:1.3;margin-bottom:3px;}
-  .tl-milestone.active-ms .tl-milestone-name{color:var(--text);}
-  .tl-milestone.done-ms .tl-milestone-name{color:var(--text-3);}
-  .tl-date-row{display:flex;align-items:center;gap:6px;}
-  .tl-date{font-family:var(--font-mono);font-size:10px;color:var(--text-3);}
+  .tl-ms-info{flex:1;min-width:0;}
+  .tl-ms-name{font-size:11px;font-weight:500;color:var(--text-2);line-height:1.3;margin-bottom:2px;}
+  .tl-milestone.active-ms .tl-ms-name{color:var(--text);}
+  .tl-milestone.done-ms .tl-ms-name{color:var(--text-3);}
+  .tl-date-row{display:flex;align-items:center;gap:5px;}
+  .tl-date{font-family:var(--font-mono);font-size:9px;color:var(--text-3);}
   .tl-date.has-date{color:var(--text-2);}
   .tl-date.overdue{color:var(--red);}
   .tl-date.soon{color:var(--yellow);}
-  .tl-edit-btn{font-family:var(--font-mono);font-size:9px;color:var(--text-3);background:none;border:none;cursor:pointer;padding:0;opacity:0;transition:opacity .15s;}
-  .tl-milestone-header:hover .tl-edit-btn{opacity:1;}
+  .tl-edit-btn{font-size:9px;color:var(--text-3);background:none;border:none;cursor:pointer;padding:0;opacity:0;transition:opacity .15s;font-family:var(--font-mono);}
   .tl-edit-btn:hover{color:var(--accent);}
-  .tl-status-badge{font-family:var(--font-mono);font-size:8px;letter-spacing:1px;padding:1px 5px;border-radius:2px;text-transform:uppercase;}
-  .tl-status-badge.active{background:var(--accent-dim);color:var(--accent);}
-  .tl-status-badge.done{background:var(--green-dim);color:var(--green);}
-
-  /* Subtasks */
-  .tl-subtasks{margin-left:18px;border-left:1px solid var(--border);padding-left:10px;margin-bottom:4px;display:none;}
+  .tl-now-badge{font-family:var(--font-mono);font-size:8px;letter-spacing:1px;padding:1px 4px;border-radius:2px;background:var(--accent-dim);color:var(--accent);text-transform:uppercase;margin-left:4px;}
+  .tl-done-badge{font-family:var(--font-mono);font-size:8px;padding:1px 4px;border-radius:2px;background:var(--green-dim);color:var(--green);margin-left:4px;}
+  .tl-connector{width:1px;height:6px;background:var(--border);margin-left:14px;}
+  .tl-subtasks{margin-left:17px;border-left:1px solid var(--border);padding-left:10px;margin-bottom:2px;display:none;}
   .tl-subtasks.open{display:block;}
-  .tl-subtask{display:flex;align-items:flex-start;gap:6px;padding:4px 0;cursor:pointer;}
+  .tl-subtask{display:flex;align-items:flex-start;gap:6px;padding:3px 0;cursor:pointer;}
   .tl-subtask:hover .tl-sub-edit{opacity:1;}
-  .tl-sub-dot{width:5px;height:5px;border-radius:50%;background:var(--border);flex-shrink:0;margin-top:5px;}
+  .tl-sub-dot{width:4px;height:4px;border-radius:50%;background:var(--border);flex-shrink:0;margin-top:6px;}
   .tl-subtask.done-sub .tl-sub-dot{background:var(--green);}
   .tl-subtask.active-sub .tl-sub-dot{background:var(--accent);}
-  .tl-sub-body{flex:1;min-width:0;}
+  .tl-sub-info{flex:1;min-width:0;}
   .tl-sub-name{font-size:10px;color:var(--text-3);line-height:1.4;}
   .tl-subtask.active-sub .tl-sub-name{color:var(--text-2);}
-  .tl-subtask.done-sub .tl-sub-name{color:var(--text-3);text-decoration:line-through;opacity:.6;}
+  .tl-subtask.done-sub .tl-sub-name{color:var(--text-3);text-decoration:line-through;opacity:.5;}
   .tl-sub-date{font-family:var(--font-mono);font-size:9px;color:var(--text-3);}
   .tl-sub-date.has-date{color:var(--text-3);}
   .tl-sub-edit{font-size:9px;color:var(--text-3);background:none;border:none;cursor:pointer;opacity:0;transition:opacity .15s;padding:0;font-family:var(--font-mono);}
+  .tl-date-input{font-family:var(--font-mono);font-size:9px;background:var(--card);border:1px solid var(--accent);color:var(--text);padding:2px 4px;outline:none;width:96px;}
+  .timeline-note{padding:8px 14px;font-family:var(--font-mono);font-size:9px;color:var(--text-3);line-height:1.7;border-top:1px solid var(--border);flex-shrink:0;}
+  .tl-milestone.active-ms .tl-ms-header{background:var(--accent-dim2);}
 
-  /* Date edit inline input */
-  .tl-date-input{font-family:var(--font-mono);font-size:10px;background:var(--card);border:1px solid var(--accent);color:var(--text);padding:2px 6px;outline:none;width:100px;}
-
-  /* Timeline connector line between milestones */
-  .tl-connector{width:1px;height:8px;background:var(--border);margin-left:16px;}
-
-  /* Focus indicator */
-  .tl-milestone.active-ms .tl-milestone-header{background:var(--accent-dim2);}
-
-  /* Timeline note */
-  .timeline-note{padding:10px 16px;font-family:var(--font-mono);font-size:9px;color:var(--text-3);line-height:1.6;border-top:1px solid var(--border);flex-shrink:0;}
-
-  @media(max-width:1100px){.timeline-panel{display:none}}
-
+  @media(max-width:1080px){.timeline-panel{display:none}}
   @media(max-width:680px){.sidebar{display:none}.messages{padding:20px 16px}.input-area{padding:10px 16px 14px}.login-card{padding:32px 24px}}
 
+  /* MOBILE TIMELINE FAB + DRAWER */
+  .tl-fab{display:none;position:fixed;bottom:84px;right:16px;width:46px;height:46px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:18px;cursor:pointer;z-index:50;box-shadow:0 4px 20px rgba(0,0,0,.5);align-items:center;justify-content:center;transition:transform .2s;}
+  .tl-fab:active{transform:scale(.94);}
+  .tl-fab-dot{position:absolute;top:7px;right:7px;width:9px;height:9px;border-radius:50%;background:var(--green);border:2px solid var(--bg);display:none;}
+  .tl-fab-dot.show{display:block;}
+  .tl-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:60;backdrop-filter:blur(2px);}
+  .tl-overlay.open{display:block;}
+  .tl-drawer{position:fixed;top:0;right:-110%;width:min(300px,90vw);height:100%;background:var(--surface);border-left:1px solid var(--border);z-index:70;display:flex;flex-direction:column;transition:right .26s cubic-bezier(.32,0,.15,1);}
+  .tl-drawer.open{right:0;}
+  .tl-drawer-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  .tl-drawer-title{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--text-3);text-transform:uppercase;}
+  .tl-drawer-row{display:flex;align-items:center;gap:10px;}
+  .tl-drawer-expand{font-family:var(--font-mono);font-size:9px;color:var(--text-3);background:none;border:none;cursor:pointer;padding:0;}
+  .tl-drawer-expand:hover{color:var(--accent);}
+  .tl-drawer-close{width:28px;height:28px;background:var(--card);border:1px solid var(--border);color:var(--text-2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:2px;}
+  .tl-drawer-body{flex:1;overflow-y:auto;padding:6px 0 16px;}
+  .tl-drawer-body::-webkit-scrollbar{width:3px;}
+  .tl-drawer-body::-webkit-scrollbar-thumb{background:var(--border);}
+  .tl-drawer-note{padding:8px 14px;font-family:var(--font-mono);font-size:9px;color:var(--text-3);line-height:1.7;border-top:1px solid var(--border);flex-shrink:0;}
+  @media(max-width:1080px){.tl-fab{display:flex;}}
 </style>
 </head>
-<body>
 <body>
 
 <!-- LOGIN -->
@@ -262,28 +245,10 @@
     <input type="text" class="login-input" id="login-username" placeholder="e.g. john or john@email.com" autocomplete="username" autocapitalize="none">
     <div class="login-label">Access Password</div>
     <input type="password" class="login-input" id="login-password" placeholder="••••••••" autocomplete="current-password">
-    <button class="login-btn" id="login-btn" onclick="doLogin()">Enter →</button>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Enter &#x2192;</button>
     <div class="login-error" id="login-error">Wrong password. Try again.</div>
     <div class="login-hint">Use the same name on every device to sync your projects.</div>
   </div>
-
-  <!-- TIMELINE PANEL -->
-  <aside class="timeline-panel" id="timeline-panel">
-    <div class="timeline-header">
-      <span class="timeline-title">Campaign Timeline</span>
-      <button class="timeline-toggle" onclick="toggleAllSubtasks()" id="tl-toggle-btn">expand all</button>
-    </div>
-    <div class="timeline-body" id="timeline-body">
-      <div class="timeline-empty" id="timeline-empty">
-        <span class="timeline-empty-icon">📅</span>
-        Timeline will appear after<br>your product alignment<br>is complete.
-      </div>
-    </div>
-    <div class="timeline-note" id="timeline-note" style="display:none">
-      Click any date to edit.<br>Empty dates = not yet planned.<br>按计划执行很重要。
-    </div>
-  </aside>
-
 </div>
 
 <!-- APP -->
@@ -304,6 +269,8 @@
 </header>
 
 <div class="app-layout">
+
+  <!-- LEFT SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-top">
       <button class="new-btn" onclick="createNewSession()">+ New Project</button>
@@ -322,29 +289,26 @@
     </div>
   </aside>
 
+  <!-- CHAT -->
   <div class="chat-container">
     <div class="welcome-state" id="welcome-state">
       <div class="welcome-logo">Kick<span>man</span></div>
       <div class="welcome-sub">Crowdfunding Coach · Mission 1</div>
-      <button class="start-btn" onclick="startCurrentSession()">Begin →</button>
-      <div class="welcome-note">14 days · Go / No-Go decision · Kickstarter-ready</div>
+      <button class="start-btn" onclick="startCurrentSession()">Begin &#x2192;</button>
+      <div class="welcome-note">14 days &middot; Go / No-Go decision &middot; Kickstarter-ready</div>
     </div>
     <div class="messages" id="messages" style="display:none"></div>
     <div class="input-area" id="input-area" style="display:none">
-      <!-- Image previews -->
       <div class="image-preview-strip" id="image-preview-strip"></div>
-      <!-- Input row -->
       <div class="input-row">
-        <textarea id="user-input" placeholder="Type your message…" rows="1" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+        <textarea id="user-input" placeholder="Type your message&#x2026;" rows="1" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
         <div class="input-actions">
-          <!-- Image upload -->
           <button class="img-btn" onclick="document.getElementById('file-input').click()" title="Upload image">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
               <polyline points="21 15 16 10 5 21"/>
             </svg>
           </button>
-          <!-- Send -->
           <button class="send-btn" id="send-btn" onclick="sendMessage()" title="Send (Shift+Enter)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
@@ -354,12 +318,56 @@
       </div>
       <input type="file" id="file-input" accept="image/*" multiple onchange="handleImageUpload(event)">
       <div class="input-meta">
-        <span class="input-hint">Enter ↵ newline · Shift+Enter ⇧↵ send</span>
+        <span class="input-hint">Enter &#x21B5; newline &middot; Shift+Enter send</span>
       </div>
     </div>
   </div>
+
+  <!-- RIGHT TIMELINE PANEL -->
+  <aside class="timeline-panel" id="timeline-panel">
+    <div class="timeline-header">
+      <span class="timeline-title">Campaign Timeline</span>
+      <button class="timeline-toggle" onclick="toggleAllSubtasks()" id="tl-toggle-btn">expand all</button>
+    </div>
+    <div class="timeline-body" id="timeline-body">
+      <div class="timeline-empty" id="timeline-empty">
+        <span class="timeline-empty-icon">&#x1F4C5;</span>
+        Timeline will appear<br>after product alignment<br>is complete.
+      </div>
+    </div>
+    <div class="timeline-note" id="timeline-note" style="display:none">
+      Hover any item to edit date.<br>&#x7A7A;&#x767D; = &#x5C1A;&#x672A;&#x89C4;&#x5212;&#xFF0C;&#x968F;&#x65F6;&#x586B;&#x5145;<br>&#x6309;&#x8BA1;&#x5212;&#x6267;&#x884C;&#x5F88;&#x91CD;&#x8981; &#x26A0;&#xFE0F;
+    </div>
+  </aside>
+
 </div>
 
+<!-- MOBILE TIMELINE FAB -->
+<button class="tl-fab" id="tl-fab" onclick="openTimelineDrawer()" title="Campaign Timeline">
+  &#x1F4C5;
+  <span class="tl-fab-dot" id="tl-fab-dot"></span>
+</button>
+
+<!-- MOBILE TIMELINE DRAWER -->
+<div class="tl-overlay" id="tl-overlay" onclick="closeTimelineDrawer()"></div>
+<div class="tl-drawer" id="tl-drawer">
+  <div class="tl-drawer-head">
+    <span class="tl-drawer-title">Campaign Timeline</span>
+    <div class="tl-drawer-row">
+      <button class="tl-drawer-expand" id="tl-drawer-expand" onclick="toggleAllSubtasks()">expand all</button>
+      <button class="tl-drawer-close" onclick="closeTimelineDrawer()">&#x2715;</button>
+    </div>
+  </div>
+  <div class="tl-drawer-body" id="tl-drawer-body">
+    <div class="timeline-empty">
+      <span class="timeline-empty-icon">&#x1F4C5;</span>
+      Timeline will appear<br>after product alignment<br>is complete.
+    </div>
+  </div>
+  <div class="tl-drawer-note" id="tl-drawer-note" style="display:none">
+    Hover any item to edit date.<br>&#x7A7A;&#x767D; = &#x5C1A;&#x672A;&#x89C4;&#x5212;&#xFF0C;&#x968F;&#x65F6;&#x586B;&#x5145;<br>&#x6309;&#x8BA1;&#x5212;&#x6267;&#x884C;&#x5F88;&#x91CD;&#x8981; &#x26A0;&#xFE0F;
+  </div>
+</div>
 
 <script>
 // ── STATE ──────────────────────────────────────────────────────────────────────
@@ -528,6 +536,34 @@ function renderTimeline(){
   });
 
   body.innerHTML = html;
+
+  // Also render into mobile drawer
+  const drawerBody = document.getElementById('tl-drawer-body');
+  const drawerNote = document.getElementById('tl-drawer-note');
+  const fabDot = document.getElementById('tl-fab-dot');
+  if(drawerBody){
+    if(!sessionStarted){
+      drawerBody.innerHTML='<div class="timeline-empty"><span class="timeline-empty-icon">&#x1F4C5;</span>Timeline will appear<br>after product alignment<br>is complete.</div>';
+      if(drawerNote)drawerNote.style.display='none';
+      if(fabDot)fabDot.classList.remove('show');
+    } else {
+      drawerBody.innerHTML = html;
+      if(drawerNote)drawerNote.style.display='block';
+      if(fabDot)fabDot.classList.add('show');
+    }
+  }
+}
+
+function openTimelineDrawer(){
+  document.getElementById('tl-overlay').classList.add('open');
+  document.getElementById('tl-drawer').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeTimelineDrawer(){
+  document.getElementById('tl-overlay').classList.remove('open');
+  document.getElementById('tl-drawer').classList.remove('open');
+  document.body.style.overflow='';
 }
 
 function toggleSubtasks(msId){
@@ -537,7 +573,11 @@ function toggleSubtasks(msId){
 
 function toggleAllSubtasks(){
   tlExpandedAll = !tlExpandedAll;
-  document.getElementById('tl-toggle-btn').textContent = tlExpandedAll ? 'collapse all' : 'expand all';
+  const label = tlExpandedAll ? 'collapse all' : 'expand all';
+  const btn1 = document.getElementById('tl-toggle-btn');
+  const btn2 = document.getElementById('tl-drawer-expand');
+  if(btn1) btn1.textContent = label;
+  if(btn2) btn2.textContent = label;
   const tl = getTimeline(); if(!tl) return;
   tl.forEach(ms => {
     const el = document.getElementById(`tl-sub-${ms.id}`);
@@ -1354,10 +1394,6 @@ function exportChat(){
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'}));
   a.download=`kickman-${s.name.slice(0,30).replace(/[^a-z0-9]/gi,'-')}-${new Date().toISOString().slice(0,10)}.txt`;a.click();
 }
-</script>
-</body>
-</html>
-
 </script>
 </body>
 </html>
