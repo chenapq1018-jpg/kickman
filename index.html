@@ -94,7 +94,7 @@
   .sidebar-step.done .step-name{color:var(--text-2);}
 
   /* Step results overlay — covers chat area */
-  .step-overlay{display:none;position:absolute;inset:0;background:var(--bg);z-index:30;flex-direction:column;animation:msgIn .2s ease forwards;}
+  .step-overlay{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:30;flex-direction:column;animation:msgIn .2s ease forwards;}
   .step-overlay.open{display:flex;}
   .step-overlay-head{height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;}
   .step-overlay-back{font-family:var(--font-mono);font-size:10px;letter-spacing:1px;color:var(--text-3);background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;transition:color .15s;padding:0;}
@@ -169,7 +169,7 @@
   }
 
   /* CHAT */
-  .chat-container{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+  .chat-container{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;position:relative;}
   .messages{flex:1;overflow-y:auto;padding:28px 32px;display:flex;flex-direction:column;gap:24px;scroll-behavior:smooth;}
   .messages::-webkit-scrollbar{width:3px;}
   .messages::-webkit-scrollbar-thumb{background:var(--border);}
@@ -2967,11 +2967,12 @@ const STEP_DEFS = {
     num: '05',
     mission: 1,
     fields: [
-      {key:'validationResults', label:'Validation Results',     hint:'Clicks, leads, CPL per version, qualitative signals'},
-      {key:'verdict',           label:'Verdict',                hint:'GO / NO-GO / CONDITIONAL with reasoning', short:true},
-      {key:'winningAngle',      label:'Winning Angle',          hint:'Which LP version won and why'},
-      {key:'risksToWatch',      label:'Risks to Watch',         hint:'Key risks before launch'},
-      {key:'nextStep',          label:'Recommended Next Step',  hint:''},
+      {key:'verdict',           label:'Verdict',                hint:'GO ✅ / NO-GO ❌ / CONDITIONAL ⚠️', short:true},
+      {key:'validationResults', label:'Validation Results',     hint:'Clicks, leads, CPL, conversion rate per LP version'},
+      {key:'winningAngle',      label:'Winning Angle & Insight', hint:'Which LP version performed better and key learnings'},
+      {key:'risksToWatch',      label:'Risks to Watch',         hint:'Key risks and concerns before launch'},
+      {key:'overallScore',      label:'Overall Readiness Score', hint:'Final score and summary reasoning', short:true},
+      {key:'nextStep',          label:'Recommended Next Step',  hint:'Clear action item'},
     ]
   },
   6: {
@@ -3079,10 +3080,14 @@ function smartExtractStep(stepNum, session){
   if(stepNum === 2){ captureLatestAlignmentRaw(session); return; }
   const def = STEP_DEFS[stepNum]; if(!def) return;
   const pats = {
-    3:/APPROACH [ABC]:|Marketing Approach/i, 4:/LP VERSION|VALIDATION PLAYBOOK/i,
-    5:/VERDICT|NO.GO|FINAL REPORT/i, 6:/VIDEO STYLE|MODULE A[^0-9]/i,
-    7:/SCENE|SCRIPT/i, 8:/PRODUCTION|VIDEO BRIEF/i,
-    9:/CAMPAIGN PAGE|MODULE B/i, 10:/LAUNCH READY|MODULE C|CHECKLIST/i
+    3:/APPROACH [ABC]:|Marketing Approach|\bAPPROACH\b.*\bCore angle\b/i,
+    4:/LP VERSION [12]|VALIDATION PLAYBOOK|Landing Page Brief/i,
+    5:/GO[\s\S]{0,10}NO.GO|VERDICT|FINAL REPORT|GO\s*\/|Readiness Score.*\n.*\n.*GO/i,
+    6:/VIDEO STYLE|MODULE A[\s:]/i,
+    7:/SCENE ORDER|SCRIPT|MODULE A[2-9]/i,
+    8:/PRODUCTION APPROACH|VIDEO BRIEF|MODULE A/i,
+    9:/CAMPAIGN PAGE|MODULE B[\s:]/i,
+    10:/LAUNCH READY|MODULE C[\s:]|PRE-LAUNCH CHECKLIST/i
   };
   const pat = pats[stepNum]; if(!pat) return;
   const msgs = [...session.history].filter(m=>m.role==='assistant'||m.role==='km').reverse();
@@ -3200,6 +3205,112 @@ function renderGenericView(def, data){
   return html || '<div class="so-view"><p style="color:var(--text-3);font-style:italic;">No content saved yet.</p></div>';
 }
 
+// ── Go/No-Go special render ──────────────────────────────────────────────────
+function renderGoNoGoView(data, session){
+  let html = '';
+  const verdict = (data.verdict||'').trim();
+  const isGo = /\bGO\b/i.test(verdict) && !/NO.GO/i.test(verdict);
+  const isNoGo = /NO.GO/i.test(verdict);
+  const isCond = /CONDITIONAL/i.test(verdict);
+
+  // Verdict banner
+  const verdictColor = isGo?'var(--green)':isNoGo?'var(--red)':'var(--yellow)';
+  const verdictBg = isGo?'rgba(45,158,107,.08)':isNoGo?'rgba(192,57,43,.08)':'rgba(212,160,23,.08)';
+  const verdictIcon = isGo?'✅':isNoGo?'❌':'⚠️';
+  const verdictLabel = isGo?'GO — Launch Validated':isNoGo?'NO-GO — Do Not Launch':'Conditional — Address Issues First';
+
+  if(verdict){
+    html += '<div style="padding:20px 24px;background:'+verdictBg+';border:1px solid '+verdictColor+';margin-bottom:28px;">';
+    html += '<div style="font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:'+verdictColor+';text-transform:uppercase;margin-bottom:8px;">Verdict</div>';
+    html += '<div style="font-family:var(--font-serif);font-size:26px;color:'+verdictColor+';">'+verdictIcon+' '+verdictLabel+'</div>';
+    html += '</div>';
+  }
+
+  // Readiness score if present
+  const scoreText = data.overallScore||'';
+  const scoreNum = parseInt((scoreText.match(/(\d+)\s*\/\s*10/)||[])[1]||0);
+  if(scoreNum){
+    const col = scoreNum>=7?'var(--green)':scoreNum>=5?'var(--yellow)':'var(--red)';
+    html += '<div class="so-section"><div class="so-section-label">Overall Readiness Score</div>';
+    html += '<div style="display:flex;align-items:baseline;gap:8px;padding:8px 0 16px;">';
+    html += '<span style="font-family:var(--font-serif);font-size:48px;color:'+col+';line-height:1;">'+scoreNum+'</span>';
+    html += '<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);">/ 10</span>';
+    const label = scoreNum>=7?' — Strong':scoreNum<5?' — Needs Work':'';
+    if(label) html += '<span style="font-family:var(--font-mono);font-size:11px;color:'+col+';">'+label+'</span>';
+    html += '</div>';
+    if(scoreText && scoreText.length>5) html += '<div style="font-size:12px;color:var(--text-2);">'+escHtml(scoreText)+'</div>';
+    html += '</div>';
+  }
+
+  // Validation results
+  if(data.validationResults){
+    html += '<div class="so-section"><div class="so-section-label">Validation Results</div>';
+    html += '<div class="so-view">'+renderMetricsBlock(data.validationResults)+'</div></div>';
+  }
+
+  // Winning angle
+  if(data.winningAngle){
+    html += '<div class="so-section"><div class="so-section-label">Winning Angle & Insight</div>';
+    html += '<div style="padding:14px 16px;background:var(--card);border-left:3px solid var(--accent);">';
+    html += '<div style="font-size:13px;color:var(--text-2);line-height:1.7;">'+escHtml(data.winningAngle)+'</div></div></div>';
+  }
+
+  // Risks
+  if(data.risksToWatch){
+    html += '<div class="so-section"><div class="so-section-label">Risks to Watch</div>';
+    const risks = String(data.risksToWatch).split('\n').filter(l=>l.trim()).map(l=>l.replace(/^[•\-\*]\s*/,'').trim()).filter(Boolean);
+    if(risks.length){
+      html += '<div style="display:flex;flex-direction:column;gap:6px;">';
+      risks.forEach(r => {
+        const isHigh = /high|critical|major/i.test(r);
+        const col = isHigh?'var(--red)':'var(--yellow)';
+        const bg = isHigh?'rgba(192,57,43,.06)':'rgba(212,160,23,.06)';
+        html += '<div style="padding:10px 14px;background:'+bg+';border-left:2px solid '+col+';font-size:12px;color:var(--text-2);">'+escHtml(r)+'</div>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+
+  // Next step
+  if(data.nextStep){
+    html += '<div class="so-section"><div class="so-section-label">Recommended Next Step</div>';
+    html += '<div style="padding:14px 16px;background:rgba(232,98,42,.06);border:1px solid rgba(232,98,42,.2);font-size:13px;color:var(--text);font-family:var(--font-mono);">'+escHtml(data.nextStep)+'</div></div>';
+  }
+
+  // If no structured data, show rawText from history
+  if(!verdict && !data.validationResults){
+    const s5raw = session.stepData && session.stepData[5] && session.stepData[5]._raw;
+    if(s5raw) html += alignmentRawToHTML(s5raw);
+  }
+
+  return html || '<div class="so-view"><p class="so-empty">No Go/No-Go report yet.</p></div>';
+}
+
+function renderMetricsBlock(text){
+  const lines = String(text||'').split('\n').filter(l=>l.trim());
+  const metrics = [];
+  const other = [];
+  lines.forEach(l => {
+    const m = l.match(/(.+?):\s*([\d.%$<>~]+.{0,20})/);
+    if(m) metrics.push({label:m[1].replace(/^[•\-\*]\s*/,'').trim(), val:m[2].trim()});
+    else other.push(l.replace(/^[•\-\*]\s*/,'').trim());
+  });
+  let html = '';
+  if(metrics.length){
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:14px;">';
+    metrics.forEach(({label,val}) => {
+      html += '<div style="padding:12px 14px;background:var(--card);border:1px solid var(--border);">';
+      html += '<div style="font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-3);text-transform:uppercase;margin-bottom:4px;">'+escHtml(label)+'</div>';
+      html += '<div style="font-family:var(--font-serif);font-size:20px;color:var(--accent);">'+escHtml(val)+'</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+  if(other.length) html += '<ul>'+other.map(l=>'<li>'+escHtml(l)+'</li>').join('')+'</ul>';
+  return html || '<p class="so-empty">No metrics yet.</p>';
+}
+
 // ── EDIT mode ─────────────────────────────────────────────────────────────────
 function renderStepEdit(stepNum, session){
   const def = STEP_DEFS[stepNum];
@@ -3243,7 +3354,7 @@ async function triggerStepGeneration(stepNum, session, bodyEl){
     2:'Generate the complete Product Alignment Document now based on everything we have discussed. Use the exact 7-section template.',
     3:'Summarize the three marketing approaches we discussed, including the chosen approach and reasoning.',
     4:'Output the Landing Page Briefs: both LP versions, Validation Playbook, ad setup notes, tracking dashboard.',
-    5:'Output the Go/No-Go Report: validation results, verdict, winning angle, risks, next steps.',
+    5:'Generate the complete Go/No-Go Report. Include: (1) VERDICT — GO/NO-GO/CONDITIONAL with one-line reason, (2) Validation Results with key metrics (CPL, conversion rate, clicks), (3) Winning Angle — which LP version performed better and why, (4) Risks to Watch — bullet list of 3-5 specific risks with HIGH/MEDIUM labels, (5) Overall Readiness Score X/10 with reasoning, (6) Recommended Next Step — one clear action.',
     6:'Summarize the Video Strategy: budget, timeline, chosen style, key video rules.',
     7:'Summarize the Script and Scenes: core USP, scene order, recommended length.',
     8:'Output the Video Brief: production approach, casting direction, production timeline.',
