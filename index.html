@@ -80,7 +80,11 @@
   .sync-status.error{color:var(--red);}
   .steps-section{padding:6px 0;flex-shrink:0;border-top:1px solid var(--border);}
   .steps-label{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--text-3);text-transform:uppercase;padding:6px 16px 4px;}
-  .sidebar-step{display:flex;align-items:flex-start;gap:10px;padding:6px 14px;}
+  .sidebar-step{display:flex;align-items:flex-start;gap:10px;padding:6px 14px;cursor:default;border-radius:2px;transition:background .15s;position:relative;}
+  .sidebar-step.done{cursor:pointer;}
+  .sidebar-step.done:hover{background:rgba(255,255,255,.04);}
+  .sidebar-step.done:hover .step-view-hint{opacity:1;}
+  .step-view-hint{font-family:var(--font-mono);font-size:8px;color:var(--accent);opacity:0;transition:opacity .15s;margin-left:auto;padding-top:2px;}
   .step-num{font-family:var(--font-mono);font-size:11px;color:var(--text-3);min-width:18px;padding-top:1px;}
   .sidebar-step.done .step-num{color:var(--green);}
   .sidebar-step.active .step-num{color:var(--accent);}
@@ -88,6 +92,56 @@
   .step-name{font-size:11px;font-weight:500;color:var(--text-3);line-height:1.3;}
   .sidebar-step.active .step-name{color:var(--text);}
   .sidebar-step.done .step-name{color:var(--text-2);}
+
+  /* Step results overlay — covers chat area */
+  .step-overlay{display:none;position:absolute;inset:0;background:var(--bg);z-index:30;flex-direction:column;animation:msgIn .2s ease forwards;}
+  .step-overlay.open{display:flex;}
+  .step-overlay-head{height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;}
+  .step-overlay-back{font-family:var(--font-mono);font-size:10px;letter-spacing:1px;color:var(--text-3);background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;transition:color .15s;padding:0;}
+  .step-overlay-back:hover{color:var(--text);}
+  .step-overlay-title{font-family:var(--font-serif);font-size:18px;color:var(--text);flex:1;}
+  .step-overlay-meta{font-family:var(--font-mono);font-size:9px;color:var(--text-3);}
+  .step-overlay-actions{display:flex;gap:8px;align-items:center;}
+  .step-overlay-btn{font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:6px 12px;border:1px solid var(--border);background:none;color:var(--text-2);cursor:pointer;transition:all .15s;white-space:nowrap;}
+  .step-overlay-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .step-overlay-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .step-overlay-btn.primary:hover{opacity:.85;}
+  .step-overlay-body{flex:1;overflow-y:auto;padding:24px 32px;}
+  .step-overlay-body::-webkit-scrollbar{width:3px;}
+  .step-overlay-body::-webkit-scrollbar-thumb{background:var(--border);}
+
+  /* Rich text editor */
+  .rte-section{margin-bottom:28px;}
+  .rte-label{font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:6px;}
+  .rte-hint{font-size:11px;color:var(--text-3);margin-bottom:8px;}
+  .rte-toolbar{display:flex;gap:2px;padding:4px 6px;background:var(--card);border:1px solid var(--border);border-bottom:none;flex-wrap:wrap;}
+  .rte-tool{font-family:var(--font-mono);font-size:11px;width:26px;height:24px;background:none;border:none;color:var(--text-3);cursor:pointer;border-radius:2px;display:flex;align-items:center;justify-content:center;transition:all .1s;}
+  .rte-tool:hover{background:rgba(255,255,255,.08);color:var(--text);}
+  .rte-tool.active{background:var(--accent-dim);color:var(--accent);}
+  .rte-tool.wide{width:auto;padding:0 6px;font-size:10px;letter-spacing:.5px;}
+  .rte-sep{width:1px;background:var(--border);margin:2px 3px;align-self:stretch;}
+  .rte-editor{min-height:80px;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:var(--font-sans);font-size:13px;line-height:1.7;padding:10px 14px;outline:none;transition:border-color .15s;}
+  .rte-editor:focus{border-color:rgba(232,98,42,.4);}
+  .rte-editor.short{min-height:44px;}
+  .rte-editor h2{font-family:var(--font-serif);font-size:16px;font-weight:400;margin:12px 0 6px;}
+  .rte-editor h3{font-family:var(--font-mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin:10px 0 4px;}
+  .rte-editor strong{font-weight:600;color:var(--text);}
+  .rte-editor em{font-style:italic;color:var(--text-2);}
+  .rte-editor ul,.rte-editor ol{padding-left:20px;margin:6px 0;}
+  .rte-editor li{margin-bottom:3px;}
+  .rte-editor blockquote{border-left:2px solid var(--accent);padding:4px 12px;margin:8px 0;background:var(--accent-dim2);color:var(--text-2);font-style:italic;}
+  .rte-editor [data-placeholder]:empty::before{content:attr(data-placeholder);color:var(--text-3);pointer-events:none;}
+
+  .step-empty-state{padding:48px 0;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--text-3);line-height:1.8;}
+  .step-empty-icon{font-size:32px;display:block;margin-bottom:14px;opacity:.4;}
+  .step-saved-badge{font-family:var(--font-mono);font-size:9px;color:var(--green);opacity:0;transition:opacity .3s;}
+  .step-saved-badge.show{opacity:1;}
+
+  @media(max-width:680px){
+    .step-overlay-body{padding:16px;}
+    .step-overlay-head{padding:0 14px;}
+    .step-overlay-btn.dl-btn{display:none;}
+  }
 
   /* CHAT */
   .chat-container{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
@@ -442,6 +496,7 @@
         <div class="export-format-row">
           <button onclick="exportChat('txt');closeExportMenu()" class="export-fmt-btn">.txt</button>
           <button onclick="exportChat('md');closeExportMenu()" class="export-fmt-btn">.md</button>
+          <button onclick="exportChat('docx');closeExportMenu()" class="export-fmt-btn">.docx</button>
           <button onclick="exportChat('pdf');closeExportMenu()" class="export-fmt-btn">.pdf</button>
         </div>
         <!-- Product Alignment -->
@@ -449,6 +504,7 @@
         <div class="export-format-row" id="export-alignment-row">
           <button onclick="downloadAlignment('txt');closeExportMenu()" class="export-fmt-btn">.txt</button>
           <button onclick="downloadAlignment('md');closeExportMenu()" class="export-fmt-btn">.md</button>
+          <button onclick="downloadAlignment('docx');closeExportMenu()" class="export-fmt-btn">.docx</button>
           <button onclick="downloadAlignment('pdf');closeExportMenu()" class="export-fmt-btn">.pdf</button>
         </div>
         <!-- Timeline -->
@@ -456,15 +512,21 @@
         <div class="export-format-row">
           <button onclick="exportTimeline('txt');closeExportMenu()" class="export-fmt-btn">.txt</button>
           <button onclick="exportTimeline('md');closeExportMenu()" class="export-fmt-btn">.md</button>
+          <button onclick="exportTimeline('docx');closeExportMenu()" class="export-fmt-btn">.docx</button>
           <button onclick="exportTimeline('pdf');closeExportMenu()" class="export-fmt-btn">.pdf</button>
         </div>
         <!-- All -->
-        <button onclick="exportAll();closeExportMenu()" class="export-menu-item export-all-item" style="margin-top:4px;">&#x2B07; Download All (.md)</button>
+        <div class="export-format-row" style="padding:6px 10px 8px;border-top:1px solid var(--border);">
+          <button onclick="exportAll('md');closeExportMenu()" class="export-fmt-btn" style="flex:1.5;color:var(--accent);">&#x2B07; All (.md)</button>
+          <button onclick="exportAll('docx');closeExportMenu()" class="export-fmt-btn" style="flex:1.5;color:var(--accent);">&#x2B07; All (.docx)</button>
+        </div>
       </div>
     </div>
     <button class="header-btn" onclick="doLogout()">Log out</button>
   </div>
 </header>
+
+
 
 <!-- MOBILE BOTTOM NAV -->
 <nav class="mobile-nav" id="mobile-nav" style="display:none;">
@@ -534,17 +596,37 @@
     </div>
     <div class="sync-status" id="sync-status"></div>
     <div class="steps-section">
-      <div class="steps-label">Current Step</div>
-      <div class="sidebar-step active" id="step-1"><div class="step-num" id="snum-1">01</div><div class="step-info"><div class="step-name">Founder Input</div></div></div>
-      <div class="sidebar-step idle" id="step-2"><div class="step-num" id="snum-2">02</div><div class="step-info"><div class="step-name">Product Alignment</div></div></div>
-      <div class="sidebar-step idle" id="step-3"><div class="step-num" id="snum-3">03</div><div class="step-info"><div class="step-name">Marketing Approaches</div></div></div>
-      <div class="sidebar-step idle" id="step-4"><div class="step-num" id="snum-4">04</div><div class="step-info"><div class="step-name">Landing Page Briefs</div></div></div>
-      <div class="sidebar-step idle" id="step-5"><div class="step-num" id="snum-5">05</div><div class="step-info"><div class="step-name">Go / No-Go Report</div></div></div>
+      <div class="steps-label">Steps</div>
+      <div class="sidebar-step active" id="step-1" onclick="openStepDrawer(1)"><div class="step-num" id="snum-1">01</div><div class="step-info"><div class="step-name" id="stepname-1">Founder Input</div></div><span class="step-view-hint">view</span></div>
+      <div class="sidebar-step idle" id="step-2" onclick="openStepDrawer(2)"><div class="step-num" id="snum-2">02</div><div class="step-info"><div class="step-name" id="stepname-2">Product Alignment</div></div><span class="step-view-hint">view</span></div>
+      <div class="sidebar-step idle" id="step-3" onclick="openStepDrawer(3)"><div class="step-num" id="snum-3">03</div><div class="step-info"><div class="step-name" id="stepname-3">Marketing Approaches</div></div><span class="step-view-hint">view</span></div>
+      <div class="sidebar-step idle" id="step-4" onclick="openStepDrawer(4)"><div class="step-num" id="snum-4">04</div><div class="step-info"><div class="step-name" id="stepname-4">Landing Page Briefs</div></div><span class="step-view-hint">view</span></div>
+      <div class="sidebar-step idle" id="step-5" onclick="openStepDrawer(5)"><div class="step-num" id="snum-5">05</div><div class="step-info"><div class="step-name" id="stepname-5">Go / No-Go Report</div></div><span class="step-view-hint">view</span></div>
     </div>
   </aside>
 
   <!-- CHAT -->
   <div class="chat-container">
+    <!-- STEP RESULTS OVERLAY — covers chat area -->
+    <div class="step-overlay" id="step-overlay">
+      <div class="step-overlay-head">
+        <button class="step-overlay-back" onclick="closeStepDrawer()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Back to chat
+        </button>
+        <div class="step-overlay-title" id="step-drawer-title">Step Results</div>
+        <div class="step-overlay-meta" id="step-drawer-meta"></div>
+        <div class="step-overlay-actions">
+          <span class="step-saved-badge" id="step-saved-badge">Saved ✓</span>
+          <button class="step-overlay-btn dl-btn" onclick="downloadStepResult()">&#x2B07; Download</button>
+          <button class="step-overlay-btn primary" onclick="saveStepResult()">Save Changes</button>
+        </div>
+      </div>
+      <div class="step-overlay-body" id="step-drawer-body">
+        <div class="step-empty-state"><span class="step-empty-icon">&#x1F4CB;</span>Complete this step to view results here.</div>
+      </div>
+    </div>
+
     <div class="welcome-state" id="welcome-state">
       <div class="welcome-logo">Kick<span>man</span></div>
       <div class="welcome-sub">Crowdfunding Coach · Mission 1</div>
@@ -1201,6 +1283,10 @@ function buildMemoryContext(session){
   if(session.alignment && session.alignment.productName){
     parts.push('\n\n# ALIGNMENT TEMPLATE REMINDER\nIf asked to output the Product Alignment Document, use ONLY these 7 sections in this exact order: (1) PRODUCT NAME & DEFINITION, (2) INTERNAL DESCRIPTION, (3) ALL FEATURES, (4) BENEFITS, (5) NEGATIVE THOUGHTS & FEELINGS — BACKER RESISTANCE MAP, (6) WHAT WE WANT PEOPLE TO THINK AND FEEL — EMOTIONAL DESTINATION MAP, (7) READINESS SCORE. No extra sections. No reordering. Always follow with <!--ALIGNMENT_UPDATE:{...}--> and ask for feedback.');
   }
+
+  // Include user-edited step data (highest priority — user edits override AI outputs)
+  const stepMem = buildStepMemoryContext(session);
+  if(stepMem) parts.push('\n# USER-EDITED STEP DATA (treat as ground truth):' + stepMem);
 
   return parts.join('');
 }
@@ -2374,6 +2460,8 @@ async function callKickman(trigger){
     // Parse and apply any timeline updates from Kickman
     const tlUpdate=parseTimelineUpdate(text); if(tlUpdate)applyTimelineUpdate(tlUpdate);
     const alUpdate=parseAlignmentUpdate(text); if(alUpdate)applyAlignmentUpdate(alUpdate,fresh.id);
+    // Auto-extract step data from this response
+    autoExtractStepData(text, fresh.step, fresh.id);
     syncTimelineToStep(fresh.step,fresh.mission||1);
     renderTimeline();
     updateAlignmentBtn(fresh);
@@ -2823,6 +2911,366 @@ function buildAlignmentText(session){
   return lines.join('\n');
 }
 
+
+// ── STEP RESULTS SYSTEM ────────────────────────────────────────────────────────
+
+// Step definitions — schema for each step's editable fields
+const STEP_DEFS = {
+  1: {
+    title: 'Founder Input',
+    num: '01',
+    mission: 1,
+    fields: [
+      {key:'whyBuilding',     label:'Why Are You Building This?',        hint:'Personal story or frustration behind the product'},
+      {key:'whatItDoes',      label:'What Does the Product Do?',         hint:'Plain language, no jargon'},
+      {key:'costsAndPricing', label:'Cost & Pricing',                    hint:'COGS estimate and target retail price'},
+      {key:'timeline',        label:'Timeline',                          hint:'Sample ready / launch date / ship to backers'},
+    ]
+  },
+  2: {
+    title: 'Product Alignment',
+    num: '02',
+    mission: 1,
+    fields: [
+      {key:'productName',          label:'Product Name & Definition',    hint:'One crisp sentence — what it is and who it is for'},
+      {key:'internalDescription',  label:'Internal Description',         hint:'2-3 sentences, functional, no spin'},
+      {key:'features',             label:'All Features',                 hint:'One per line'},
+      {key:'benefits',             label:'Benefits',                     hint:'One per line — reframe features as human outcomes'},
+      {key:'negativeThoughts',     label:'Resistance Map — What Backers Might Think/Feel', hint:'One per line — doubts and fears to preempt'},
+      {key:'emotionalDestination', label:'Emotional Destination — What We Want Them to Feel', hint:'One per line — inner voice of a converted backer'},
+      {key:'readinessScore',       label:'Readiness Score',              hint:'X / 10 with brief reasoning', short:true},
+    ]
+  },
+  3: {
+    title: 'Marketing Approaches',
+    num: '03',
+    mission: 1,
+    fields: [
+      {key:'approachA', label:'Approach A', hint:'Name, core angle, sample headline, risk'},
+      {key:'approachB', label:'Approach B', hint:'Name, core angle, sample headline, risk'},
+      {key:'approachC', label:'Approach C', hint:'Name, core angle, sample headline, risk'},
+      {key:'chosen',    label:'Chosen Approach & Reason', hint:'Which angle you chose and why', short:true},
+    ]
+  },
+  4: {
+    title: 'Landing Page Briefs',
+    num: '04',
+    mission: 1,
+    fields: [
+      {key:'lpVersion1',        label:'LP Version 1',           hint:'Headline, subheadline, hero visual, 3 sections, CTA, what it tests'},
+      {key:'lpVersion2',        label:'LP Version 2',           hint:'Headline, subheadline, hero visual, 3 sections, CTA, what it tests'},
+      {key:'validationPlaybook',label:'Validation Playbook',    hint:'Budget, platform, ad ideas, metrics, duration'},
+      {key:'adSetupNotes',      label:'Ad Setup Notes',         hint:'Facebook/Google setup steps, pixel status'},
+      {key:'dashboard',         label:'Tracking Dashboard',     hint:'Key metrics to watch: CPL, CVR, CTR'},
+    ]
+  },
+  5: {
+    title: 'Go / No-Go Report',
+    num: '05',
+    mission: 1,
+    fields: [
+      {key:'validationResults', label:'Validation Results',     hint:'Clicks, leads, CPL per version, qualitative signals'},
+      {key:'verdict',           label:'Verdict',                hint:'GO / NO-GO / CONDITIONAL with reasoning', short:true},
+      {key:'winningAngle',      label:'Winning Angle',          hint:'Which LP version won and why'},
+      {key:'risksToWatch',      label:'Risks to Watch',         hint:'Key risks before launch'},
+      {key:'nextStep',          label:'Recommended Next Step',  hint:''},
+    ]
+  },
+  6: {
+    title: 'Video Strategy',
+    num: '06',
+    mission: 2,
+    fields: [
+      {key:'budget',        label:'Production Budget & Timeline', hint:'Budget tier, target launch date, prototype status', short:true},
+      {key:'styleChoice',   label:'Chosen Video Style',           hint:'Style A/B/C and why it fits', short:true},
+      {key:'videoRules',    label:'Key Video Rules',              hint:'What works / what kills on Kickstarter'},
+    ]
+  },
+  7: {
+    title: 'Script & Scenes',
+    num: '07',
+    mission: 2,
+    fields: [
+      {key:'coreUSP',       label:'Core Video USP',               hint:'The one thing the video makes undeniable', short:true},
+      {key:'scenes',        label:'Scene Order',                  hint:'Ranked scenes with timings and cutdown flags'},
+      {key:'videoLength',   label:'Recommended Length',           hint:'Main video + cutdown plan (15s/30s/60s)', short:true},
+    ]
+  },
+  8: {
+    title: 'Video Brief',
+    num: '08',
+    mission: 2,
+    fields: [
+      {key:'productionApproach', label:'Production Approach',    hint:'Company / team recommendation based on budget'},
+      {key:'castingDirection',   label:'Casting Direction',      hint:'Talent profile and where to find them'},
+      {key:'videoTimeline',      label:'Production Timeline',    hint:'Week-by-week from now to launch'},
+    ]
+  },
+  9: {
+    title: 'Campaign Page',
+    num: '09',
+    mission: 2,
+    fields: [
+      {key:'pageStructure',  label:'Page Structure',             hint:'12 sections with copy options A/B'},
+      {key:'assetChecklist', label:'Asset Checklist',            hint:'Photos, GIFs, graphics, video needed'},
+      {key:'trustSignals',   label:'Trust Signals',              hint:'Have / develop / skip'},
+    ]
+  },
+  10: {
+    title: 'Launch Ready',
+    num: '10',
+    mission: 2,
+    fields: [
+      {key:'communityPlan',  label:'Community Plan',             hint:'Facebook Group, WhatsApp beta group, social accounts'},
+      {key:'contentPlan',    label:'Content Plan',               hint:'Weekly rhythm, hook testing, platform priority'},
+      {key:'ipChecklist',    label:'IP & Domain Checklist',      hint:'Domain, trademark, patent status'},
+      {key:'launchChecklist',label:'Launch Checklist',           hint:'Everything confirmed before going live'},
+    ]
+  },
+};
+
+let currentStepDrawer = null; // which step is open
+
+// ── Open step drawer ──────────────────────────────────────────────────────────
+function openStepDrawer(stepNum){
+  const def = STEP_DEFS[stepNum];
+  if(!def) return;
+
+  const session = getSession(activeId);
+  if(!session) return;
+
+  // Only allow viewing completed or active steps
+  const currentStep = session.step || 1;
+  const mission = session.mission || 1;
+  const stepMission = def.mission;
+  // Allow viewing if: step is completed, or it's the current active step
+  const isReachable = (stepMission === 1 && stepNum <= currentStep) ||
+                      (stepMission === 2 && mission >= 2);
+  if(!isReachable){
+    // Shake the step element
+    const el = document.getElementById('step-' + stepNum);
+    if(el){ el.style.opacity='0.5'; setTimeout(()=>el.style.opacity='',400); }
+    return;
+  }
+
+  currentStepDrawer = stepNum;
+
+  // Set header
+  document.getElementById('step-drawer-title').textContent = def.num + ' — ' + def.title;
+  const lastEdit = session.stepData && session.stepData[stepNum] && session.stepData[stepNum].updatedAt
+    ? 'Last edited: ' + new Date(session.stepData[stepNum].updatedAt).toLocaleDateString('en',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})
+    : 'No edits saved yet';
+  document.getElementById('step-drawer-meta').textContent = lastEdit;
+
+  // Render fields
+  renderStepFields(stepNum, session);
+
+  // Open drawer
+  document.getElementById('step-drawer-overlay').classList.add('open');
+  document.getElementById('step-drawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeStepDrawer(){
+  document.getElementById('step-drawer-overlay').classList.remove('open');
+  document.getElementById('step-drawer').classList.remove('open');
+  document.body.style.overflow = '';
+  currentStepDrawer = null;
+}
+
+// ── Render editable fields ────────────────────────────────────────────────────
+function renderStepFields(stepNum, session){
+  const def = STEP_DEFS[stepNum];
+  const data = (session.stepData && session.stepData[stepNum]) || {};
+  const body = document.getElementById('step-drawer-body');
+
+  // Special case: step 2 reads from session.alignment as source of truth
+  const stepData = stepNum === 2 ? mergeAlignmentToStepData(session) : data;
+
+  // Check if any data exists
+  const hasData = Object.keys(stepData).some(k => k !== 'updatedAt' && stepData[k]);
+
+  if(!hasData){
+    body.innerHTML = '<div class="step-empty-state"><span class="step-empty-icon">&#x1F4CB;</span>No results saved yet for this step.<br><br>Complete the step in the chat, then Kickman\'s output<br>will appear here automatically.</div>';
+    return;
+  }
+
+  body.innerHTML = def.fields.map(f => {
+    const val = stepData[f.key] || '';
+    const rows = f.short ? 2 : Math.max(4, (val.split('\n').length + 1));
+    return '<div class="step-section">' +
+      '<div class="step-section-label">' + f.label + '</div>' +
+      (f.hint ? '<div style="font-size:11px;color:var(--text-3);margin-bottom:6px;">' + f.hint + '</div>' : '') +
+      '<textarea class="step-section-field' + (f.short?' short':'') + '" id="sf-' + f.key + '" rows="' + rows + '" placeholder="' + f.hint + '">' + escHtml(val) + '</textarea>' +
+      '</div>';
+  }).join('');
+}
+
+// Merge session.alignment data into step 2 field format
+function mergeAlignmentToStepData(session){
+  const a = session.alignment || {};
+  const d = (session.stepData && session.stepData[2]) || {};
+  return {
+    productName: a.productName || d.productName || '',
+    internalDescription: a.internalDescription || d.internalDescription || '',
+    features: Array.isArray(a.features) ? a.features.join('\n') : (d.features || ''),
+    benefits: Array.isArray(a.benefits) ? a.benefits.join('\n') : (d.benefits || ''),
+    negativeThoughts: Array.isArray(a.negativeThoughts) ? a.negativeThoughts.join('\n') : (d.negativeThoughts || ''),
+    emotionalDestination: Array.isArray(a.emotionalDestination) ? a.emotionalDestination.join('\n') : (d.emotionalDestination || ''),
+    readinessScore: a.readinessScore ? a.readinessScore + '/10' + (a.readinessNotes ? ' — ' + a.readinessNotes : '') : (d.readinessScore || ''),
+    updatedAt: a.updatedAt || d.updatedAt,
+  };
+}
+
+// ── Save step result ──────────────────────────────────────────────────────────
+function saveStepResult(){
+  const stepNum = currentStepDrawer;
+  if(!stepNum) return;
+  const def = STEP_DEFS[stepNum];
+  const session = getSession(activeId);
+  if(!session) return;
+
+  if(!session.stepData) session.stepData = {};
+  if(!session.stepData[stepNum]) session.stepData[stepNum] = {};
+
+  // Read all field values from DOM
+  const saved = {};
+  def.fields.forEach(f => {
+    const el = document.getElementById('sf-' + f.key);
+    if(el) saved[f.key] = el.value.trim();
+  });
+  saved.updatedAt = Date.now();
+  session.stepData[stepNum] = saved;
+
+  // Special sync: step 2 also updates session.alignment
+  if(stepNum === 2){
+    if(!session.alignment) session.alignment = {};
+    if(saved.productName) session.alignment.productName = saved.productName;
+    if(saved.internalDescription) session.alignment.internalDescription = saved.internalDescription;
+    if(saved.features) session.alignment.features = saved.features.split('\n').filter(Boolean);
+    if(saved.benefits) session.alignment.benefits = saved.benefits.split('\n').filter(Boolean);
+    if(saved.negativeThoughts) session.alignment.negativeThoughts = saved.negativeThoughts.split('\n').filter(Boolean);
+    if(saved.emotionalDestination) session.alignment.emotionalDestination = saved.emotionalDestination.split('\n').filter(Boolean);
+    if(saved.readinessScore) session.alignment.readinessScore = parseInt(saved.readinessScore) || saved.readinessScore;
+    session.alignment.updatedAt = Date.now();
+    updateAlignmentBtn(session);
+  }
+
+  session.updatedAt = Date.now();
+  scheduleSave(session);
+
+  // Update meta line
+  document.getElementById('step-drawer-meta').textContent = 'Saved just now';
+
+  // Show saved badge
+  const badge = document.getElementById('step-saved-badge');
+  badge.classList.add('show');
+  setTimeout(() => badge.classList.remove('show'), 2000);
+
+  // Notify Kickman memory of the update (will be picked up next message)
+  // No API call needed — buildMemoryContext reads from session.stepData
+}
+
+// ── Download step result ──────────────────────────────────────────────────────
+function downloadStepResult(){
+  const stepNum = currentStepDrawer;
+  if(!stepNum) return;
+
+  // Special case: step 2 uses the full buildAlignmentText
+  if(stepNum === 2){
+    downloadAlignment('txt');
+    return;
+  }
+
+  const def = STEP_DEFS[stepNum];
+  const session = getSession(activeId);
+  const data = (session && session.stepData && session.stepData[stepNum]) || {};
+
+  const lines = [
+    'KICKMAN — ' + def.title.toUpperCase(),
+    'Project: ' + (session ? session.name||'Untitled' : ''),
+    'Exported: ' + new Date().toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric'}),
+    '',
+    '═'.repeat(60),
+    ''
+  ];
+
+  def.fields.forEach(f => {
+    const val = data[f.key];
+    if(val){
+      lines.push(f.label.toUpperCase());
+      lines.push('─'.repeat(40));
+      lines.push(val);
+      lines.push('');
+    }
+  });
+
+  lines.push('─'.repeat(60));
+  lines.push('kickman.org');
+
+  const filename = 'kickman-step' + def.num + '-' + def.title.toLowerCase().replace(/\s+/g,'-') + '-' + new Date().toISOString().slice(0,10) + '.txt';
+  downloadBlob(lines.join('\n'), filename);
+}
+
+// ── Auto-extract step data from Kickman response ──────────────────────────────
+// Called after each Kickman response to auto-populate step data
+function autoExtractStepData(text, stepNum, sessionId){
+  const session = getSession(sessionId || activeId);
+  if(!session) return;
+  if(!session.stepData) session.stepData = {};
+  const def = STEP_DEFS[stepNum];
+  if(!def) return;
+
+  // For step 2, alignment is already handled by applyAlignmentUpdate
+  // For other steps, do a simple full-text capture as the "raw" field
+  if(stepNum === 2) return;
+
+  // Store the raw Kickman output for the step
+  const clean = text.replace(/<!--[\s\S]*?-->/g,'').trim();
+  if(!session.stepData[stepNum]) session.stepData[stepNum] = {};
+
+  // Only overwrite if this is clearly a step deliverable (not a mid-step question)
+  // Heuristic: response is long enough to be a deliverable
+  if(clean.length < 200) return;
+
+  // For step 1: extract founder answers
+  if(stepNum === 1 && !session.stepData[1].whatItDoes){
+    session.stepData[1]._raw = clean;
+    session.stepData[1].updatedAt = Date.now();
+  }
+  // For other steps: store as first field's key as raw content
+  else if(stepNum > 2 && stepNum <= 10){
+    const firstKey = def.fields[0].key;
+    if(!session.stepData[stepNum][firstKey]){
+      session.stepData[stepNum][firstKey] = clean;
+      session.stepData[stepNum].updatedAt = Date.now();
+    }
+  }
+
+  scheduleSave(session);
+}
+
+// ── Include step data in memory context ──────────────────────────────────────
+function buildStepMemoryContext(session){
+  if(!session || !session.stepData) return '';
+  const parts = [];
+  Object.keys(session.stepData).forEach(sNum => {
+    const num = parseInt(sNum);
+    const def = STEP_DEFS[num];
+    const data = session.stepData[sNum];
+    if(!def || !data) return;
+    const hasContent = def.fields.some(f => data[f.key] && data[f.key].length > 0);
+    if(!hasContent) return;
+    const lines = ['\\n# STEP ' + def.num + ' — ' + def.title.toUpperCase() + ' (user-edited)'];
+    def.fields.forEach(f => {
+      if(data[f.key]) lines.push(f.label + ': ' + data[f.key].slice(0, 300));
+    });
+    parts.push(lines.join('\\n'));
+  });
+  return parts.join('\\n');
+}
+
+
 // ── EXPORT ────────────────────────────────────────────────────────────────────
 
 function toggleExportMenu(){
@@ -2843,6 +3291,30 @@ function closeExportMenu(){
 }
 
 function slugify(str){ return (str||'').slice(0,30).replace(/[^a-z0-9]/gi,'-').toLowerCase(); }
+
+// ── Server-side DOCX export via /api/export ───────────────────────────────────
+async function exportViaAPI(type, data, projectName){
+  const btn = document.getElementById('export-menu-btn');
+  const origText = btn ? btn.textContent : '';
+  if(btn){ btn.textContent = 'Generating…'; btn.disabled = true; }
+  try{
+    const res = await fetch('/api/export',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ password: currentPw, type, data, projectName })
+    });
+    if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error||res.status); }
+    const json = await res.json();
+    const bytes = Uint8Array.from(atob(json.base64), ch=>ch.charCodeAt(0));
+    const blob = new Blob([bytes],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = json.filename; a.click(); URL.revokeObjectURL(a.href);
+  } catch(e){
+    alert('Word export failed: ' + e.message + '\n\nTip: Try .txt or .md instead.');
+  } finally {
+    if(btn){ btn.textContent = origText; btn.disabled = false; }
+  }
+}
 const TODAY = ()=>new Date().toISOString().slice(0,10);
 const NOWSTR = ()=>new Date().toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric'});
 
@@ -2940,6 +3412,7 @@ function chatToHTML(s){
 function exportChat(fmt='txt'){
   const s = getSession(activeId); if(!s) return;
   const base = 'kickman-chat-' + slugify(s.name) + '-' + TODAY();
+  if(fmt==='docx'){ exportViaAPI('chat', {history: s.history}, s.name); return; }
   if(fmt==='pdf'){ printAsPDF(chatToHTML(s), 'Chat — ' + (s.name||'Kickman')); return; }
   const now = NOWSTR();
   const lines = ['KICKMAN — CONVERSATION HISTORY','Project: '+(s.name||'Untitled'),'Exported: '+now,'','═'.repeat(60),''];
@@ -3008,6 +3481,7 @@ function downloadAlignment(fmt='txt'){
     }
   }
 
+  if(fmt==='docx'){ exportViaAPI('alignment', session.alignment, session.name); return; }
   if(fmt==='pdf'){ printAsPDF(alignmentToHTML(session), 'Product Alignment — ' + (session.name||'Kickman')); return; }
   const text = buildAlignmentText(session);
   if(!text){ alert('Could not build alignment document. Please ask Kickman to regenerate it.'); return; }
@@ -3030,6 +3504,7 @@ function exportTimeline(fmt='txt'){
   const s = getSession(activeId); if(!s) return;
   const tl = s.timeline || DEFAULT_TIMELINE;
   const base = 'kickman-timeline-' + slugify(s.name) + '-' + TODAY();
+  if(fmt==='docx'){ exportViaAPI('timeline', {timeline: s.timeline||DEFAULT_TIMELINE}, s.name); return; }
   if(fmt==='pdf'){ printAsPDF(timelineToHTML(s), 'Timeline — ' + (s.name||'Kickman')); return; }
   const riskLabel = {low:'Low Risk', medium:'Watch', high:'High Risk'};
   const now = NOWSTR();
@@ -3063,8 +3538,12 @@ function exportTimeline(fmt='txt'){
 }
 
 // ── Export All (.md) ──────────────────────────────────────────────────────────
-async function exportAll(){
+async function exportAll(fmt='md'){
   const s = getSession(activeId); if(!s) return;
+  if(fmt==='docx'){
+    exportViaAPI('full',{alignment:s.alignment||{},timeline:s.timeline||DEFAULT_TIMELINE,history:s.history||[]},s.name);
+    return;
+  }
   const sections = [];
   sections.push('# Kickman — Complete Project Export\n**Project:** '+(s.name||'Untitled')+'  \n**Exported:** '+NOWSTR()+'  \n**Source:** kickman.org\n\n---\n');
   const at = buildAlignmentText(s);
