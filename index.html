@@ -93,114 +93,79 @@
   .sidebar-step.active .step-name{color:var(--text);}
   .sidebar-step.done .step-name{color:var(--text-2);}
 
-  /* ── STEP RESULTS OVERLAY ──────────────────────────────────────────────── */
-  .step-overlay{display:none;position:absolute;inset:0;background:var(--bg);z-index:30;flex-direction:column;}
-  .step-overlay.open{display:flex;animation:fadeInUp .22s ease forwards;}
-  @keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
-  /* Top bar */
-  .step-overlay-head{
-    height:56px;border-bottom:1px solid var(--border);
-    display:flex;align-items:center;padding:0 28px;gap:16px;flex-shrink:0;
-    background:var(--surface);
-  }
-  .step-overlay-back{
-    font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;
-    color:var(--text-3);background:none;border:none;cursor:pointer;
-    display:flex;align-items:center;gap:5px;transition:color .15s;padding:0;flex-shrink:0;
-  }
-  .step-overlay-back:hover{color:var(--accent);}
-  .step-overlay-back svg{opacity:.6;}
-  .so-divider{width:1px;height:18px;background:var(--border);flex-shrink:0;}
-  .step-overlay-title{font-family:var(--font-serif);font-size:17px;color:var(--text);flex:1;letter-spacing:.3px;}
-  .step-overlay-meta{font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:.5px;flex-shrink:0;}
-  .step-overlay-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;}
-  .step-saved-badge{font-family:var(--font-mono);font-size:9px;color:var(--green);opacity:0;transition:opacity .3s;margin-right:4px;}
-  .step-saved-badge.show{opacity:1;}
-  .so-btn{
-    font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;
-    padding:7px 14px;border:1px solid var(--border);background:none;color:var(--text-2);
-    cursor:pointer;transition:all .15s;white-space:nowrap;
-  }
-  .so-btn:hover{border-color:var(--accent);color:var(--accent);}
-  .so-btn.edit-mode{background:var(--accent-dim2);border-color:rgba(232,98,42,.4);color:var(--accent);}
-  .so-btn.save{background:var(--accent);color:#fff;border-color:var(--accent);}
-  .so-btn.save:hover{opacity:.85;}
-
-  /* Scroll body */
-  .step-overlay-body{flex:1;overflow-y:auto;background:var(--bg);}
+  /* Step results overlay — covers chat area */
+  .step-overlay{display:none;position:absolute;inset:0;background:var(--bg);z-index:30;flex-direction:column;animation:msgIn .2s ease forwards;}
+  .step-overlay.open{display:flex;}
+  .step-overlay-head{height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;}
+  .step-overlay-back{font-family:var(--font-mono);font-size:10px;letter-spacing:1px;color:var(--text-3);background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;transition:color .15s;padding:0;}
+  .step-overlay-back:hover{color:var(--text);}
+  .step-overlay-title{font-family:var(--font-serif);font-size:18px;color:var(--text);flex:1;}
+  .step-overlay-meta{font-family:var(--font-mono);font-size:9px;color:var(--text-3);}
+  .step-overlay-actions{display:flex;gap:8px;align-items:center;}
+  .step-overlay-btn{font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:6px 12px;border:1px solid var(--border);background:none;color:var(--text-2);cursor:pointer;transition:all .15s;white-space:nowrap;}
+  .step-overlay-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .step-overlay-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .step-overlay-btn.primary:hover{opacity:.85;}
+  .step-overlay-body{flex:1;overflow-y:auto;padding:24px 32px;}
   .step-overlay-body::-webkit-scrollbar{width:3px;}
   .step-overlay-body::-webkit-scrollbar-thumb{background:var(--border);}
 
-  /* Document layout inside body */
-  .so-doc{max-width:720px;margin:0 auto;padding:40px 32px 80px;}
+  /* Rich text editor */
+  .rte-section{margin-bottom:28px;}
+  .rte-label{font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:6px;}
+  .rte-hint{font-size:11px;color:var(--text-3);margin-bottom:8px;}
+  .rte-toolbar{display:flex;gap:2px;padding:4px 6px;background:var(--card);border:1px solid var(--border);border-bottom:none;flex-wrap:wrap;}
+  .rte-tool{font-family:var(--font-mono);font-size:11px;width:26px;height:24px;background:none;border:none;color:var(--text-3);cursor:pointer;border-radius:2px;display:flex;align-items:center;justify-content:center;transition:all .1s;}
+  .rte-tool:hover{background:rgba(255,255,255,.08);color:var(--text);}
+  .rte-tool.active{background:var(--accent-dim);color:var(--accent);}
+  .rte-tool.wide{width:auto;padding:0 6px;font-size:10px;letter-spacing:.5px;}
+  .rte-sep{width:1px;background:var(--border);margin:2px 3px;align-self:stretch;}
+  .rte-editor{min-height:80px;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:var(--font-sans);font-size:13px;line-height:1.7;padding:10px 14px;outline:none;transition:border-color .15s;}
+  .rte-editor:focus{border-color:rgba(232,98,42,.4);}
+  .rte-editor.short{min-height:44px;}
+  .rte-editor h2{font-family:var(--font-serif);font-size:16px;font-weight:400;margin:12px 0 6px;}
+  .rte-editor h3{font-family:var(--font-mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin:10px 0 4px;}
+  .rte-editor strong{font-weight:600;color:var(--text);}
+  .rte-editor em{font-style:italic;color:var(--text-2);}
+  .rte-editor ul,.rte-editor ol{padding-left:20px;margin:6px 0;}
+  .rte-editor li{margin-bottom:3px;}
+  .rte-editor blockquote{border-left:2px solid var(--accent);padding:4px 12px;margin:8px 0;background:var(--accent-dim2);color:var(--text-2);font-style:italic;}
+  .rte-editor [data-placeholder]:empty::before{content:attr(data-placeholder);color:var(--text-3);pointer-events:none;}
 
-  /* Document header block */
+  .step-empty-state{padding:48px 0;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--text-3);line-height:1.8;}
+  .step-empty-icon{font-size:32px;display:block;margin-bottom:14px;opacity:.4;}
+  .step-saved-badge{font-family:var(--font-mono);font-size:9px;color:var(--green);opacity:0;transition:opacity .3s;}
+  .step-saved-badge.show{opacity:1;}
+
+  .so-doc{max-width:720px;margin:0 auto;padding:40px 32px 80px;}
   .so-doc-header{margin-bottom:36px;padding-bottom:24px;border-bottom:2px solid var(--border);}
   .so-doc-step-num{font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
   .so-doc-title{font-family:var(--font-serif);font-size:28px;font-weight:400;color:var(--text);margin:0 0 6px;}
   .so-doc-subtitle{font-family:var(--font-mono);font-size:10px;color:var(--text-3);letter-spacing:.5px;}
-
-  /* Each section */
-  .so-section{margin-bottom:32px;position:relative;}
-  .so-section-label{
-    font-family:var(--font-mono);font-size:8px;letter-spacing:3px;color:var(--accent);
-    text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;
-  }
+  .so-section{margin-bottom:32px;}
+  .so-section-label{font-family:var(--font-mono);font-size:8px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
   .so-section-label::after{content:'';flex:1;height:1px;background:rgba(232,98,42,.15);}
-
-  /* View mode: rendered content */
-  .so-view{
-    font-size:13px;line-height:1.8;color:var(--text-2);
-    font-family:var(--font-sans);
-  }
-  .so-view p{margin:0 0 8px;}
+  .so-view{font-size:13px;line-height:1.8;color:var(--text-2);}
   .so-view ul{padding-left:0;margin:0;list-style:none;}
-  .so-view li{
-    padding:5px 0 5px 20px;border-bottom:1px solid rgba(255,255,255,.04);
-    position:relative;color:var(--text-2);font-size:13px;line-height:1.6;
-  }
+  .so-view li{padding:5px 0 5px 20px;border-bottom:1px solid rgba(255,255,255,.04);position:relative;font-size:13px;}
   .so-view li::before{content:'·';position:absolute;left:0;color:var(--accent);font-size:16px;line-height:1.3;}
   .so-view li:last-child{border-bottom:none;}
-  .so-view.quote-style li{
-    padding:8px 0 8px 16px;border-left:2px solid rgba(232,98,42,.25);border-bottom:none;
-    margin-bottom:6px;font-style:italic;color:var(--text-2);
-  }
+  .so-view.quote-style li{padding:8px 0 8px 16px;border-left:2px solid rgba(232,98,42,.25);border-bottom:none;margin-bottom:6px;font-style:italic;}
   .so-view.quote-style li::before{display:none;}
-  .so-view .so-empty{color:var(--text-3);font-style:italic;font-size:12px;}
-
-  /* Score badge */
-  .so-score-badge{
-    display:inline-flex;align-items:center;gap:10px;
-    padding:10px 20px;background:var(--card);border:1px solid var(--border);
-  }
-  .so-score-num{font-family:var(--font-serif);font-size:32px;color:var(--accent);line-height:1;}
-  .so-score-label{font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;}
-
-  /* Edit mode: textarea */
-  .so-editor{
-    width:100%;background:var(--card);border:1px solid rgba(232,98,42,.3);
-    color:var(--text);font-family:var(--font-mono);font-size:12px;line-height:1.7;
-    padding:12px 14px;resize:vertical;outline:none;
-    transition:border-color .15s;min-height:80px;box-sizing:border-box;
-  }
+  .so-empty{color:var(--text-3);font-style:italic;font-size:12px;}
+  .so-empty-state{padding:64px 32px;text-align:center;}
+  .so-empty-icon{font-size:32px;display:block;margin-bottom:16px;opacity:.4;}
+  .so-empty-title{font-family:var(--font-serif);font-size:20px;color:var(--text-3);margin-bottom:8px;}
+  .so-empty-body{font-family:var(--font-mono);font-size:10px;color:var(--text-3);line-height:1.8;}
+  .so-editor{width:100%;background:var(--card);border:1px solid rgba(232,98,42,.3);color:var(--text);font-family:var(--font-mono);font-size:12px;line-height:1.7;padding:12px 14px;resize:vertical;outline:none;min-height:80px;box-sizing:border-box;}
   .so-editor:focus{border-color:var(--accent);}
   .so-editor.short{min-height:44px;resize:none;}
-  .so-edit-hint{font-family:var(--font-mono);font-size:9px;color:var(--text-3);margin-top:5px;letter-spacing:.3px;}
-
-  /* Empty state */
-  .so-empty-state{
-    padding:64px 32px;text-align:center;
-  }
-  .so-empty-icon{font-size:36px;display:block;margin-bottom:16px;opacity:.3;}
-  .so-empty-title{font-family:var(--font-serif);font-size:20px;color:var(--text-3);margin-bottom:8px;}
-  .so-empty-body{font-family:var(--font-mono);font-size:10px;color:var(--text-3);line-height:1.8;letter-spacing:.3px;}
+  .so-edit-hint{font-family:var(--font-mono);font-size:9px;color:var(--text-3);margin-top:5px;}
 
   @media(max-width:680px){
-    .so-doc{padding:20px 16px 60px;}
-    .step-overlay-head{padding:0 14px;height:50px;}
-    .so-btn.dl-btn{display:none;}
-    .step-overlay-meta{display:none;}
+    .step-overlay-body{padding:16px;}
+    .step-overlay-head{padding:0 14px;}
+    .step-overlay-btn.dl-btn{display:none;}
   }
 
   /* CHAT */
@@ -539,7 +504,6 @@
         <div class="export-format-row">
           <button onclick="exportChat('txt');closeExportMenu()" class="export-fmt-btn">.txt</button>
           <button onclick="exportChat('md');closeExportMenu()" class="export-fmt-btn">.md</button>
-          <button onclick="exportChat('docx');closeExportMenu()" class="export-fmt-btn">.docx</button>
           <button onclick="exportChat('pdf');closeExportMenu()" class="export-fmt-btn">.pdf</button>
         </div>
         <!-- Product Alignment -->
@@ -547,7 +511,6 @@
         <div class="export-format-row" id="export-alignment-row">
           <button onclick="downloadAlignment('txt');closeExportMenu()" class="export-fmt-btn">.txt</button>
           <button onclick="downloadAlignment('md');closeExportMenu()" class="export-fmt-btn">.md</button>
-          <button onclick="downloadAlignment('docx');closeExportMenu()" class="export-fmt-btn">.docx</button>
           <button onclick="downloadAlignment('pdf');closeExportMenu()" class="export-fmt-btn">.pdf</button>
         </div>
         <!-- Timeline -->
@@ -555,14 +518,10 @@
         <div class="export-format-row">
           <button onclick="exportTimeline('txt');closeExportMenu()" class="export-fmt-btn">.txt</button>
           <button onclick="exportTimeline('md');closeExportMenu()" class="export-fmt-btn">.md</button>
-          <button onclick="exportTimeline('docx');closeExportMenu()" class="export-fmt-btn">.docx</button>
           <button onclick="exportTimeline('pdf');closeExportMenu()" class="export-fmt-btn">.pdf</button>
         </div>
         <!-- All -->
-        <div class="export-format-row" style="padding:6px 10px 8px;border-top:1px solid var(--border);">
-          <button onclick="exportAll('md');closeExportMenu()" class="export-fmt-btn" style="flex:1.5;color:var(--accent);">&#x2B07; All (.md)</button>
-          <button onclick="exportAll('docx');closeExportMenu()" class="export-fmt-btn" style="flex:1.5;color:var(--accent);">&#x2B07; All (.docx)</button>
-        </div>
+        <button onclick="exportAll();closeExportMenu()" class="export-menu-item export-all-item" style="margin-top:4px;">&#x2B07; Download All (.md)</button>
       </div>
     </div>
     <button class="header-btn" onclick="doLogout()">Log out</button>
@@ -667,8 +626,7 @@
           <button class="so-btn save" onclick="saveStepResult()" id="so-save-btn" style="display:none;">Save</button>
         </div>
       </div>
-      <div class="step-overlay-body" id="step-drawer-body">
-      </div>
+      <div class="step-overlay-body" id="step-drawer-body"></div>
     </div>
 
     <div class="welcome-state" id="welcome-state">
@@ -3072,37 +3030,22 @@ const STEP_DEFS = {
 let currentStepDrawer = null;
 let stepEditMode = false;
 
-// ── Open / close ─────────────────────────────────────────────────────────────
+// ── Open ──────────────────────────────────────────────────────────────────────
 function openStepDrawer(stepNum){
-  const def = STEP_DEFS[stepNum];
-  if(!def) return;
-  const session = getSession(activeId);
-  if(!session) return;
-
-  const currentStep = session.step || 1;
-  const mission = session.mission || 1;
-  const isReachable = (def.mission === 1 && stepNum <= currentStep) ||
-                      (def.mission === 2 && mission >= 2);
-  if(!isReachable){
-    const el = document.getElementById('step-'+stepNum);
-    if(el){ el.style.opacity='0.5'; setTimeout(()=>el.style.opacity='',400); }
-    return;
-  }
-
-  currentStepDrawer = stepNum;
-  stepEditMode = false;
-
+  const def = STEP_DEFS[stepNum]; if(!def) return;
+  const session = getSession(activeId); if(!session) return;
+  const step = session.step||1, mission = session.mission||1;
+  const ok = (def.mission===1 && stepNum<=step) || (def.mission===2 && mission>=2);
+  if(!ok){ const el=document.getElementById('step-'+stepNum); if(el){el.style.opacity='0.5';setTimeout(()=>el.style.opacity='',400);} return; }
+  currentStepDrawer = stepNum; stepEditMode = false;
   document.getElementById('step-drawer-title').textContent = def.num + ' — ' + def.title;
-  const lastEdit = session.stepData && session.stepData[stepNum] && session.stepData[stepNum].updatedAt
-    ? 'Edited ' + new Date(session.stepData[stepNum].updatedAt).toLocaleDateString('en',{month:'short',day:'numeric'})
-    : '';
-  document.getElementById('step-drawer-meta').textContent = lastEdit;
-  document.getElementById('so-save-btn').style.display = 'none';
-  document.getElementById('so-edit-btn').style.display = '';
-  document.getElementById('so-edit-btn').textContent = '✎ Edit';
-  document.getElementById('so-edit-btn').className = 'so-btn edit-mode';
-
-  // Auto-extract from history if step has no data yet
+  const d = session.stepData && session.stepData[stepNum];
+  document.getElementById('step-drawer-meta').textContent = d && d.updatedAt
+    ? 'Edited ' + new Date(d.updatedAt).toLocaleDateString('en',{month:'short',day:'numeric'}) : '';
+  const saveBtn = document.getElementById('so-save-btn');
+  const editBtn = document.getElementById('so-edit-btn');
+  if(saveBtn) saveBtn.style.display='none';
+  if(editBtn){ editBtn.textContent='✎ Edit'; editBtn.className='so-btn edit-mode'; }
   smartExtractStep(stepNum, session);
   renderStepView(stepNum, session);
   document.getElementById('step-overlay').classList.add('open');
@@ -3110,119 +3053,128 @@ function openStepDrawer(stepNum){
 
 function closeStepDrawer(){
   document.getElementById('step-overlay').classList.remove('open');
-  currentStepDrawer = null;
-  stepEditMode = false;
+  currentStepDrawer = null; stepEditMode = false;
 }
 
 function toggleStepEditMode(){
   if(!currentStepDrawer) return;
   stepEditMode = !stepEditMode;
   const session = getSession(activeId);
+  const editBtn = document.getElementById('so-edit-btn');
+  const saveBtn = document.getElementById('so-save-btn');
   if(stepEditMode){
     renderStepEdit(currentStepDrawer, session);
-    document.getElementById('so-edit-btn').textContent = '✕ Cancel';
-    document.getElementById('so-edit-btn').className = 'so-btn';
-    document.getElementById('so-save-btn').style.display = '';
+    if(editBtn){ editBtn.textContent='✕ Cancel'; editBtn.className='so-btn'; }
+    if(saveBtn) saveBtn.style.display='';
   } else {
     renderStepView(currentStepDrawer, session);
-    document.getElementById('so-edit-btn').textContent = '✎ Edit';
-    document.getElementById('so-edit-btn').className = 'so-btn edit-mode';
-    document.getElementById('so-save-btn').style.display = 'none';
+    if(editBtn){ editBtn.textContent='✎ Edit'; editBtn.className='so-btn edit-mode'; }
+    if(saveBtn) saveBtn.style.display='none';
   }
 }
 
-// ── VIEW MODE — professional document rendering ──────────────────────────────
+// ── Smart extract before rendering ───────────────────────────────────────────
+function smartExtractStep(stepNum, session){
+  if(!session || !session.history) return;
+  if(stepNum === 2){ captureLatestAlignmentRaw(session); return; }
+  const def = STEP_DEFS[stepNum]; if(!def) return;
+  const pats = {
+    3:/APPROACH [ABC]:|Marketing Approach/i, 4:/LP VERSION|VALIDATION PLAYBOOK/i,
+    5:/VERDICT|NO.GO|FINAL REPORT/i, 6:/VIDEO STYLE|MODULE A[^0-9]/i,
+    7:/SCENE|SCRIPT/i, 8:/PRODUCTION|VIDEO BRIEF/i,
+    9:/CAMPAIGN PAGE|MODULE B/i, 10:/LAUNCH READY|MODULE C|CHECKLIST/i
+  };
+  const pat = pats[stepNum]; if(!pat) return;
+  const msgs = [...session.history].filter(m=>m.role==='assistant'||m.role==='km').reverse();
+  for(const msg of msgs){
+    const text = typeof msg.content==='string'?msg.content:(msg.content?.[0]?.text||'');
+    const clean = text.replace(/<!--[\s\S]*?-->/g,'').trim();
+    if(clean.length<200 || !pat.test(clean)) continue;
+    if(!session.stepData) session.stepData={};
+    if(!session.stepData[stepNum]) session.stepData[stepNum]={};
+    const fk = def.fields[0].key;
+    if(!session.stepData[stepNum][fk]){
+      session.stepData[stepNum][fk] = clean.slice(0,5000);
+      session.stepData[stepNum].updatedAt = Date.now();
+      scheduleSave(session);
+    }
+    break;
+  }
+}
+
+// ── VIEW mode ─────────────────────────────────────────────────────────────────
 function renderStepView(stepNum, session){
   const def = STEP_DEFS[stepNum];
   const raw = (session.stepData && session.stepData[stepNum]) || {};
-  const data = stepNum === 2 ? mergeAlignmentToStepData(session) : raw;
   const body = document.getElementById('step-drawer-body');
 
-  const hasData = def.fields.some(f => data[f.key] && String(data[f.key]).trim().length > 0);
+  // Step 2 uses rawText
+  const rawText = stepNum===2 && raw._rawText;
+  const merged = stepNum===2 ? mergeAlignmentToStepData(session) : raw;
+  const hasData = rawText || def.fields.some(f=>merged[f.key]&&String(merged[f.key]).trim().length>0);
 
   if(!hasData){
-    // Show generating state, then trigger Kickman to produce the content
     body.innerHTML = '<div class="so-empty-state">' +
-      '<span class="so-empty-icon" style="animation:spin 1.5s linear infinite;display:inline-block;">⟳</span>' +
+      '<span class="so-empty-icon" style="animation:spin 1.5s linear infinite;display:inline-block">⟳</span>' +
       '<div class="so-empty-title">Generating results...</div>' +
-      '<div class="so-empty-body">Kickman is extracting the output from your conversation.</div>' +
-      '</div>';
-    // Add spin keyframe if not present
+      '<div class="so-empty-body">Kickman is extracting output from your conversation.</div></div>';
     if(!document.getElementById('spin-style')){
-      const st = document.createElement('style');
-      st.id = 'spin-style';
-      st.textContent = '@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
+      const st=document.createElement('style'); st.id='spin-style';
+      st.textContent='@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
       document.head.appendChild(st);
     }
-    // Trigger Kickman to regenerate this step's content
-    setTimeout(() => triggerStepGeneration(stepNum, session, body), 300);
+    setTimeout(()=>triggerStepGeneration(stepNum, session, body), 300);
     return;
   }
 
   let html = '<div class="so-doc">';
-  // Document header
   html += '<div class="so-doc-header">';
-  html += '<div class="so-doc-step-num">Step ' + def.num + ' · Mission ' + def.mission + '</div>';
-  html += '<div class="so-doc-title">' + escHtml(def.title) + '</div>';
-  const proj = session.name && session.name !== 'New Project' ? session.name : '';
-  if(proj) html += '<div class="so-doc-subtitle">' + escHtml(proj) + '</div>';
+  html += '<div class="so-doc-step-num">Step '+def.num+' · Mission '+def.mission+'</div>';
+  html += '<div class="so-doc-title">'+escHtml(def.title)+'</div>';
+  const proj = session.name&&session.name!=='New Project'?escHtml(session.name):'';
+  if(proj) html += '<div class="so-doc-subtitle">'+proj+'</div>';
   html += '</div>';
 
-  // Special rendering per step
-  if(stepNum === 2) html += renderAlignmentView(data);
-  else html += renderGenericView(def, data);
-
+  if(stepNum===2){
+    html += rawText ? alignmentRawToHTML(rawText) : renderAlignmentView(merged);
+  } else {
+    html += renderGenericView(def, merged);
+  }
   html += '</div>';
   body.innerHTML = html;
 }
 
 function renderAlignmentView(d){
+  const lines2html = txt => {
+    const items = String(txt||'').split('\n').filter(l=>l.trim()).map(l=>l.replace(/^[•\-\*]\s*/,'').replace(/\*+/g,'').trim()).filter(Boolean);
+    if(!items.length) return '<p class="so-empty">Not yet filled in.</p>';
+    return '<ul>'+items.map(i=>'<li>'+escHtml(i)+'</li>').join('')+'</ul>';
+  };
+  const quotes2html = txt => {
+    const items = String(txt||'').split('\n').filter(l=>l.trim()).map(l=>l.replace(/^[•\-\*]\s*/,'').replace(/^["""\u201c]/,'').replace(/["""\u201d]$/,'').replace(/\*+/g,'').trim()).filter(l=>l.length>3);
+    if(!items.length) return '<p class="so-empty">Not yet filled in.</p>';
+    return '<ul>'+items.map(i=>'<li>'+escHtml(i)+'</li>').join('')+'</ul>';
+  };
   let html = '';
-  const section = (label, content, style) => {
-    if(!content || !String(content).trim()) return '';
-    let s = '<div class="so-section">';
-    s += '<div class="so-section-label">' + label + '</div>';
-    s += '<div class="so-view' + (style?' '+style:'') + '">' + content + '</div>';
-    s += '</div>';
-    return s;
-  };
-
-  const lines2html = (text) => {
-    const items = String(text||'').split('\n').filter(l=>l.trim()).map(l=>l.replace(/^[•\-\*]\s*/,'').trim()).filter(Boolean);
-    if(!items.length) return '<p class="so-empty">Not filled in yet.</p>';
-    return '<ul>' + items.map(i=>'<li>' + escHtml(i) + '</li>').join('') + '</ul>';
-  };
-
-  const quotes2html = (text) => {
-    const items = String(text||'').split('\n').filter(l=>l.trim()).map(l=>l.replace(/^[•\-\*]\s*/,'').replace(/^[""\u201c]/,'').replace(/[""\u201d]$/,'').trim()).filter(Boolean);
-    if(!items.length) return '<p class="so-empty">Not filled in yet.</p>';
-    return '<ul>' + items.map(i=>'<li>' + escHtml(i) + '</li>').join('') + '</ul>';
-  };
-
-  // 1 & 2 — Name + description side-by-side styled block
-  html += '<div class="so-section">';
-  html += '<div class="so-section-label">Product Name & Definition</div>';
+  // Name + description card
+  html += '<div class="so-section"><div class="so-section-label">Product Name & Definition</div>';
   html += '<div style="padding:16px 20px;background:var(--card);border-left:3px solid var(--accent);margin-bottom:2px;">';
-  html += '<div style="font-family:var(--font-serif);font-size:20px;color:var(--text);margin-bottom:6px;">' + escHtml(d.productName||'') + '</div>';
-  if(d.internalDescription) html += '<div style="font-size:12px;color:var(--text-2);line-height:1.7;">' + escHtml(d.internalDescription) + '</div>';
+  html += '<div style="font-family:var(--font-serif);font-size:20px;color:var(--text);margin-bottom:6px;">'+escHtml(d.productName||'')+'</div>';
+  if(d.internalDescription) html += '<div style="font-size:12px;color:var(--text-2);line-height:1.7;">'+escHtml(d.internalDescription)+'</div>';
   html += '</div></div>';
 
-  html += section('All Features', lines2html(d.features));
-  html += section('Benefits', lines2html(d.benefits));
-  html += section('Resistance Map — What Backers Might Think/Feel', quotes2html(d.negativeThoughts), 'quote-style');
-  html += section('Emotional Destination — What We Want Them to Feel', quotes2html(d.emotionalDestination), 'quote-style');
-
+  const sec = (label, content) => '<div class="so-section"><div class="so-section-label">'+label+'</div><div class="so-view">'+content+'</div></div>';
+  html += sec('All Features', lines2html(d.features));
+  html += sec('Benefits', lines2html(d.benefits));
+  html += '<div class="so-section"><div class="so-section-label">Resistance Map — What Backers Might Think/Feel</div><div class="so-view quote-style">'+quotes2html(d.negativeThoughts)+'</div></div>';
+  html += '<div class="so-section"><div class="so-section-label">Emotional Destination — What We Want Them to Feel</div><div class="so-view quote-style">'+quotes2html(d.emotionalDestination)+'</div></div>';
   if(d.readinessScore){
-    const score = parseInt(d.readinessScore) || 0;
-    const color = score >= 7 ? 'var(--green)' : score >= 5 ? 'var(--yellow)' : 'var(--red)';
+    const s = parseInt(d.readinessScore)||0;
+    const col = s>=7?'var(--green)':s>=5?'var(--yellow)':'var(--red)';
     html += '<div class="so-section"><div class="so-section-label">Readiness Score</div>';
-    html += '<div style="display:flex;align-items:center;gap:20px;padding:16px 0;">';
-    html += '<div style="font-family:var(--font-serif);font-size:48px;line-height:1;color:'+color+';">' + score + '</div>';
-    html += '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);">OUT OF 10</div>';
-    if(d.readinessScore && isNaN(parseInt(d.readinessScore))){
-      html += '<div style="font-size:12px;color:var(--text-2);max-width:400px;">' + escHtml(String(d.readinessScore)) + '</div>';
-    }
-    html += '</div></div>';
+    html += '<div style="display:flex;align-items:baseline;gap:8px;padding:12px 0;">';
+    html += '<span style="font-family:var(--font-serif);font-size:48px;color:'+col+';line-height:1;">'+s+'</span>';
+    html += '<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);">/ 10</span></div></div>';
   }
   return html;
 }
@@ -3230,353 +3182,245 @@ function renderAlignmentView(d){
 function renderGenericView(def, data){
   let html = '';
   def.fields.forEach(f => {
-    const val = data[f.key] || data[f.key+'_html'];
-    if(!val || !String(val).trim()) return;
-    html += '<div class="so-section">';
-    html += '<div class="so-section-label">' + escHtml(f.label) + '</div>';
-    // If HTML content stored, render it; otherwise plain text
-    const hasHtml = /<[a-z][\s\S]*>/i.test(String(val));
-    if(hasHtml){
-      html += '<div class="so-view">' + val + '</div>';
+    const val = data[f.key] || data[f.key+'_html'] || '';
+    if(!String(val).trim()) return;
+    html += '<div class="so-section"><div class="so-section-label">'+escHtml(f.label)+'</div>';
+    if(/<[a-z][\s\S]*>/i.test(String(val))){
+      html += '<div class="so-view">'+val+'</div>';
     } else {
       const lines = String(val).split('\n').filter(l=>l.trim());
-      html += '<div class="so-view"><ul>' +
-        lines.map(l=>'<li>'+escHtml(l.replace(/^[•\-\*]\s*/,'').trim())+'</li>').join('') +
-        '</ul></div>';
+      if(lines.length > 1){
+        html += '<div class="so-view"><ul>'+lines.map(l=>'<li>'+escHtml(l.replace(/^[•\-\*]\s*/,'').trim())+'</li>').join('')+'</ul></div>';
+      } else {
+        html += '<div class="so-view"><p>'+escHtml(String(val))+'</p></div>';
+      }
     }
     html += '</div>';
   });
-  return html || '<div class="so-view"><p class="so-empty">No content saved yet.</p></div>';
+  return html || '<div class="so-view"><p style="color:var(--text-3);font-style:italic;">No content saved yet.</p></div>';
 }
 
-// ── EDIT MODE — textarea per field ───────────────────────────────────────────
+// ── EDIT mode ─────────────────────────────────────────────────────────────────
 function renderStepEdit(stepNum, session){
   const def = STEP_DEFS[stepNum];
   const raw = (session.stepData && session.stepData[stepNum]) || {};
-  const data = stepNum === 2 ? mergeAlignmentToStepData(session) : raw;
+  const data = stepNum===2 ? mergeAlignmentToStepData(session) : raw;
   const body = document.getElementById('step-drawer-body');
-
   let html = '<div class="so-doc">';
   html += '<div class="so-doc-header" style="border-color:rgba(232,98,42,.3);">';
-  html += '<div class="so-doc-step-num" style="color:var(--accent);">Editing — ' + def.title + '</div>';
-  html += '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);">Edit any field and click Save when done</div>';
-  html += '</div>';
-
+  html += '<div class="so-doc-step-num" style="color:var(--accent);">Editing — '+escHtml(def.title)+'</div>';
+  html += '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);">Edit any field and click Save</div></div>';
   def.fields.forEach(f => {
-    const val = data[f.key] || '';
-    html += '<div class="so-section">';
-    html += '<div class="so-section-label">' + escHtml(f.label) + '</div>';
-    if(f.hint) html += '<div class="so-edit-hint">' + escHtml(f.hint) + '</div>';
-    const rows = f.short ? 2 : Math.max(4, String(val).split('\n').length + 2);
-    html += '<textarea class="so-editor' + (f.short?' short':'') + '" id="sf-'+f.key+'" rows="'+rows+'" placeholder="'+escHtml(f.hint||'')+'">'+escHtml(val)+'</textarea>';
-    html += '</div>';
+    const val = data[f.key]||'';
+    const rows = f.short?2:Math.max(4,String(val).split('\n').length+2);
+    html += '<div class="so-section"><div class="so-section-label">'+escHtml(f.label)+'</div>';
+    if(f.hint) html += '<div class="so-edit-hint">'+escHtml(f.hint)+'</div>';
+    html += '<textarea class="so-editor'+(f.short?' short':'')+'" id="sf-'+f.key+'" rows="'+rows+'" placeholder="'+escHtml(f.hint||'')+'">'+escHtml(val)+'</textarea></div>';
   });
   html += '</div>';
   body.innerHTML = html;
 }
 
 function mergeAlignmentToStepData(session){
-  const a = session.alignment || {};
-  const d = (session.stepData && session.stepData[2]) || {};
+  const a = session.alignment||{}, d=(session.stepData&&session.stepData[2])||{};
   return {
-    productName: a.productName || d.productName || '',
-    internalDescription: a.internalDescription || d.internalDescription || '',
-    features: Array.isArray(a.features) ? a.features.join('\n') : (d.features || ''),
-    benefits: Array.isArray(a.benefits) ? a.benefits.join('\n') : (d.benefits || ''),
-    negativeThoughts: Array.isArray(a.negativeThoughts) ? a.negativeThoughts.join('\n') : (d.negativeThoughts || ''),
-    emotionalDestination: Array.isArray(a.emotionalDestination) ? a.emotionalDestination.join('\n') : (d.emotionalDestination || ''),
-    readinessScore: a.readinessScore ? String(a.readinessScore) + (String(a.readinessScore).includes('/') ? '' : '/10') + (a.readinessNotes ? ' — ' + a.readinessNotes : '') : (d.readinessScore || ''),
-    updatedAt: a.updatedAt || d.updatedAt,
+    productName: a.productName||d.productName||'',
+    internalDescription: a.internalDescription||d.internalDescription||'',
+    features: Array.isArray(a.features)?a.features.join('\n'):(d.features||''),
+    benefits: Array.isArray(a.benefits)?a.benefits.join('\n'):(d.benefits||''),
+    negativeThoughts: Array.isArray(a.negativeThoughts)?a.negativeThoughts.join('\n'):(d.negativeThoughts||''),
+    emotionalDestination: Array.isArray(a.emotionalDestination)?a.emotionalDestination.join('\n'):(d.emotionalDestination||''),
+    readinessScore: a.readinessScore?(String(a.readinessScore)+(String(a.readinessScore).includes('/')?' ':'/10')+(a.readinessNotes?' — '+a.readinessNotes:'')):(d.readinessScore||''),
+    updatedAt: a.updatedAt||d.updatedAt,
   };
+}
+
+// ── Trigger auto-generation when step is empty ────────────────────────────────
+async function triggerStepGeneration(stepNum, session, bodyEl){
+  const def = STEP_DEFS[stepNum]; if(!def) return;
+  const prompts = {
+    1:'Summarize the founder input from our conversation: why building this, what the product does, cost and pricing, timeline.',
+    2:'Generate the complete Product Alignment Document now based on everything we have discussed. Use the exact 7-section template.',
+    3:'Summarize the three marketing approaches we discussed, including the chosen approach and reasoning.',
+    4:'Output the Landing Page Briefs: both LP versions, Validation Playbook, ad setup notes, tracking dashboard.',
+    5:'Output the Go/No-Go Report: validation results, verdict, winning angle, risks, next steps.',
+    6:'Summarize the Video Strategy: budget, timeline, chosen style, key video rules.',
+    7:'Summarize the Script and Scenes: core USP, scene order, recommended length.',
+    8:'Output the Video Brief: production approach, casting direction, production timeline.',
+    9:'Summarize the Campaign Page: 12-section structure, asset checklist, trust signals.',
+    10:'Output the Launch Ready checklist: community plan, content plan, IP checklist, pre-launch checklist.',
+  };
+  const prompt = prompts[stepNum]; if(!prompt) return;
+  try{
+    const sysPrompt = getSystemPrompt(session.mission||1)+buildMemoryContext(session);
+    const msgs = buildMessageHistory(session);
+    msgs.push({role:'user',content:prompt+' Output full results now.'});
+    const res = await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:msgs,system:sysPrompt,password:currentPw})});
+    if(!res.ok) throw new Error('API error');
+    const data = await res.json();
+    const text = data.content?.[0]?.text||'';
+    const alUp = parseAlignmentUpdate(text); if(alUp) applyAlignmentUpdate(alUp, session.id);
+    const fresh = getSession(activeId);
+    if(!fresh.stepData) fresh.stepData={};
+    if(!fresh.stepData[stepNum]) fresh.stepData[stepNum]={};
+    fresh.stepData[stepNum][def.fields[0].key] = text.replace(/<!--[\s\S]*?-->/g,'').trim();
+    fresh.stepData[stepNum].updatedAt = Date.now();
+    fresh.updatedAt = Date.now(); scheduleSave(fresh);
+    smartExtractStep(stepNum, fresh);
+    if(currentStepDrawer===stepNum){ renderStepView(stepNum,fresh); document.getElementById('step-drawer-meta').textContent='Just generated'; }
+  }catch(e){
+    if(bodyEl&&currentStepDrawer===stepNum) bodyEl.innerHTML='<div class="so-empty-state"><span class="so-empty-icon">⚠</span><div class="so-empty-title">Could not generate</div><div class="so-empty-body">Complete this step in the chat first, then come back here.<br><br><span style="color:var(--accent);cursor:pointer;" onclick="closeStepDrawer()">← Back to chat</span></div></div>';
+  }
 }
 
 // ── Save ──────────────────────────────────────────────────────────────────────
 function saveStepResult(){
-  const stepNum = currentStepDrawer;
-  if(!stepNum) return;
+  const stepNum = currentStepDrawer; if(!stepNum) return;
   const def = STEP_DEFS[stepNum];
-  const session = getSession(activeId);
-  if(!session) return;
-
-  if(!session.stepData) session.stepData = {};
-  const saved = {updatedAt: Date.now()};
-  def.fields.forEach(f => {
-    const el = document.getElementById('sf-'+f.key);
-    if(el) saved[f.key] = el.value.trim();
-  });
+  const session = getSession(activeId); if(!session) return;
+  if(!session.stepData) session.stepData={};
+  const saved = {updatedAt:Date.now()};
+  def.fields.forEach(f => { const el=document.getElementById('sf-'+f.key); if(el) saved[f.key]=el.value.trim(); });
   session.stepData[stepNum] = saved;
-
-  // Step 2 → sync to session.alignment
-  if(stepNum === 2){
-    if(!session.alignment) session.alignment = {};
-    if(saved.productName) session.alignment.productName = saved.productName;
-    if(saved.internalDescription) session.alignment.internalDescription = saved.internalDescription;
-    if(saved.features) session.alignment.features = saved.features.split('\n').map(l=>l.replace(/^[•\-\*]\s*/,'').trim()).filter(Boolean);
-    if(saved.benefits) session.alignment.benefits = saved.benefits.split('\n').map(l=>l.replace(/^[•\-\*]\s*/,'').trim()).filter(Boolean);
-    if(saved.negativeThoughts) session.alignment.negativeThoughts = saved.negativeThoughts.split('\n').map(l=>l.replace(/^[•"\u201c\-\*]\s*/,'').replace(/[""\u201d]$/,'').trim()).filter(Boolean);
-    if(saved.emotionalDestination) session.alignment.emotionalDestination = saved.emotionalDestination.split('\n').map(l=>l.replace(/^[•"\u201c\-\*]\s*/,'').replace(/[""\u201d]$/,'').trim()).filter(Boolean);
-    if(saved.readinessScore) session.alignment.readinessScore = saved.readinessScore;
-    session.alignment.updatedAt = Date.now();
-    updateAlignmentBtn(session);
+  if(stepNum===2){
+    if(!session.alignment) session.alignment={};
+    if(saved.productName) session.alignment.productName=saved.productName;
+    if(saved.internalDescription) session.alignment.internalDescription=saved.internalDescription;
+    if(saved.features) session.alignment.features=saved.features.split('\n').map(l=>l.replace(/^[•\-\*]\s*/,'').trim()).filter(Boolean);
+    if(saved.benefits) session.alignment.benefits=saved.benefits.split('\n').map(l=>l.replace(/^[•\-\*]\s*/,'').trim()).filter(Boolean);
+    if(saved.negativeThoughts) session.alignment.negativeThoughts=saved.negativeThoughts.split('\n').map(l=>l.replace(/^[•"\u201c\-\*]\s*/,'').replace(/["\u201d]$/,'').trim()).filter(Boolean);
+    if(saved.emotionalDestination) session.alignment.emotionalDestination=saved.emotionalDestination.split('\n').map(l=>l.replace(/^[•"\u201c\-\*]\s*/,'').replace(/["\u201d]$/,'').trim()).filter(Boolean);
+    if(saved.readinessScore) session.alignment.readinessScore=saved.readinessScore;
+    session.alignment.updatedAt=Date.now(); updateAlignmentBtn(session);
+    // Also update rawText
+    if(!session.stepData[2]) session.stepData[2]={};
+    delete session.stepData[2]._rawText; // clear rawText so structured data is used
   }
-
-  session.updatedAt = Date.now();
-  scheduleSave(session);
-
-  // Switch back to view mode
-  stepEditMode = false;
-  renderStepView(stepNum, session);
-  document.getElementById('so-edit-btn').textContent = '✎ Edit';
-  document.getElementById('so-edit-btn').className = 'so-btn edit-mode';
-  document.getElementById('so-save-btn').style.display = 'none';
-  document.getElementById('step-drawer-meta').textContent = 'Saved just now';
-
-  const badge = document.getElementById('step-saved-badge');
-  badge.classList.add('show');
-  setTimeout(()=>badge.classList.remove('show'), 2000);
+  session.updatedAt=Date.now(); scheduleSave(session);
+  stepEditMode=false; renderStepView(stepNum,session);
+  const editBtn=document.getElementById('so-edit-btn');
+  const saveBtn=document.getElementById('so-save-btn');
+  if(editBtn){editBtn.textContent='✎ Edit';editBtn.className='so-btn edit-mode';}
+  if(saveBtn) saveBtn.style.display='none';
+  document.getElementById('step-drawer-meta').textContent='Saved just now';
+  const badge=document.getElementById('step-saved-badge');
+  if(badge){badge.classList.add('show');setTimeout(()=>badge.classList.remove('show'),2000);}
 }
 
 // ── Download ──────────────────────────────────────────────────────────────────
 function downloadStepResult(){
-  const stepNum = currentStepDrawer;
-  if(!stepNum) return;
-  if(stepNum === 2){ downloadAlignment('docx'); return; }
-
-  const def = STEP_DEFS[stepNum];
-  const session = getSession(activeId);
-  const data = (session && session.stepData && session.stepData[stepNum]) || {};
-  const lines = [
-    'KICKMAN — ' + def.title.toUpperCase(),
-    'Project: ' + (session ? session.name||'Untitled' : ''),
-    'Exported: ' + new Date().toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric'}),
-    '', '═'.repeat(60), ''
-  ];
-  def.fields.forEach(f => {
-    const val = data[f.key];
-    if(val){ lines.push(f.label.toUpperCase()); lines.push('─'.repeat(40)); lines.push(val); lines.push(''); }
-  });
-  lines.push('─'.repeat(60)); lines.push('kickman.org');
-  downloadBlob(lines.join('\n'), 'kickman-step'+def.num+'-'+def.title.toLowerCase().replace(/\s+/g,'-')+'-'+new Date().toISOString().slice(0,10)+'.txt');
-}
-// ── Trigger Kickman to generate missing step content ─────────────────────────
-async function triggerStepGeneration(stepNum, session, bodyEl){
-  const def = STEP_DEFS[stepNum];
-  if(!def) return;
-
-  const prompts = {
-    1: 'Based on our conversation so far, summarize the founder input: why they are building this, what the product does, cost and pricing, and timeline.',
-    2: 'Generate the complete Product Alignment Document now based on everything we have discussed. Use the exact template with all 7 sections.',
-    3: 'Summarize the three marketing approaches we discussed, including the chosen approach and reasoning.',
-    4: 'Output the Landing Page Briefs including both LP versions, the Validation Playbook, ad setup notes, and tracking dashboard.',
-    5: 'Output the Go/No-Go Report with validation results, verdict, winning angle, risks, and next steps.',
-    6: 'Summarize the Video Strategy from Module A including budget, timeline, chosen style, and key video rules.',
-    7: 'Summarize the Script and Scenes plan including core USP, scene order with timings, and recommended video length.',
-    8: 'Output the Video Brief including production approach, casting direction, and production timeline.',
-    9: 'Summarize the Campaign Page structure including the 12-section page outline, asset checklist, and trust signals.',
-    10: 'Output the Launch Ready checklist including community plan, content plan, IP checklist, and pre-launch checklist.',
-  };
-
-  const prompt = prompts[stepNum];
-  if(!prompt) return;
-
-  try {
-    const sysPrompt = getSystemPrompt(session.mission || 1) + buildMemoryContext(session);
-    const messages = buildMessageHistory(session);
-    // Add generation request
-    messages.push({role:'user', content: prompt + ' Output the full results now, do not ask questions.'});
-
-    const res = await fetch('/api/chat',{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({messages, system: sysPrompt, password: currentPw})
-    });
-    if(!res.ok) throw new Error('API error');
-    const data = await res.json();
-    const text = data.content?.[0]?.text || '';
-
-    // Parse alignment update if step 2
-    const alUpdate = parseAlignmentUpdate(text);
-    if(alUpdate) applyAlignmentUpdate(alUpdate, session.id);
-
-    // Store as step data
-    const fresh = getSession(activeId);
-    if(!fresh.stepData) fresh.stepData = {};
-    if(!fresh.stepData[stepNum]) fresh.stepData[stepNum] = {};
-    const def2 = STEP_DEFS[stepNum];
-    if(def2 && def2.fields[0]){
-      fresh.stepData[stepNum][def2.fields[0].key] = text.replace(/<!--[\s\S]*?-->/g,'').trim();
-    }
-    fresh.stepData[stepNum].updatedAt = Date.now();
-    fresh.updatedAt = Date.now();
-    scheduleSave(fresh);
-
-    // Re-run smart extract now that we have the response
-    smartExtractStep(stepNum, fresh);
-
-    // Re-render view
-    if(currentStepDrawer === stepNum){
-      renderStepView(stepNum, fresh);
-      document.getElementById('step-drawer-meta').textContent = 'Just generated';
-    }
-  } catch(e) {
-    if(bodyEl && currentStepDrawer === stepNum){
-      bodyEl.innerHTML = '<div class="so-empty-state">' +
-        '<span class="so-empty-icon">⚠</span>' +
-        '<div class="so-empty-title">Could not generate results</div>' +
-        '<div class="so-empty-body">Complete this step in the chat first,<br>then come back to view results here.<br><br>' +
-        '<span style="color:var(--accent);cursor:pointer;" onclick="closeStepDrawer()">← Back to chat</span></div>' +
-        '</div>';
-    }
-  }
-}
-
-// ── Smart extract: scan history and populate stepData when opening ────────────
-// Called every time a step is opened — always uses latest history
-function smartExtractStep(stepNum, session){
-  if(!session || !session.history) return;
-
-  // Step 2 (Product Alignment) — use session.alignment if available
-  if(stepNum === 2){
-    if(session.alignment && session.alignment.productName){
-      // Already have alignment data — it's always up to date
+  const stepNum = currentStepDrawer; if(!stepNum) return;
+  if(stepNum===2){
+    const s2=getSession(activeId);
+    const raw2=s2&&s2.stepData&&s2.stepData[2]&&s2.stepData[2]._rawText;
+    if(raw2){
+      const hdr=['KICKMAN — PRODUCT ALIGNMENT DOCUMENT','Project: '+(s2?s2.name||'Untitled':''),'Exported: '+new Date().toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric'}),'','═'.repeat(60),''].join('\n');
+      downloadBlob(hdr+raw2+'\n\n'+'─'.repeat(60)+'\nkickman.org','kickman-product-alignment-'+slugify(s2.name)+'-'+TODAY()+'.txt');
       return;
     }
-    // Try to extract from history
-    extractAlignmentFromHistoryToSession(session);
-    return;
+    downloadAlignment('txt'); return;
   }
+  const def=STEP_DEFS[stepNum];
+  const session=getSession(activeId);
+  const data=(session&&session.stepData&&session.stepData[stepNum])||{};
+  const lines=['KICKMAN — '+def.title.toUpperCase(),'Project: '+(session?session.name||'Untitled':''),'Exported: '+new Date().toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric'}),'','═'.repeat(60),''];
+  def.fields.forEach(f=>{const val=data[f.key];if(val){lines.push(f.label.toUpperCase());lines.push('─'.repeat(40));lines.push(val);lines.push('');}});
+  lines.push('─'.repeat(60)); lines.push('kickman.org');
+  downloadBlob(lines.join('\n'),'kickman-step'+def.num+'-'+def.title.toLowerCase().replace(/\s+/g,'-')+'-'+new Date().toISOString().slice(0,10)+'.txt');
+}
 
-  // For other steps: always re-scan history to find latest Kickman output
-  // This ensures the view reflects the most recent conversation output
-  const extracted = extractStepFromHistory(stepNum, session.history);
-  if(extracted){
+
+// ── Capture latest alignment raw text from history ───────────────────────────
+// Stores the complete markdown text — no field parsing, zero data loss
+function captureLatestAlignmentRaw(session){
+  if(!session || !session.history) return;
+  const msgs = [...session.history].reverse();
+  for(const msg of msgs){
+    if(msg.role !== 'assistant' && msg.role !== 'km') continue;
+    const text = typeof msg.content === 'string' ? msg.content : (msg.content?.[0]?.text || '');
+    const clean = text.replace(/<!--[\s\S]*?-->/g, '').trim();
+    const markers = [
+      /PRODUCT NAME/i, /INTERNAL DESCRIPTION/i, /ALL FEATURES/i,
+      /BENEFITS/i, /NEGATIVE THOUGHTS|RESISTANCE MAP/i,
+      /EMOTIONAL DESTINATION|WHAT WE WANT/i, /READINESS SCORE/i
+    ];
+    if(markers.filter(rx => rx.test(clean)).length < 2) continue;
     if(!session.stepData) session.stepData = {};
-    // Merge extracted into existing (don't overwrite user edits of specific fields)
-    const existing = session.stepData[stepNum] || {};
-    const def = STEP_DEFS[stepNum];
-    const firstKey = def && def.fields[0] && def.fields[0].key;
-    // Only auto-fill first field if user hasn't manually edited other fields
-    const hasUserEdits = def && def.fields.slice(1).some(f => existing[f.key] && existing[f.key].trim());
-    if(!hasUserEdits){
-      session.stepData[stepNum] = Object.assign({}, extracted, existing.updatedAt ? {updatedAt: existing.updatedAt} : {});
-    } else if(!existing[firstKey]){
-      session.stepData[stepNum][firstKey] = extracted[firstKey];
+    if(!session.stepData[2]) session.stepData[2] = {};
+    if(session.stepData[2]._rawText !== clean){
+      session.stepData[2]._rawText = clean;
+      session.stepData[2].updatedAt = Date.now();
+      scheduleSave(session);
     }
+    if(!session.alignment) session.alignment = {};
+    if(!session.alignment.productName){
+      // Simple extraction: first non-empty line after PRODUCT NAME
+      const lines = clean.split('\n');
+      let afterName = false;
+      for(const ln of lines){
+        if(/PRODUCT NAME/i.test(ln)){ afterName = true; continue; }
+        if(afterName && ln.trim() && !/^#/.test(ln.trim())){
+          session.alignment.productName = ln.replace(/\*+/g,'').trim();
+          break;
+        }
+      }
+    }
+    return;
   }
 }
 
-// Extract alignment data from history and write to session.alignment
-function extractAlignmentFromHistoryToSession(session){
-  const msgs = (session.history || []).filter(m => m.role==='assistant'||m.role==='km');
-  for(let i = msgs.length - 1; i >= 0; i--){
-    const text = typeof msgs[i].content==='string' ? msgs[i].content : (msgs[i].content?.[0]?.text||'');
-    const clean = text.replace(/<!--[\s\S]*?-->/g,'').trim();
-    if(!clean.includes('PRODUCT NAME') && !clean.includes('产品名称') && !clean.includes('INTERNAL DESCRIPTION')) continue;
+// Render raw alignment markdown as HTML — no parsing, faithful to original
+function alignmentRawToHTML(rawText){
+  if(!rawText) return '<p style="color:var(--text-3);font-style:italic;">No content yet.</p>';
+  let html = '';
+  const lines = rawText.split('\n');
+  let inList = false;
+  const closeList = () => { if(inList){ html += '</ul>'; inList = false; } };
 
-    const alignment = {};
+  for(const rawLine of lines){
+    const line = rawLine.trim();
+    if(!line){ closeList(); continue; }
 
-    // Product name
-    const nameMatch = clean.match(/(?:PRODUCT NAME[^:\r\n]*:?|[^\r\n]*:?)[\s\S]{0,20}?([A-Z][^\r\n*]{2,60})/i);
-    if(nameMatch) alignment.productName = nameMatch[1].trim();
-
-    // Internal description
-    const descMatch = clean.match(/INTERNAL DESCRIPTION([\s\S]{1,600}?)(?:ALL FEATURES|BENEFITS|\n{3})/i);
-    if(descMatch) alignment.internalDescription = descMatch[1].replace(/\*+/g,'').trim();
-
-    // Features
-    const featStart = clean.search(/ALL FEATURES|所有功能/i);
-    const featEnd = clean.search(/BENEFITS|好处|优势/i);
-    if(featStart > -1){
-      const featSection = clean.slice(featStart, featEnd > featStart ? featEnd : featStart + 800);
-      alignment.features = featSection.split('\n')
-        .filter(l => /^[•\-\*]/.test(l.trim()))
-        .map(l => l.replace(/^[•\-\*]\s*/,'').replace(/\*+/g,'').trim())
-        .filter(Boolean);
+    // Section headers: ## or **TEXT** alone or numbered 01. Title
+    if(/^#{1,3}\s/.test(line) || /^\*\*[^*]{2,}\*\*$/.test(line) ||
+       /^0?[1-9]\.\s+[A-Z\u4e00-\u9fff]/.test(line) ||
+       /^(?:PRODUCT NAME|INTERNAL DESC|ALL FEATURES|BENEFITS|NEGATIVE|EMOTIONAL|READINESS)/i.test(line)){
+      closeList();
+      const text = line.replace(/^#{1,3}\s*/,'').replace(/\*+/g,'').replace(/^\d+\.\s*/,'').trim();
+      html += '<div class="so-section-label" style="margin-top:24px;">' + escHtml(text) + '</div>';
+      continue;
     }
 
-    // Benefits
-    const benStart = clean.search(/^#+\s*BENEFITS|^BENEFITS|^好处/im);
-    const benEnd = clean.search(/NEGATIVE|RESISTANCE|WHAT MIGHT|可能担心/i);
-    if(benStart > -1){
-      const benSection = clean.slice(benStart, benEnd > benStart ? benEnd : benStart + 800);
-      alignment.benefits = benSection.split('\n')
-        .filter(l => /^[•\-\*]/.test(l.trim()))
-        .map(l => l.replace(/^[•\-\*]\s*/,'').replace(/\*+/g,'').trim())
-        .filter(Boolean);
-    }
-
-    // Negative thoughts
-    const negStart = clean.search(/NEGATIVE THOUGHTS|RESISTANCE MAP|BACKER RESISTANCE|消费者可能/i);
-    const negEnd = clean.search(/EMOTIONAL DESTINATION|WHAT WE WANT|情感目标/i);
-    if(negStart > -1){
-      const negSection = clean.slice(negStart, negEnd > negStart ? negEnd : negStart + 1200);
-      alignment.negativeThoughts = negSection.split('\n')
-        .filter(l => /^[•\-\*"]/.test(l.trim()) || /^[""]/.test(l.trim()))
-        .map(l => l.replace(/^[•\-\*]\s*/,'').replace(/^[""“]/,'').replace(/[""”]$/,'').replace(/\*+/g,'').trim())
-        .filter(l => l.length > 5);
-    }
-
-    // Emotional destination
-    const posStart = clean.search(/EMOTIONAL DESTINATION|WHAT WE WANT|情感目标|我们希望/i);
-    const posEnd = clean.search(/READINESS SCORE|准备就绪|\/10/i);
-    if(posStart > -1){
-      const posSection = clean.slice(posStart, posEnd > posStart ? posEnd : posStart + 1200);
-      alignment.emotionalDestination = posSection.split('\n')
-        .filter(l => /^[•\-\*"]/.test(l.trim()) || /^[""]/.test(l.trim()))
-        .map(l => l.replace(/^[•\-\*]\s*/,'').replace(/^[""“]/,'').replace(/[""”]$/,'').replace(/\*+/g,'').trim())
-        .filter(l => l.length > 5);
+    // Bullet items and quoted items
+    if(/^[•\-\*]\s/.test(line) || /^["\u201c]/.test(line)){
+      if(!inList){ html += '<ul class="so-raw-list">'; inList = true; }
+      const text = line.replace(/^[•\-\*]\s*/,'').replace(/^["\u201c]/,'').replace(/["\u201d]$/,'').trim();
+      const fmt = text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>');
+      html += '<li>' + fmt + '</li>';
+      continue;
     }
 
     // Readiness score
-    const scoreMatch = clean.match(/READINESS SCORE[^:\r\n]*:?[\s\S]{0,20}?(\d+)\s*\/\s*10/i);
-    if(scoreMatch) alignment.readinessScore = parseInt(scoreMatch[1]);
-
-    if(alignment.productName || (alignment.features && alignment.features.length > 0)){
-      if(!session.alignment) session.alignment = {};
-      Object.assign(session.alignment, alignment);
-      session.alignment.updatedAt = Date.now();
-      scheduleSave(session);
-      return;
+    if(/^\d+\s*\/\s*10/.test(line)){
+      closeList();
+      const m = line.match(/(\d+)\s*\/\s*10/);
+      if(m){
+        const s = parseInt(m[1]);
+        const col = s>=7?'var(--green)':s>=5?'var(--yellow)':'var(--red)';
+        html += '<div style="display:flex;align-items:baseline;gap:8px;padding:12px 0;">' +
+          '<span style="font-family:var(--font-serif);font-size:48px;color:'+col+';line-height:1;">'+s+'</span>' +
+          '<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);">/ 10</span></div>';
+      }
+      continue;
     }
+
+    // Regular text
+    closeList();
+    const fmt = line.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>');
+    html += '<p style="margin:4px 0 10px;color:var(--text-2);font-size:13px;line-height:1.7;">' + fmt + '</p>';
   }
-}
-
-// Extract content for any step from conversation history
-function extractStepFromHistory(stepNum, history){
-  if(!history) return null;
-  const def = STEP_DEFS[stepNum];
-  if(!def) return null;
-
-  // Get all assistant messages
-  const msgs = history.filter(m => m.role==='assistant'||m.role==='km').reverse(); // latest first
-
-  // Step-specific extraction patterns
-  const stepPatterns = {
-    3: /APPROACH [ABC]:|Marketing Approach|营销方向/i,
-    4: /LP VERSION|LANDING PAGE|VALIDATION PLAYBOOK|着陆页/i,
-    5: /VERDICT|GO\s*[\/|]|NO.GO|FINAL REPORT|最终报告/i,
-    6: /VIDEO STYLE|Video Strategy|MODULE A|视频风格/i,
-    7: /SCENE|SCRIPT|MODULE A[2-9]|场景/i,
-    8: /PRODUCTION|VIDEO BRIEF|MODULE A/i,
-    9: /CAMPAIGN PAGE|MODULE B|页面结构/i,
-    10: /LAUNCH READY|MODULE C|CHECKLIST|上线清单/i,
-  };
-
-  const pattern = stepPatterns[stepNum];
-  if(!pattern) return null;
-
-  for(const msg of msgs){
-    const text = typeof msg.content==='string' ? msg.content : (msg.content?.[0]?.text||'');
-    const clean = text.replace(/<!--[\s\S]*?-->/g,'').trim();
-    if(clean.length < 100) continue;
-    if(!pattern.test(clean)) continue;
-
-    // Store the full relevant output in the first field
-    const firstField = def.fields[0];
-    const result = {updatedAt: Date.now()};
-    result[firstField.key] = clean.slice(0, 4000); // cap at 4000 chars
-    return result;
-  }
-  return null;
+  closeList();
+  return html;
 }
 
 // ── Auto-extract step data from Kickman response ──────────────────────────────
@@ -3588,9 +3432,12 @@ function autoExtractStepData(text, stepNum, sessionId){
   const def = STEP_DEFS[stepNum];
   if(!def) return;
 
-  // For step 2, alignment is already handled by applyAlignmentUpdate
-  // For other steps, do a simple full-text capture as the "raw" field
-  if(stepNum === 2) return;
+  // Step 2: capture raw text from latest response
+  if(stepNum === 2){
+    const s2 = getSession(sessionId || activeId);
+    if(s2) captureLatestAlignmentRaw(s2);
+    return;
+  }
 
   // Store the raw Kickman output for the step
   const clean = text.replace(/<!--[\s\S]*?-->/g,'').trim();
@@ -3658,30 +3505,6 @@ function closeExportMenu(){
 }
 
 function slugify(str){ return (str||'').slice(0,30).replace(/[^a-z0-9]/gi,'-').toLowerCase(); }
-
-// ── Server-side DOCX export via /api/export ───────────────────────────────────
-async function exportViaAPI(type, data, projectName){
-  const btn = document.getElementById('export-menu-btn');
-  const origText = btn ? btn.textContent : '';
-  if(btn){ btn.textContent = 'Generating…'; btn.disabled = true; }
-  try{
-    const res = await fetch('/api/export',{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ password: currentPw, type, data, projectName })
-    });
-    if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error||res.status); }
-    const json = await res.json();
-    const bytes = Uint8Array.from(atob(json.base64), ch=>ch.charCodeAt(0));
-    const blob = new Blob([bytes],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = json.filename; a.click(); URL.revokeObjectURL(a.href);
-  } catch(e){
-    alert('Word export failed: ' + e.message + '\n\nTip: Try .txt or .md instead.');
-  } finally {
-    if(btn){ btn.textContent = origText; btn.disabled = false; }
-  }
-}
 const TODAY = ()=>new Date().toISOString().slice(0,10);
 const NOWSTR = ()=>new Date().toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric'});
 
@@ -3779,7 +3602,6 @@ function chatToHTML(s){
 function exportChat(fmt='txt'){
   const s = getSession(activeId); if(!s) return;
   const base = 'kickman-chat-' + slugify(s.name) + '-' + TODAY();
-  if(fmt==='docx'){ exportViaAPI('chat', {history: s.history}, s.name); return; }
   if(fmt==='pdf'){ printAsPDF(chatToHTML(s), 'Chat — ' + (s.name||'Kickman')); return; }
   const now = NOWSTR();
   const lines = ['KICKMAN — CONVERSATION HISTORY','Project: '+(s.name||'Untitled'),'Exported: '+now,'','═'.repeat(60),''];
@@ -3848,7 +3670,6 @@ function downloadAlignment(fmt='txt'){
     }
   }
 
-  if(fmt==='docx'){ exportViaAPI('alignment', session.alignment, session.name); return; }
   if(fmt==='pdf'){ printAsPDF(alignmentToHTML(session), 'Product Alignment — ' + (session.name||'Kickman')); return; }
   const text = buildAlignmentText(session);
   if(!text){ alert('Could not build alignment document. Please ask Kickman to regenerate it.'); return; }
@@ -3871,7 +3692,6 @@ function exportTimeline(fmt='txt'){
   const s = getSession(activeId); if(!s) return;
   const tl = s.timeline || DEFAULT_TIMELINE;
   const base = 'kickman-timeline-' + slugify(s.name) + '-' + TODAY();
-  if(fmt==='docx'){ exportViaAPI('timeline', {timeline: s.timeline||DEFAULT_TIMELINE}, s.name); return; }
   if(fmt==='pdf'){ printAsPDF(timelineToHTML(s), 'Timeline — ' + (s.name||'Kickman')); return; }
   const riskLabel = {low:'Low Risk', medium:'Watch', high:'High Risk'};
   const now = NOWSTR();
@@ -3905,12 +3725,8 @@ function exportTimeline(fmt='txt'){
 }
 
 // ── Export All (.md) ──────────────────────────────────────────────────────────
-async function exportAll(fmt='md'){
+async function exportAll(){
   const s = getSession(activeId); if(!s) return;
-  if(fmt==='docx'){
-    exportViaAPI('full',{alignment:s.alignment||{},timeline:s.timeline||DEFAULT_TIMELINE,history:s.history||[]},s.name);
-    return;
-  }
   const sections = [];
   sections.push('# Kickman — Complete Project Export\n**Project:** '+(s.name||'Untitled')+'  \n**Exported:** '+NOWSTR()+'  \n**Source:** kickman.org\n\n---\n');
   const at = buildAlignmentText(s);
