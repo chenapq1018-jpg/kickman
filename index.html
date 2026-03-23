@@ -3226,6 +3226,130 @@ const STEP_DEFS = {
   },
 };
 
+
+// ── STEP REQUIREMENTS — gate what each step needs before showing results ──────
+// Each step defines: required fields in session.alignment + session data checks
+// If requirements not met, show a "what's missing" screen instead of generating
+
+const STEP_REQUIREMENTS = {
+  1: {
+    label: 'Founder Input',
+    needs: [], // Step 1 is always accessible — it IS the input
+    missing_msg: '',
+  },
+  2: {
+    label: 'Product Alignment',
+    needs: [
+      { check: s => s.alignment && s.alignment.productName, label: 'Product name confirmed' },
+      { check: s => s.alignment && s.alignment.features && s.alignment.features.length > 0, label: 'Feature list discussed' },
+      { check: s => s.alignment && s.alignment.negativeThoughts && s.alignment.negativeThoughts.length > 0, label: 'Backer resistance map created' },
+      { check: s => s.alignment && s.alignment.readinessScore, label: 'Readiness score assigned' },
+    ],
+    hint: 'Complete the Product Alignment conversation with Kickman first.',
+  },
+  3: {
+    label: 'Marketing Approaches',
+    needs: [
+      { check: s => s.alignment && s.alignment.productName, label: 'Product alignment complete (Step 02)' },
+      { check: s => s.step >= 3 || hasStepData(s, 3), label: 'Marketing approaches discussed with Kickman' },
+    ],
+    hint: 'Finish Step 02 (Product Alignment) first, then ask Kickman to present marketing angles.',
+  },
+  4: {
+    label: 'Landing Page Briefs',
+    needs: [
+      { check: s => s.step >= 4 || hasStepData(s, 4), label: 'Landing page briefs discussed with Kickman' },
+      { check: s => hasStepData(s, 3), label: 'Marketing approach selected (Step 03)' },
+    ],
+    hint: 'Complete Step 03 first, then work through the landing page brief with Kickman.',
+  },
+  5: {
+    label: 'Go / No-Go Report',
+    needs: [
+      { check: s => s.verdict || s.step >= 5 || hasStepData(s, 5), label: 'Validation completed and results reviewed' },
+      { check: s => hasStepData(s, 4), label: 'Landing page briefs complete (Step 04)' },
+    ],
+    hint: 'Run your validation test first. Once you have real data, Kickman will generate the Go/No-Go report.',
+  },
+  6: {
+    label: 'Video Strategy',
+    needs: [
+      { check: s => (s.mission || 1) >= 2, label: 'Validated and entered Mission 2 (must have GO verdict)' },
+      { check: s => s.step >= 6 || hasStepData(s, 6), label: 'Video strategy discussed with Kickman' },
+    ],
+    hint: 'You need a GO verdict from Step 05 to enter Mission 2.',
+  },
+  7: {
+    label: 'Script & Scenes',
+    needs: [
+      { check: s => (s.mission || 1) >= 2, label: 'In Mission 2' },
+      { check: s => s.step >= 7 || hasStepData(s, 7), label: 'Script and scenes discussed with Kickman' },
+    ],
+    hint: 'Complete Step 06 (Video Strategy) first.',
+  },
+  8: {
+    label: 'Video Brief',
+    needs: [
+      { check: s => (s.mission || 1) >= 2, label: 'In Mission 2' },
+      { check: s => s.step >= 8 || hasStepData(s, 8), label: 'Video brief discussed with Kickman' },
+    ],
+    hint: 'Complete Steps 06-07 first.',
+  },
+  9: {
+    label: 'Campaign Page',
+    needs: [
+      { check: s => (s.mission || 1) >= 2, label: 'In Mission 2' },
+      { check: s => s.step >= 9 || hasStepData(s, 9), label: 'Campaign page structure discussed with Kickman' },
+    ],
+    hint: 'Complete the video modules (Steps 06-08) first.',
+  },
+  10: {
+    label: 'Launch Ready',
+    needs: [
+      { check: s => (s.mission || 1) >= 2, label: 'In Mission 2' },
+      { check: s => s.step >= 10 || hasStepData(s, 10), label: 'Launch checklist reviewed with Kickman' },
+    ],
+    hint: 'Complete Step 09 (Campaign Page) first.',
+  },
+  11: {
+    label: 'Pricing Strategy',
+    needs: [
+      { check: s => (s.mission || 1) >= 2, label: 'Completed Mission 1 validation' },
+      { check: s => s.alignment && s.alignment.productName, label: 'Product name and definition confirmed' },
+      { check: s => s.stepData && s.stepData[11] && (s.stepData[11]._raw || s.stepData[11].cogs), label: 'COGS and pricing discussed with Kickman' },
+    ],
+    hint: 'Tell Kickman your product cost (COGS) and target retail price. Kickman will then build the pricing strategy.',
+    key_info: ['Product COGS (fully-loaded cost per unit)', 'Target MSRP (retail price)', 'Expected Kickstarter discount level'],
+  },
+  12: {
+    label: 'Financial Forecast',
+    needs: [
+      { check: s => s.stepData && s.stepData[11] && (s.stepData[11]._raw || s.stepData[11].cogs), label: 'Pricing strategy complete (Step 11)' },
+      { check: s => s.alignment && s.alignment.productName, label: 'Product alignment confirmed' },
+      { check: s => s.stepData && s.stepData[12] && (s.stepData[12]._raw || s.stepData[12].scenario1), label: 'Financial model built with Kickman' },
+    ],
+    hint: 'Complete Step 11 (Pricing Strategy) first. Kickman needs your COGS and pricing before building the financial model.',
+    key_info: ['COGS confirmed', 'MSRP and KS price agreed', 'Fixed costs estimated (video, design, pre-launch)', 'Target volume scenarios discussed'],
+  },
+  13: {
+    label: 'Pledge Tiers',
+    needs: [
+      { check: s => s.stepData && s.stepData[12] && (s.stepData[12]._raw || s.stepData[12].scenario1), label: 'Financial forecast complete (Step 12)' },
+      { check: s => s.stepData && s.stepData[13] && (s.stepData[13]._raw || s.stepData[13].superEB), label: 'Pledge tiers designed with Kickman' },
+    ],
+    hint: 'Complete Step 12 (Financial Forecast) first. The tier economics need to be grounded in the financial model.',
+    key_info: ['Financial model complete', 'MSRP and margins confirmed', 'Inventory constraints discussed', 'Stretch goal ideas identified'],
+  },
+};
+
+// Check if a step's requirements are met — returns {met: bool, missing: []}
+function checkStepRequirements(stepNum, session) {
+  const req = STEP_REQUIREMENTS[stepNum];
+  if(!req || !req.needs || req.needs.length === 0) return { met: true, missing: [] };
+  const missing = req.needs.filter(n => !n.check(session));
+  return { met: missing.length === 0, missing };
+}
+
 let currentStepDrawer = null;
 let stepEditMode = false;
 
@@ -3242,6 +3366,12 @@ function openStepDrawer(stepNum){
   if(editBtn){editBtn.textContent='✎ Edit';editBtn.className='so-btn edit-mode';}
   smartExtractStep(stepNum,session);
   renderStepView(stepNum,session);
+  // Show/hide action buttons based on whether step has data
+  const hasD = hasStepData(session, stepNum);
+  const dlBtn = document.getElementById('so-download-btn');
+  const edBtn = document.getElementById('so-edit-btn');
+  if(dlBtn) dlBtn.style.display = hasD ? '' : 'none';
+  if(edBtn) edBtn.style.display = hasD ? '' : 'none';
   document.getElementById('step-overlay').classList.add('open');
 }
 
@@ -3350,10 +3480,16 @@ function renderStepView(stepNum,session){
   const merged=stepNum===2?mergeAlignmentToStepData(session):raw;
   const hasData=rawText||def.fields.some(f=>merged[f.key]&&String(merged[f.key]).trim().length>0)||raw._raw;
 
+  // ── Gate check: show requirements screen if not met ──────────────────────
   if(!hasData){
-    body.innerHTML='<div class="so-empty-state"><span class="so-empty-icon" style="animation:spin 1.5s linear infinite;display:inline-block">&#x21BB;</span><div class="so-empty-title">Generating results...</div><div class="so-empty-body">Kickman is extracting output from your conversation.</div></div>';
-    if(!document.getElementById('spin-style')){const st=document.createElement('style');st.id='spin-style';st.textContent='@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';document.head.appendChild(st);}
-    setTimeout(()=>triggerStepGeneration(stepNum,session,body),300);
+    const gate = checkStepRequirements(stepNum, session);
+    if(!gate.met){
+      renderStepGate(stepNum, session, gate, body);
+      return;
+    }
+    // Requirements met but no data yet — this step was just unlocked, prompt to discuss
+    const req = STEP_REQUIREMENTS[stepNum];
+    renderStepNotStarted(stepNum, def, req, body);
     return;
   }
 
@@ -3372,6 +3508,93 @@ function renderStepView(stepNum,session){
   else html+=renderGenericView(def,merged);
   html+='</div>';
   body.innerHTML=html;
+}
+
+
+// ── Gate screen: requirements not met ─────────────────────────────────────────
+function renderStepGate(stepNum, session, gate, body){
+  const req = STEP_REQUIREMENTS[stepNum];
+  const def = STEP_DEFS[stepNum];
+
+  // Calculate overall progress
+  const total = req.needs.length;
+  const done = total - gate.missing.length;
+  const pct = Math.round(done / total * 100);
+
+  let html = '<div class="so-doc">';
+
+  // Header with step info
+  html += '<div class="so-doc-header" style="border-color:rgba(255,255,255,.08);">';
+  html += '<div class="so-doc-step-num" style="color:var(--text-3);">Step ' + def.num + ' &middot; Mission ' + def.mission + '</div>';
+  html += '<div class="so-doc-title" style="color:var(--text-3);">' + escHtml(def.title) + '</div>';
+  html += '<div style="margin-top:8px;font-family:var(--font-mono);font-size:10px;color:var(--text-3);">Not yet unlocked</div>';
+  html += '</div>';
+
+  // Progress bar
+  html += '<div style="margin-bottom:24px;">';
+  html += '<div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:9px;color:var(--text-3);margin-bottom:6px;">';
+  html += '<span>Requirements</span><span>' + done + ' / ' + total + ' met</span></div>';
+  html += '<div style="height:3px;background:rgba(255,255,255,.06);border-radius:2px;">';
+  html += '<div style="height:3px;background:var(--accent);border-radius:2px;width:' + pct + '%;transition:width .4s;"></div></div></div>';
+
+  // Checklist
+  html += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:28px;">';
+  req.needs.forEach(function(need){
+    const met = need.check(session);
+    html += '<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:var(--card);border:1px solid ' + (met?'rgba(45,158,107,.25)':'rgba(255,255,255,.06)') + ';">';
+    html += '<div style="width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:1px;background:' + (met?'rgba(45,158,107,.2)':'rgba(255,255,255,.05)') + ';color:' + (met?'var(--green)':'var(--text-3)') + ';">' + (met?'&#x2713;':'&#x25CB;') + '</div>';
+    html += '<div style="font-size:12px;color:' + (met?'var(--text-2)':'var(--text-3)') + ';line-height:1.5;">' + escHtml(need.label) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // Key info needed (for M3 steps)
+  if(req.key_info && req.key_info.length > 0 && gate.missing.length > 0){
+    html += '<div class="so-section"><div class="so-section-label">What Kickman needs from you</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:6px;">';
+    req.key_info.forEach(function(item){
+      html += '<div style="padding:8px 14px;font-size:12px;color:var(--text-2);border-left:2px solid rgba(232,98,42,.3);background:var(--card);">&#x2192; ' + escHtml(item) + '</div>';
+    });
+    html += '</div></div>';
+  }
+
+  // CTA
+  if(gate.missing.length > 0){
+    html += '<div style="margin-top:28px;padding:16px 20px;background:rgba(232,98,42,.06);border:1px solid rgba(232,98,42,.2);">';
+    html += '<div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:1px;margin-bottom:6px;">NEXT STEP</div>';
+    html += '<div style="font-size:13px;color:var(--text-2);line-height:1.6;">' + escHtml(req.hint || 'Discuss this topic with Kickman in the chat to unlock this section.') + '</div>';
+    html += '<button onclick="closeStepDrawer()" style="margin-top:12px;font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;background:var(--accent);color:#fff;border:none;cursor:pointer;">&#x2190; Go to chat</button>';
+    html += '</div>';
+  }
+
+  html += '</div>';
+  body.innerHTML = html;
+}
+
+// ── Not-started screen: requirements met but no output yet ────────────────────
+function renderStepNotStarted(stepNum, def, req, body){
+  let html = '<div class="so-doc">';
+  html += '<div class="so-doc-header">';
+  html += '<div class="so-doc-step-num">Step ' + def.num + ' &middot; Mission ' + def.mission + '</div>';
+  html += '<div class="so-doc-title">' + escHtml(def.title) + '</div>';
+  html += '<div class="so-doc-subtitle" style="color:var(--green);">&#x2713; Ready to begin</div>';
+  html += '</div>';
+
+  html += '<div style="padding:20px 0;">';
+  html += '<div style="font-size:13px;color:var(--text-2);line-height:1.7;margin-bottom:20px;">All requirements met. Go to the chat and ask Kickman to work through this step. Results will appear here automatically.</div>';
+
+  if(req && req.key_info){
+    html += '<div class="so-section"><div class="so-section-label">Topics to cover</div><div style="display:flex;flex-direction:column;gap:6px;">';
+    req.key_info.forEach(function(item){
+      html += '<div style="padding:8px 14px;font-size:12px;color:var(--text-2);border-left:2px solid rgba(232,98,42,.3);background:var(--card);">&#x2192; ' + escHtml(item) + '</div>';
+    });
+    html += '</div></div>';
+  }
+
+  html += '<button onclick="closeStepDrawer()" style="margin-top:20px;font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;background:var(--accent);color:#fff;border:none;cursor:pointer;">&#x2190; Go to chat</button>';
+  html += '</div>';
+  html += '</div>';
+  body.innerHTML = html;
 }
 
 function renderAlignmentView(d){
