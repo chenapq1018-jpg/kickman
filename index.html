@@ -446,7 +446,7 @@
         </div>
         <!-- Product Alignment -->
         <div class="export-section-label" id="export-alignment-item">&#x1F4C4; Product Alignment</div>
-        <div class="export-format-row">
+        <div class="export-format-row" id="export-alignment-row">
           <button onclick="downloadAlignment('txt');closeExportMenu()" class="export-fmt-btn">.txt</button>
           <button onclick="downloadAlignment('md');closeExportMenu()" class="export-fmt-btn">.md</button>
           <button onclick="downloadAlignment('pdf');closeExportMenu()" class="export-fmt-btn">.pdf</button>
@@ -2268,7 +2268,7 @@ function loadSession(id){
   }
   renderList();
   renderTimeline();
-  updateAlignmentBtn(session);
+  updateAlignmentBtn(getSession(id) || session);
 }
 
 async function startCurrentSession(){
@@ -2725,10 +2725,23 @@ function applyAlignmentUpdate(update, sessionId){
 }
 
 function updateAlignmentBtn(session){
+  // Always read freshest data from cache
+  const s = getSession((session && session.id) || activeId) || session;
+  const hasAlignment = s && s.alignment && s.alignment.productName;
+
+  // Update the standalone header button
   const btn = document.getElementById('alignment-download-btn');
-  if(!btn) return;
-  const hasAlignment = session && session.alignment && session.alignment.productName;
-  btn.style.display = hasAlignment ? 'flex' : 'none';
+  if(btn) btn.style.display = hasAlignment ? 'flex' : 'none';
+
+  // Update the export menu alignment section
+  const label = document.getElementById('export-alignment-item');
+  const row = document.getElementById('export-alignment-row');
+  if(label) label.style.opacity = hasAlignment ? '1' : '0.4';
+  if(row){
+    row.style.opacity = hasAlignment ? '1' : '0.4';
+    row.style.pointerEvents = hasAlignment ? 'auto' : 'none';
+    row.title = hasAlignment ? '' : 'Complete Step 2 first to unlock Product Alignment export';
+  }
 }
 
 // Single source of truth for alignment text — used by both download and exportAll
@@ -2833,10 +2846,9 @@ function toggleExportMenu(){
   const open = menu.style.display !== 'none';
   menu.style.display = open ? 'none' : 'block';
   if(!open){
-    // Dim alignment item if no alignment yet
+    // Always sync alignment button state when opening menu
     const s = getSession(activeId);
-    const alignItem = document.getElementById('export-alignment-item');
-    if(alignItem) alignItem.style.opacity = (s && s.alignment && s.alignment.productName) ? '1' : '0.4';
+    updateAlignmentBtn(s);
     setTimeout(()=>document.addEventListener('click', closeExportMenu, {once:true}), 10);
   }
 }
