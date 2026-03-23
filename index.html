@@ -93,54 +93,114 @@
   .sidebar-step.active .step-name{color:var(--text);}
   .sidebar-step.done .step-name{color:var(--text-2);}
 
-  /* Step results overlay — covers chat area */
-  .step-overlay{display:none;position:absolute;inset:0;background:var(--bg);z-index:30;flex-direction:column;animation:msgIn .2s ease forwards;}
-  .step-overlay.open{display:flex;}
-  .step-overlay-head{height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;}
-  .step-overlay-back{font-family:var(--font-mono);font-size:10px;letter-spacing:1px;color:var(--text-3);background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;transition:color .15s;padding:0;}
-  .step-overlay-back:hover{color:var(--text);}
-  .step-overlay-title{font-family:var(--font-serif);font-size:18px;color:var(--text);flex:1;}
-  .step-overlay-meta{font-family:var(--font-mono);font-size:9px;color:var(--text-3);}
-  .step-overlay-actions{display:flex;gap:8px;align-items:center;}
-  .step-overlay-btn{font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:6px 12px;border:1px solid var(--border);background:none;color:var(--text-2);cursor:pointer;transition:all .15s;white-space:nowrap;}
-  .step-overlay-btn:hover{border-color:var(--accent);color:var(--accent);}
-  .step-overlay-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
-  .step-overlay-btn.primary:hover{opacity:.85;}
-  .step-overlay-body{flex:1;overflow-y:auto;padding:24px 32px;}
+  /* ── STEP RESULTS OVERLAY ──────────────────────────────────────────────── */
+  .step-overlay{display:none;position:absolute;inset:0;background:var(--bg);z-index:30;flex-direction:column;}
+  .step-overlay.open{display:flex;animation:fadeInUp .22s ease forwards;}
+  @keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  /* Top bar */
+  .step-overlay-head{
+    height:56px;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;padding:0 28px;gap:16px;flex-shrink:0;
+    background:var(--surface);
+  }
+  .step-overlay-back{
+    font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;
+    color:var(--text-3);background:none;border:none;cursor:pointer;
+    display:flex;align-items:center;gap:5px;transition:color .15s;padding:0;flex-shrink:0;
+  }
+  .step-overlay-back:hover{color:var(--accent);}
+  .step-overlay-back svg{opacity:.6;}
+  .so-divider{width:1px;height:18px;background:var(--border);flex-shrink:0;}
+  .step-overlay-title{font-family:var(--font-serif);font-size:17px;color:var(--text);flex:1;letter-spacing:.3px;}
+  .step-overlay-meta{font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:.5px;flex-shrink:0;}
+  .step-overlay-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+  .step-saved-badge{font-family:var(--font-mono);font-size:9px;color:var(--green);opacity:0;transition:opacity .3s;margin-right:4px;}
+  .step-saved-badge.show{opacity:1;}
+  .so-btn{
+    font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;
+    padding:7px 14px;border:1px solid var(--border);background:none;color:var(--text-2);
+    cursor:pointer;transition:all .15s;white-space:nowrap;
+  }
+  .so-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .so-btn.edit-mode{background:var(--accent-dim2);border-color:rgba(232,98,42,.4);color:var(--accent);}
+  .so-btn.save{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .so-btn.save:hover{opacity:.85;}
+
+  /* Scroll body */
+  .step-overlay-body{flex:1;overflow-y:auto;background:var(--bg);}
   .step-overlay-body::-webkit-scrollbar{width:3px;}
   .step-overlay-body::-webkit-scrollbar-thumb{background:var(--border);}
 
-  /* Rich text editor */
-  .rte-section{margin-bottom:28px;}
-  .rte-label{font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:6px;}
-  .rte-hint{font-size:11px;color:var(--text-3);margin-bottom:8px;}
-  .rte-toolbar{display:flex;gap:2px;padding:4px 6px;background:var(--card);border:1px solid var(--border);border-bottom:none;flex-wrap:wrap;}
-  .rte-tool{font-family:var(--font-mono);font-size:11px;width:26px;height:24px;background:none;border:none;color:var(--text-3);cursor:pointer;border-radius:2px;display:flex;align-items:center;justify-content:center;transition:all .1s;}
-  .rte-tool:hover{background:rgba(255,255,255,.08);color:var(--text);}
-  .rte-tool.active{background:var(--accent-dim);color:var(--accent);}
-  .rte-tool.wide{width:auto;padding:0 6px;font-size:10px;letter-spacing:.5px;}
-  .rte-sep{width:1px;background:var(--border);margin:2px 3px;align-self:stretch;}
-  .rte-editor{min-height:80px;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:var(--font-sans);font-size:13px;line-height:1.7;padding:10px 14px;outline:none;transition:border-color .15s;}
-  .rte-editor:focus{border-color:rgba(232,98,42,.4);}
-  .rte-editor.short{min-height:44px;}
-  .rte-editor h2{font-family:var(--font-serif);font-size:16px;font-weight:400;margin:12px 0 6px;}
-  .rte-editor h3{font-family:var(--font-mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin:10px 0 4px;}
-  .rte-editor strong{font-weight:600;color:var(--text);}
-  .rte-editor em{font-style:italic;color:var(--text-2);}
-  .rte-editor ul,.rte-editor ol{padding-left:20px;margin:6px 0;}
-  .rte-editor li{margin-bottom:3px;}
-  .rte-editor blockquote{border-left:2px solid var(--accent);padding:4px 12px;margin:8px 0;background:var(--accent-dim2);color:var(--text-2);font-style:italic;}
-  .rte-editor [data-placeholder]:empty::before{content:attr(data-placeholder);color:var(--text-3);pointer-events:none;}
+  /* Document layout inside body */
+  .so-doc{max-width:720px;margin:0 auto;padding:40px 32px 80px;}
 
-  .step-empty-state{padding:48px 0;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--text-3);line-height:1.8;}
-  .step-empty-icon{font-size:32px;display:block;margin-bottom:14px;opacity:.4;}
-  .step-saved-badge{font-family:var(--font-mono);font-size:9px;color:var(--green);opacity:0;transition:opacity .3s;}
-  .step-saved-badge.show{opacity:1;}
+  /* Document header block */
+  .so-doc-header{margin-bottom:36px;padding-bottom:24px;border-bottom:2px solid var(--border);}
+  .so-doc-step-num{font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
+  .so-doc-title{font-family:var(--font-serif);font-size:28px;font-weight:400;color:var(--text);margin:0 0 6px;}
+  .so-doc-subtitle{font-family:var(--font-mono);font-size:10px;color:var(--text-3);letter-spacing:.5px;}
+
+  /* Each section */
+  .so-section{margin-bottom:32px;position:relative;}
+  .so-section-label{
+    font-family:var(--font-mono);font-size:8px;letter-spacing:3px;color:var(--accent);
+    text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;
+  }
+  .so-section-label::after{content:'';flex:1;height:1px;background:rgba(232,98,42,.15);}
+
+  /* View mode: rendered content */
+  .so-view{
+    font-size:13px;line-height:1.8;color:var(--text-2);
+    font-family:var(--font-sans);
+  }
+  .so-view p{margin:0 0 8px;}
+  .so-view ul{padding-left:0;margin:0;list-style:none;}
+  .so-view li{
+    padding:5px 0 5px 20px;border-bottom:1px solid rgba(255,255,255,.04);
+    position:relative;color:var(--text-2);font-size:13px;line-height:1.6;
+  }
+  .so-view li::before{content:'·';position:absolute;left:0;color:var(--accent);font-size:16px;line-height:1.3;}
+  .so-view li:last-child{border-bottom:none;}
+  .so-view.quote-style li{
+    padding:8px 0 8px 16px;border-left:2px solid rgba(232,98,42,.25);border-bottom:none;
+    margin-bottom:6px;font-style:italic;color:var(--text-2);
+  }
+  .so-view.quote-style li::before{display:none;}
+  .so-view .so-empty{color:var(--text-3);font-style:italic;font-size:12px;}
+
+  /* Score badge */
+  .so-score-badge{
+    display:inline-flex;align-items:center;gap:10px;
+    padding:10px 20px;background:var(--card);border:1px solid var(--border);
+  }
+  .so-score-num{font-family:var(--font-serif);font-size:32px;color:var(--accent);line-height:1;}
+  .so-score-label{font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:2px;text-transform:uppercase;}
+
+  /* Edit mode: textarea */
+  .so-editor{
+    width:100%;background:var(--card);border:1px solid rgba(232,98,42,.3);
+    color:var(--text);font-family:var(--font-mono);font-size:12px;line-height:1.7;
+    padding:12px 14px;resize:vertical;outline:none;
+    transition:border-color .15s;min-height:80px;box-sizing:border-box;
+  }
+  .so-editor:focus{border-color:var(--accent);}
+  .so-editor.short{min-height:44px;resize:none;}
+  .so-edit-hint{font-family:var(--font-mono);font-size:9px;color:var(--text-3);margin-top:5px;letter-spacing:.3px;}
+
+  /* Empty state */
+  .so-empty-state{
+    padding:64px 32px;text-align:center;
+  }
+  .so-empty-icon{font-size:36px;display:block;margin-bottom:16px;opacity:.3;}
+  .so-empty-title{font-family:var(--font-serif);font-size:20px;color:var(--text-3);margin-bottom:8px;}
+  .so-empty-body{font-family:var(--font-mono);font-size:10px;color:var(--text-3);line-height:1.8;letter-spacing:.3px;}
 
   @media(max-width:680px){
-    .step-overlay-body{padding:16px;}
-    .step-overlay-head{padding:0 14px;}
-    .step-overlay-btn.dl-btn{display:none;}
+    .so-doc{padding:20px 16px 60px;}
+    .step-overlay-head{padding:0 14px;height:50px;}
+    .so-btn.dl-btn{display:none;}
+    .step-overlay-meta{display:none;}
   }
 
   /* CHAT */
@@ -611,19 +671,20 @@
     <div class="step-overlay" id="step-overlay">
       <div class="step-overlay-head">
         <button class="step-overlay-back" onclick="closeStepDrawer()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-          Back to chat
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
         </button>
-        <div class="step-overlay-title" id="step-drawer-title">Step Results</div>
+        <div class="so-divider"></div>
+        <div class="step-overlay-title" id="step-drawer-title"></div>
         <div class="step-overlay-meta" id="step-drawer-meta"></div>
         <div class="step-overlay-actions">
           <span class="step-saved-badge" id="step-saved-badge">Saved ✓</span>
-          <button class="step-overlay-btn dl-btn" onclick="downloadStepResult()">&#x2B07; Download</button>
-          <button class="step-overlay-btn primary" onclick="saveStepResult()">Save Changes</button>
+          <button class="so-btn dl-btn" onclick="downloadStepResult()" id="so-download-btn">&#x2B07; Download</button>
+          <button class="so-btn edit-mode" onclick="toggleStepEditMode()" id="so-edit-btn">&#x270E; Edit</button>
+          <button class="so-btn save" onclick="saveStepResult()" id="so-save-btn" style="display:none;">Save</button>
         </div>
       </div>
       <div class="step-overlay-body" id="step-drawer-body">
-        <div class="step-empty-state"><span class="step-empty-icon">&#x1F4CB;</span>Complete this step to view results here.</div>
       </div>
     </div>
 
@@ -3029,80 +3090,201 @@ const STEP_DEFS = {
   },
 };
 
-let currentStepDrawer = null; // which step is open
+let currentStepDrawer = null;
+let stepEditMode = false;
 
-// ── Open step drawer ──────────────────────────────────────────────────────────
+// ── Open / close ─────────────────────────────────────────────────────────────
 function openStepDrawer(stepNum){
   const def = STEP_DEFS[stepNum];
   if(!def) return;
-
   const session = getSession(activeId);
   if(!session) return;
 
-  // Only allow viewing completed or active steps
   const currentStep = session.step || 1;
   const mission = session.mission || 1;
-  const stepMission = def.mission;
-  // Allow viewing if: step is completed, or it's the current active step
-  const isReachable = (stepMission === 1 && stepNum <= currentStep) ||
-                      (stepMission === 2 && mission >= 2);
+  const isReachable = (def.mission === 1 && stepNum <= currentStep) ||
+                      (def.mission === 2 && mission >= 2);
   if(!isReachable){
-    // Shake the step element
-    const el = document.getElementById('step-' + stepNum);
+    const el = document.getElementById('step-'+stepNum);
     if(el){ el.style.opacity='0.5'; setTimeout(()=>el.style.opacity='',400); }
     return;
   }
 
   currentStepDrawer = stepNum;
+  stepEditMode = false;
 
-  // Set header
   document.getElementById('step-drawer-title').textContent = def.num + ' — ' + def.title;
   const lastEdit = session.stepData && session.stepData[stepNum] && session.stepData[stepNum].updatedAt
-    ? 'Last edited: ' + new Date(session.stepData[stepNum].updatedAt).toLocaleDateString('en',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})
-    : 'No edits saved yet';
+    ? 'Edited ' + new Date(session.stepData[stepNum].updatedAt).toLocaleDateString('en',{month:'short',day:'numeric'})
+    : '';
   document.getElementById('step-drawer-meta').textContent = lastEdit;
+  document.getElementById('so-save-btn').style.display = 'none';
+  document.getElementById('so-edit-btn').style.display = '';
+  document.getElementById('so-edit-btn').textContent = '✎ Edit';
+  document.getElementById('so-edit-btn').className = 'so-btn edit-mode';
 
-  // Render fields
-  renderStepFields(stepNum, session);
-
-  // Show overlay inside chat container
+  renderStepView(stepNum, session);
   document.getElementById('step-overlay').classList.add('open');
 }
 
 function closeStepDrawer(){
   document.getElementById('step-overlay').classList.remove('open');
   currentStepDrawer = null;
+  stepEditMode = false;
 }
 
-// ── Render editable fields ────────────────────────────────────────────────────
-function renderStepFields(stepNum, session){
+function toggleStepEditMode(){
+  if(!currentStepDrawer) return;
+  stepEditMode = !stepEditMode;
+  const session = getSession(activeId);
+  if(stepEditMode){
+    renderStepEdit(currentStepDrawer, session);
+    document.getElementById('so-edit-btn').textContent = '✕ Cancel';
+    document.getElementById('so-edit-btn').className = 'so-btn';
+    document.getElementById('so-save-btn').style.display = '';
+  } else {
+    renderStepView(currentStepDrawer, session);
+    document.getElementById('so-edit-btn').textContent = '✎ Edit';
+    document.getElementById('so-edit-btn').className = 'so-btn edit-mode';
+    document.getElementById('so-save-btn').style.display = 'none';
+  }
+}
+
+// ── VIEW MODE — professional document rendering ──────────────────────────────
+function renderStepView(stepNum, session){
   const def = STEP_DEFS[stepNum];
-  const data = (session.stepData && session.stepData[stepNum]) || {};
+  const raw = (session.stepData && session.stepData[stepNum]) || {};
+  const data = stepNum === 2 ? mergeAlignmentToStepData(session) : raw;
   const body = document.getElementById('step-drawer-body');
 
-  // Special case: step 2 reads from session.alignment as source of truth
-  const stepData = stepNum === 2 ? mergeAlignmentToStepData(session) : data;
-
-  // Check if any data exists
-  const hasData = Object.keys(stepData).some(k => k !== 'updatedAt' && stepData[k]);
+  const hasData = def.fields.some(f => data[f.key] && String(data[f.key]).trim().length > 0);
 
   if(!hasData){
-    body.innerHTML = '<div class="step-empty-state"><span class="step-empty-icon">&#x1F4CB;</span>No results saved yet for this step.<br><br>Complete the step in the chat, then Kickman\'s output<br>will appear here automatically.</div>';
+    body.innerHTML = '<div class="so-empty-state">' +
+      '<span class="so-empty-icon">📋</span>' +
+      '<div class="so-empty-title">' + def.title + '</div>' +
+      '<div class="so-empty-body">Complete this step in the chat —<br>results will appear here automatically.<br><br>' +
+      '<span style="color:var(--accent);cursor:pointer;" onclick="closeStepDrawer()">← Back to chat</span></div>' +
+      '</div>';
     return;
   }
 
-  body.innerHTML = def.fields.map(f => {
-    const val = stepData[f.key] || '';
-    const rows = f.short ? 2 : Math.max(4, (val.split('\n').length + 1));
-    return '<div class="step-section">' +
-      '<div class="step-section-label">' + f.label + '</div>' +
-      (f.hint ? '<div style="font-size:11px;color:var(--text-3);margin-bottom:6px;">' + f.hint + '</div>' : '') +
-      '<textarea class="step-section-field' + (f.short?' short':'') + '" id="sf-' + f.key + '" rows="' + rows + '" placeholder="' + f.hint + '">' + escHtml(val) + '</textarea>' +
-      '</div>';
-  }).join('');
+  let html = '<div class="so-doc">';
+  // Document header
+  html += '<div class="so-doc-header">';
+  html += '<div class="so-doc-step-num">Step ' + def.num + ' · Mission ' + def.mission + '</div>';
+  html += '<div class="so-doc-title">' + escHtml(def.title) + '</div>';
+  const proj = session.name && session.name !== 'New Project' ? session.name : '';
+  if(proj) html += '<div class="so-doc-subtitle">' + escHtml(proj) + '</div>';
+  html += '</div>';
+
+  // Special rendering per step
+  if(stepNum === 2) html += renderAlignmentView(data);
+  else html += renderGenericView(def, data);
+
+  html += '</div>';
+  body.innerHTML = html;
 }
 
-// Merge session.alignment data into step 2 field format
+function renderAlignmentView(d){
+  let html = '';
+  const section = (label, content, style) => {
+    if(!content || !String(content).trim()) return '';
+    let s = '<div class="so-section">';
+    s += '<div class="so-section-label">' + label + '</div>';
+    s += '<div class="so-view' + (style?' '+style:'') + '">' + content + '</div>';
+    s += '</div>';
+    return s;
+  };
+
+  const lines2html = (text) => {
+    const items = String(text||'').split('\n').filter(l=>l.trim()).map(l=>l.replace(/^[•\-\*]\s*/,'').trim()).filter(Boolean);
+    if(!items.length) return '<p class="so-empty">Not filled in yet.</p>';
+    return '<ul>' + items.map(i=>'<li>' + escHtml(i) + '</li>').join('') + '</ul>';
+  };
+
+  const quotes2html = (text) => {
+    const items = String(text||'').split('\n').filter(l=>l.trim()).map(l=>l.replace(/^[•\-\*]\s*/,'').replace(/^[""\u201c]/,'').replace(/[""\u201d]$/,'').trim()).filter(Boolean);
+    if(!items.length) return '<p class="so-empty">Not filled in yet.</p>';
+    return '<ul>' + items.map(i=>'<li>' + escHtml(i) + '</li>').join('') + '</ul>';
+  };
+
+  // 1 & 2 — Name + description side-by-side styled block
+  html += '<div class="so-section">';
+  html += '<div class="so-section-label">Product Name & Definition</div>';
+  html += '<div style="padding:16px 20px;background:var(--card);border-left:3px solid var(--accent);margin-bottom:2px;">';
+  html += '<div style="font-family:var(--font-serif);font-size:20px;color:var(--text);margin-bottom:6px;">' + escHtml(d.productName||'') + '</div>';
+  if(d.internalDescription) html += '<div style="font-size:12px;color:var(--text-2);line-height:1.7;">' + escHtml(d.internalDescription) + '</div>';
+  html += '</div></div>';
+
+  html += section('All Features', lines2html(d.features));
+  html += section('Benefits', lines2html(d.benefits));
+  html += section('Resistance Map — What Backers Might Think/Feel', quotes2html(d.negativeThoughts), 'quote-style');
+  html += section('Emotional Destination — What We Want Them to Feel', quotes2html(d.emotionalDestination), 'quote-style');
+
+  if(d.readinessScore){
+    const score = parseInt(d.readinessScore) || 0;
+    const color = score >= 7 ? 'var(--green)' : score >= 5 ? 'var(--yellow)' : 'var(--red)';
+    html += '<div class="so-section"><div class="so-section-label">Readiness Score</div>';
+    html += '<div style="display:flex;align-items:center;gap:20px;padding:16px 0;">';
+    html += '<div style="font-family:var(--font-serif);font-size:48px;line-height:1;color:'+color+';">' + score + '</div>';
+    html += '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);">OUT OF 10</div>';
+    if(d.readinessScore && isNaN(parseInt(d.readinessScore))){
+      html += '<div style="font-size:12px;color:var(--text-2);max-width:400px;">' + escHtml(String(d.readinessScore)) + '</div>';
+    }
+    html += '</div></div>';
+  }
+  return html;
+}
+
+function renderGenericView(def, data){
+  let html = '';
+  def.fields.forEach(f => {
+    const val = data[f.key] || data[f.key+'_html'];
+    if(!val || !String(val).trim()) return;
+    html += '<div class="so-section">';
+    html += '<div class="so-section-label">' + escHtml(f.label) + '</div>';
+    // If HTML content stored, render it; otherwise plain text
+    const hasHtml = /<[a-z][\s\S]*>/i.test(String(val));
+    if(hasHtml){
+      html += '<div class="so-view">' + val + '</div>';
+    } else {
+      const lines = String(val).split('\n').filter(l=>l.trim());
+      html += '<div class="so-view"><ul>' +
+        lines.map(l=>'<li>'+escHtml(l.replace(/^[•\-\*]\s*/,'').trim())+'</li>').join('') +
+        '</ul></div>';
+    }
+    html += '</div>';
+  });
+  return html || '<div class="so-view"><p class="so-empty">No content saved yet.</p></div>';
+}
+
+// ── EDIT MODE — textarea per field ───────────────────────────────────────────
+function renderStepEdit(stepNum, session){
+  const def = STEP_DEFS[stepNum];
+  const raw = (session.stepData && session.stepData[stepNum]) || {};
+  const data = stepNum === 2 ? mergeAlignmentToStepData(session) : raw;
+  const body = document.getElementById('step-drawer-body');
+
+  let html = '<div class="so-doc">';
+  html += '<div class="so-doc-header" style="border-color:rgba(232,98,42,.3);">';
+  html += '<div class="so-doc-step-num" style="color:var(--accent);">Editing — ' + def.title + '</div>';
+  html += '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);">Edit any field and click Save when done</div>';
+  html += '</div>';
+
+  def.fields.forEach(f => {
+    const val = data[f.key] || '';
+    html += '<div class="so-section">';
+    html += '<div class="so-section-label">' + escHtml(f.label) + '</div>';
+    if(f.hint) html += '<div class="so-edit-hint">' + escHtml(f.hint) + '</div>';
+    const rows = f.short ? 2 : Math.max(4, String(val).split('\n').length + 2);
+    html += '<textarea class="so-editor' + (f.short?' short':'') + '" id="sf-'+f.key+'" rows="'+rows+'" placeholder="'+escHtml(f.hint||'')+'">'+escHtml(val)+'</textarea>';
+    html += '</div>';
+  });
+  html += '</div>';
+  body.innerHTML = html;
+}
+
 function mergeAlignmentToStepData(session){
   const a = session.alignment || {};
   const d = (session.stepData && session.stepData[2]) || {};
@@ -3113,12 +3295,12 @@ function mergeAlignmentToStepData(session){
     benefits: Array.isArray(a.benefits) ? a.benefits.join('\n') : (d.benefits || ''),
     negativeThoughts: Array.isArray(a.negativeThoughts) ? a.negativeThoughts.join('\n') : (d.negativeThoughts || ''),
     emotionalDestination: Array.isArray(a.emotionalDestination) ? a.emotionalDestination.join('\n') : (d.emotionalDestination || ''),
-    readinessScore: a.readinessScore ? a.readinessScore + '/10' + (a.readinessNotes ? ' — ' + a.readinessNotes : '') : (d.readinessScore || ''),
+    readinessScore: a.readinessScore ? String(a.readinessScore) + (String(a.readinessScore).includes('/') ? '' : '/10') + (a.readinessNotes ? ' — ' + a.readinessNotes : '') : (d.readinessScore || ''),
     updatedAt: a.updatedAt || d.updatedAt,
   };
 }
 
-// ── Save step result ──────────────────────────────────────────────────────────
+// ── Save ──────────────────────────────────────────────────────────────────────
 function saveStepResult(){
   const stepNum = currentStepDrawer;
   if(!stepNum) return;
@@ -3127,27 +3309,23 @@ function saveStepResult(){
   if(!session) return;
 
   if(!session.stepData) session.stepData = {};
-  if(!session.stepData[stepNum]) session.stepData[stepNum] = {};
-
-  // Read all field values from DOM
-  const saved = {};
+  const saved = {updatedAt: Date.now()};
   def.fields.forEach(f => {
-    const el = document.getElementById('sf-' + f.key);
+    const el = document.getElementById('sf-'+f.key);
     if(el) saved[f.key] = el.value.trim();
   });
-  saved.updatedAt = Date.now();
   session.stepData[stepNum] = saved;
 
-  // Special sync: step 2 also updates session.alignment
+  // Step 2 → sync to session.alignment
   if(stepNum === 2){
     if(!session.alignment) session.alignment = {};
     if(saved.productName) session.alignment.productName = saved.productName;
     if(saved.internalDescription) session.alignment.internalDescription = saved.internalDescription;
-    if(saved.features) session.alignment.features = saved.features.split('\n').filter(Boolean);
-    if(saved.benefits) session.alignment.benefits = saved.benefits.split('\n').filter(Boolean);
-    if(saved.negativeThoughts) session.alignment.negativeThoughts = saved.negativeThoughts.split('\n').filter(Boolean);
-    if(saved.emotionalDestination) session.alignment.emotionalDestination = saved.emotionalDestination.split('\n').filter(Boolean);
-    if(saved.readinessScore) session.alignment.readinessScore = parseInt(saved.readinessScore) || saved.readinessScore;
+    if(saved.features) session.alignment.features = saved.features.split('\n').map(l=>l.replace(/^[•\-\*]\s*/,'').trim()).filter(Boolean);
+    if(saved.benefits) session.alignment.benefits = saved.benefits.split('\n').map(l=>l.replace(/^[•\-\*]\s*/,'').trim()).filter(Boolean);
+    if(saved.negativeThoughts) session.alignment.negativeThoughts = saved.negativeThoughts.split('\n').map(l=>l.replace(/^[•"\u201c\-\*]\s*/,'').replace(/[""\u201d]$/,'').trim()).filter(Boolean);
+    if(saved.emotionalDestination) session.alignment.emotionalDestination = saved.emotionalDestination.split('\n').map(l=>l.replace(/^[•"\u201c\-\*]\s*/,'').replace(/[""\u201d]$/,'').trim()).filter(Boolean);
+    if(saved.readinessScore) session.alignment.readinessScore = saved.readinessScore;
     session.alignment.updatedAt = Date.now();
     updateAlignmentBtn(session);
   }
@@ -3155,59 +3333,41 @@ function saveStepResult(){
   session.updatedAt = Date.now();
   scheduleSave(session);
 
-  // Update meta line
+  // Switch back to view mode
+  stepEditMode = false;
+  renderStepView(stepNum, session);
+  document.getElementById('so-edit-btn').textContent = '✎ Edit';
+  document.getElementById('so-edit-btn').className = 'so-btn edit-mode';
+  document.getElementById('so-save-btn').style.display = 'none';
   document.getElementById('step-drawer-meta').textContent = 'Saved just now';
 
-  // Show saved badge
   const badge = document.getElementById('step-saved-badge');
   badge.classList.add('show');
-  setTimeout(() => badge.classList.remove('show'), 2000);
-
-  // Notify Kickman memory of the update (will be picked up next message)
-  // No API call needed — buildMemoryContext reads from session.stepData
+  setTimeout(()=>badge.classList.remove('show'), 2000);
 }
 
-// ── Download step result ──────────────────────────────────────────────────────
+// ── Download ──────────────────────────────────────────────────────────────────
 function downloadStepResult(){
   const stepNum = currentStepDrawer;
   if(!stepNum) return;
-
-  // Special case: step 2 uses the full buildAlignmentText
-  if(stepNum === 2){
-    downloadAlignment('txt');
-    return;
-  }
+  if(stepNum === 2){ downloadAlignment('docx'); return; }
 
   const def = STEP_DEFS[stepNum];
   const session = getSession(activeId);
   const data = (session && session.stepData && session.stepData[stepNum]) || {};
-
   const lines = [
     'KICKMAN — ' + def.title.toUpperCase(),
     'Project: ' + (session ? session.name||'Untitled' : ''),
     'Exported: ' + new Date().toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric'}),
-    '',
-    '═'.repeat(60),
-    ''
+    '', '═'.repeat(60), ''
   ];
-
   def.fields.forEach(f => {
     const val = data[f.key];
-    if(val){
-      lines.push(f.label.toUpperCase());
-      lines.push('─'.repeat(40));
-      lines.push(val);
-      lines.push('');
-    }
+    if(val){ lines.push(f.label.toUpperCase()); lines.push('─'.repeat(40)); lines.push(val); lines.push(''); }
   });
-
-  lines.push('─'.repeat(60));
-  lines.push('kickman.org');
-
-  const filename = 'kickman-step' + def.num + '-' + def.title.toLowerCase().replace(/\s+/g,'-') + '-' + new Date().toISOString().slice(0,10) + '.txt';
-  downloadBlob(lines.join('\n'), filename);
+  lines.push('─'.repeat(60)); lines.push('kickman.org');
+  downloadBlob(lines.join('\n'), 'kickman-step'+def.num+'-'+def.title.toLowerCase().replace(/\s+/g,'-')+'-'+new Date().toISOString().slice(0,10)+'.txt');
 }
-
 // ── Auto-extract step data from Kickman response ──────────────────────────────
 // Called after each Kickman response to auto-populate step data
 function autoExtractStepData(text, stepNum, sessionId){
