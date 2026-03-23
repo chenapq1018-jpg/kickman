@@ -159,10 +159,18 @@
   .input-hint{font-family:var(--font-mono);font-size:10px;color:var(--text-3);}
 
   /* Export dropdown */
-  .export-menu-item{display:block;width:100%;padding:11px 16px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text-2);font-family:var(--font-mono);font-size:10px;letter-spacing:1px;text-align:left;cursor:pointer;white-space:nowrap;transition:background .15s;}
+  .export-menu-item{display:block;width:100%;padding:10px 14px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text-2);font-family:var(--font-mono);font-size:10px;letter-spacing:1px;text-align:left;cursor:pointer;white-space:nowrap;transition:background .15s;}
   .export-menu-item:last-child{border-bottom:none;}
   .export-menu-item:hover{background:rgba(255,255,255,.04);color:var(--text);}
   .export-all-item{color:var(--accent)!important;border-top:1px solid var(--border)!important;}
+  .export-section-label{padding:8px 14px 4px;font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--text-3);text-transform:uppercase;border-top:1px solid var(--border);}
+  .export-section-label:first-child{border-top:none;}
+  .export-format-row{display:flex;gap:0;padding:0 10px 6px;}
+  .export-fmt-btn{flex:1;padding:5px 4px;background:var(--card);border:1px solid var(--border);color:var(--text-2);font-family:var(--font-mono);font-size:10px;cursor:pointer;transition:all .15s;letter-spacing:.5px;}
+  .export-fmt-btn:not(:last-child){border-right:none;}
+  .export-fmt-btn:first-child{border-radius:2px 0 0 2px;}
+  .export-fmt-btn:last-child{border-radius:0 2px 2px 0;}
+  .export-fmt-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);z-index:1;position:relative;}
 
   /* Alignment download button */
   #alignment-download-btn{
@@ -428,11 +436,30 @@
     </button>
     <div style="position:relative;display:inline-block;">
       <button class="header-btn" onclick="toggleExportMenu()" id="export-menu-btn">Export ▾</button>
-      <div id="export-menu" style="display:none;position:absolute;top:100%;right:0;margin-top:4px;background:var(--surface);border:1px solid var(--border);min-width:200px;z-index:200;">
-        <button onclick="exportChat();closeExportMenu()" class="export-menu-item">&#x1F4AC; Chat History</button>
-        <button onclick="downloadAlignment();closeExportMenu()" class="export-menu-item" id="export-alignment-item">&#x1F4C4; Product Alignment</button>
-        <button onclick="exportTimeline();closeExportMenu()" class="export-menu-item">&#x1F4C5; Timeline Plan</button>
-        <button onclick="exportAll();closeExportMenu()" class="export-menu-item export-all-item">&#x2B07; Download All (ZIP)</button>
+      <div id="export-menu" style="display:none;position:absolute;top:100%;right:0;margin-top:4px;background:var(--surface);border:1px solid var(--border);min-width:240px;z-index:200;">
+        <!-- Chat History -->
+        <div class="export-section-label">&#x1F4AC; Chat History</div>
+        <div class="export-format-row">
+          <button onclick="exportChat('txt');closeExportMenu()" class="export-fmt-btn">.txt</button>
+          <button onclick="exportChat('md');closeExportMenu()" class="export-fmt-btn">.md</button>
+          <button onclick="exportChat('pdf');closeExportMenu()" class="export-fmt-btn">.pdf</button>
+        </div>
+        <!-- Product Alignment -->
+        <div class="export-section-label" id="export-alignment-item">&#x1F4C4; Product Alignment</div>
+        <div class="export-format-row">
+          <button onclick="downloadAlignment('txt');closeExportMenu()" class="export-fmt-btn">.txt</button>
+          <button onclick="downloadAlignment('md');closeExportMenu()" class="export-fmt-btn">.md</button>
+          <button onclick="downloadAlignment('pdf');closeExportMenu()" class="export-fmt-btn">.pdf</button>
+        </div>
+        <!-- Timeline -->
+        <div class="export-section-label">&#x1F4C5; Timeline Plan</div>
+        <div class="export-format-row">
+          <button onclick="exportTimeline('txt');closeExportMenu()" class="export-fmt-btn">.txt</button>
+          <button onclick="exportTimeline('md');closeExportMenu()" class="export-fmt-btn">.md</button>
+          <button onclick="exportTimeline('pdf');closeExportMenu()" class="export-fmt-btn">.pdf</button>
+        </div>
+        <!-- All -->
+        <button onclick="exportAll();closeExportMenu()" class="export-menu-item export-all-item" style="margin-top:4px;">&#x2B07; Download All (.md)</button>
       </div>
     </div>
     <button class="header-btn" onclick="doLogout()">Log out</button>
@@ -1704,6 +1731,15 @@ Output **KICKMAN MISSION 1 — FINAL REPORT** with:
 6. Call out structural problems clearly and early
 7. No filler, no cheerleading
 8. End every response with exactly one: deliverable, question, or decision point
+9. PRODUCT ALIGNMENT TEMPLATE IS FIXED — whenever you output the Product Alignment Document (at Step 2, or any time the user asks to see/update/regenerate it), you MUST follow this exact structure and order, nothing more, nothing less:
+   - PRODUCT NAME & DEFINITION
+   - INTERNAL DESCRIPTION
+   - ALL FEATURES
+   - BENEFITS
+   - NEGATIVE THOUGHTS & FEELINGS — BACKER RESISTANCE MAP
+   - WHAT WE WANT PEOPLE TO THINK AND FEEL — EMOTIONAL DESTINATION MAP
+   - READINESS SCORE
+   Do NOT add extra sections, rename sections, reorder sections, or summarize sections unless the user explicitly asks you to add something new. The template is the template. If the user says "show me the alignment" or "output the product alignment", reproduce the current stored alignment in full using this exact structure.
 
 # PRODUCT ALIGNMENT SYSTEM
 
@@ -2627,72 +2663,71 @@ function updateAlignmentBtn(session){
   btn.style.display = hasAlignment ? 'flex' : 'none';
 }
 
-function downloadAlignment(){
-  const session = getSession(activeId);
-  if(!session || !session.alignment) return;
-  const a = session.alignment;
+// Single source of truth for alignment text — used by both download and exportAll
+function buildAlignmentText(session){
+  if(!session) return null;
+  // Always read fresh from cache to get latest version
+  const s = getSession(session.id || activeId);
+  if(!s || !s.alignment || !s.alignment.productName) return null;
+  const a = s.alignment;
   const now = new Date().toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric'});
+  const updatedAt = a.updatedAt
+    ? new Date(a.updatedAt).toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})
+    : now;
 
   const lines = [];
   lines.push('KICKMAN — PRODUCT ALIGNMENT DOCUMENT');
   lines.push('Generated by Kickman.org');
-  lines.push('Last updated: ' + now);
-  lines.push('Project: ' + (session.name || 'Untitled'));
+  lines.push('Last updated: ' + updatedAt);
+  lines.push('Exported: ' + now);
+  lines.push('Project: ' + (s.name || 'Untitled'));
   lines.push('');
   lines.push('═'.repeat(60));
   lines.push('');
 
-  if(a.productName){
-    lines.push('PRODUCT NAME & DEFINITION');
-    lines.push('─'.repeat(40));
-    lines.push(a.productName);
-    if(a.definition) lines.push(a.definition);
-    lines.push('');
-  }
+  // Strict template — fixed order, no extras
+  lines.push('1. PRODUCT NAME & DEFINITION');
+  lines.push('─'.repeat(40));
+  lines.push(a.productName || '(not set)');
+  if(a.definition) lines.push(a.definition);
+  lines.push('');
 
-  if(a.internalDescription){
-    lines.push('INTERNAL DESCRIPTION');
-    lines.push('─'.repeat(40));
-    lines.push(a.internalDescription);
-    lines.push('');
-  }
+  lines.push('2. INTERNAL DESCRIPTION');
+  lines.push('─'.repeat(40));
+  lines.push(a.internalDescription || '(not set)');
+  lines.push('');
 
-  if(a.features && a.features.length){
-    lines.push('ALL FEATURES');
-    lines.push('─'.repeat(40));
-    a.features.forEach(f => lines.push('• ' + f));
-    lines.push('');
-  }
+  lines.push('3. ALL FEATURES');
+  lines.push('─'.repeat(40));
+  if(a.features && a.features.length) a.features.forEach(f => lines.push('• ' + f));
+  else lines.push('(not set)');
+  lines.push('');
 
-  if(a.benefits && a.benefits.length){
-    lines.push('BENEFITS');
-    lines.push('─'.repeat(40));
-    a.benefits.forEach(b => lines.push('• ' + b));
-    lines.push('');
-  }
+  lines.push('4. BENEFITS');
+  lines.push('─'.repeat(40));
+  if(a.benefits && a.benefits.length) a.benefits.forEach(b => lines.push('• ' + b));
+  else lines.push('(not set)');
+  lines.push('');
 
-  if(a.negativeThoughts && a.negativeThoughts.length){
-    lines.push('WHAT MIGHT BACKERS THINK OR FEEL (Resistance Map)');
-    lines.push('─'.repeat(40));
-    lines.push('These are the doubts and fears we need to preempt throughout the campaign:');
-    lines.push('');
-    a.negativeThoughts.forEach(t => lines.push('• "' + t + '"'));
-    lines.push('');
-  }
+  lines.push('5. WHAT MIGHT BACKERS THINK OR FEEL — Resistance Map');
+  lines.push('─'.repeat(40));
+  lines.push('Doubts and fears to preempt throughout the entire campaign:');
+  lines.push('');
+  if(a.negativeThoughts && a.negativeThoughts.length) a.negativeThoughts.forEach(t => lines.push('• "' + t + '"'));
+  else lines.push('(not set)');
+  lines.push('');
 
-  if(a.emotionalDestination && a.emotionalDestination.length){
-    lines.push('WHAT WE WANT PEOPLE TO THINK AND FEEL (Emotional Destination)');
-    lines.push('─'.repeat(40));
-    lines.push('These are the feelings a converted backer has when they click Back:');
-    lines.push('');
-    a.emotionalDestination.forEach(t => lines.push('• "' + t + '"'));
-    lines.push('');
-  }
+  lines.push('6. WHAT WE WANT PEOPLE TO THINK AND FEEL — Emotional Destination');
+  lines.push('─'.repeat(40));
+  lines.push('What a converted backer feels when they click Back:');
+  lines.push('');
+  if(a.emotionalDestination && a.emotionalDestination.length) a.emotionalDestination.forEach(t => lines.push('• "' + t + '"'));
+  else lines.push('(not set)');
+  lines.push('');
 
   if(a.readinessScore){
-    lines.push('READINESS SCORE');
+    lines.push('READINESS SCORE: ' + a.readinessScore + ' / 10');
     lines.push('─'.repeat(40));
-    lines.push('Score: ' + a.readinessScore + ' / 10');
     if(a.readinessNotes) lines.push(a.readinessNotes);
     lines.push('');
   }
@@ -2703,10 +2738,18 @@ function downloadAlignment(){
   lines.push('Update it anytime by telling Kickman about changes to your product.');
   lines.push('kickman.org');
 
-  const text = lines.join('\n');
-  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
-  const el = document.createElement('a');
-  el.href = URL.createObjectURL(blob);
+  return lines.join('\n');
+}
+
+function downloadAlignment(){
+  const session = getSession(activeId);
+  if(!session || !session.alignment || !session.alignment.productName){
+    alert('Product Alignment not yet generated. Complete Step 2 first.');
+    return;
+  }
+  const text = buildAlignmentText(session);
+  if(!text) return;
+  const a = session.alignment;
   const filename = (a.productName || session.name || 'product')
     .slice(0,30).replace(/[^a-z0-9]/gi,'-').toLowerCase();
   el.download = 'kickman-alignment-' + filename + '-' + new Date().toISOString().slice(0,10) + '.txt';
@@ -2735,137 +2778,195 @@ function closeExportMenu(){
 }
 
 function slugify(str){ return (str||'').slice(0,30).replace(/[^a-z0-9]/gi,'-').toLowerCase(); }
-function downloadBlob(text, filename){
+const TODAY = ()=>new Date().toISOString().slice(0,10);
+const NOWSTR = ()=>new Date().toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric'});
+
+// ── Core download helpers ─────────────────────────────────────────────────────
+function downloadBlob(content, filename, mime){
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));
+  a.href = URL.createObjectURL(new Blob([content],{type:mime||'text/plain;charset=utf-8'}));
   a.download = filename; a.click(); URL.revokeObjectURL(a.href);
 }
 
-// ── Chat history ──────────────────────────────────────────────────────────────
-function exportChat(){
-  const s = getSession(activeId); if(!s) return;
-  const now = new Date().toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric'});
-  const lines = [
-    'KICKMAN — CONVERSATION HISTORY',
-    'Project: ' + (s.name||'Untitled'),
-    'Exported: ' + now,
-    '',
-    '═'.repeat(60),
-    ''
-  ];
-  s.history
-    .filter(m => m.content !== 'Begin.')
-    .forEach(m => {
-      const role = m.role === 'km' ? 'KICKMAN' : 'YOU';
-      const text = typeof m.content==='string' ? m.content : (m.content[0]?.text||'');
-      // Strip hidden blocks
-      const clean = text.replace(/<!--[\s\S]*?-->/g,'').trim();
-      lines.push('[' + role + ']');
-      lines.push(clean);
-      lines.push('');
-      lines.push('─'.repeat(40));
-      lines.push('');
-    });
-  downloadBlob(lines.join('\n'), 'kickman-chat-' + slugify(s.name) + '-' + new Date().toISOString().slice(0,10) + '.txt');
+function printAsPDF(htmlContent, title){
+  const win = window.open('','_blank');
+  const css = 'body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:13px;line-height:1.7;color:#1a1a1a;max-width:780px;margin:40px auto;padding:0 30px;}h1{font-size:22px;font-weight:700;margin-bottom:4px;}h2{font-size:15px;font-weight:600;margin:28px 0 8px;padding-bottom:6px;border-bottom:2px solid #e8622a;color:#e8622a;text-transform:uppercase;letter-spacing:1px;}p{margin:0 0 10px;}ul{padding-left:20px;margin:0 0 12px;}li{margin-bottom:4px;}.meta{font-size:11px;color:#888;margin-bottom:24px;}.section{margin-bottom:28px;}blockquote{border-left:3px solid #e8622a;padding:4px 12px;margin:8px 0;background:#fff8f5;color:#444;font-style:italic;}table{width:100%;border-collapse:collapse;font-size:12px;margin:12px 0;}th{background:#f5f5f5;padding:7px 10px;text-align:left;font-weight:600;border-bottom:2px solid #ddd;}td{padding:6px 10px;border-bottom:1px solid #eee;}';
+  win.document.title = title;
+  const style = win.document.createElement('style');
+  style.textContent = css;
+  win.document.head.appendChild(style);
+  win.document.body.innerHTML = htmlContent;
+  // Add print trigger via script element (avoids inline script tag parsing issues)
+  const sc = win.document.createElement('script');
+  sc.textContent = 'setTimeout(function(){window.print();},400);';
+  win.document.body.appendChild(sc);
 }
 
-// ── Timeline ──────────────────────────────────────────────────────────────────
-function exportTimeline(){
-  const s = getSession(activeId); if(!s) return;
-  const tl = s.timeline || DEFAULT_TIMELINE;
-  const now = new Date().toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric'});
-  const lines = [
-    'KICKMAN — CAMPAIGN TIMELINE',
-    'Project: ' + (s.name||'Untitled'),
-    'Exported: ' + now,
-    '',
-    '═'.repeat(60),
-    ''
-  ];
+// ── TXT / MD / PDF converters ─────────────────────────────────────────────────
+// Convert plain text to Markdown
+function txtToMd(txt){ return txt; } // our txt is already readable; md = same content, .md extension
 
-  const riskLabel = {low:'✓ Low Risk', medium:'● Watch', high:'⚠ High Risk'};
-  const statusLabel = {done:'[DONE]', active:'[ACTIVE]', pending:'[PENDING]'};
+// Convert plain-text alignment to HTML for PDF
+function alignmentToHTML(s){
+  const a = s.alignment;
+  if(!a) return '<p>No alignment data.</p>';
+  let html = `<h1>Product Alignment Document</h1>
+    <div class="meta">Project: ${s.name||'Untitled'} &nbsp;·&nbsp; Exported: ${NOWSTR()} &nbsp;·&nbsp; kickman.org</div>`;
+  const section = (num, title, content) =>
+    `<div class="section"><h2>${num}. ${title}</h2>${content}</div>`;
+  const bullets = arr => arr && arr.length ? '<ul>' + arr.map(x=>`<li>${x}</li>`).join('') + '</ul>' : '<p>—</p>';
+  const quotes = arr => arr && arr.length ? arr.map(x=>`<blockquote>"${x}"</blockquote>`).join('') : '<p>—</p>';
 
-  tl.forEach((ms, i) => {
-    const status = statusLabel[ms.status] || '[PENDING]';
-    const risk = riskLabel[ms.risk] || '';
-    const date = ms.date ? ms.date : 'TBD';
-    lines.push((i+1) + '. ' + ms.name);
-    lines.push('   Status: ' + status + '  |  Date: ' + date + '  |  ' + risk);
-    if(ms.hint) lines.push('   Note: ' + ms.hint);
-    ms.subtasks.forEach(st => {
-      const stDate = st.date ? st.date : 'TBD';
-      const stStatus = st.status==='done'?'✓':st.status==='active'?'→':'○';
-      lines.push('   ' + stStatus + ' ' + st.name + ' — ' + stDate);
-    });
-    lines.push('');
-  });
-
-  lines.push('─'.repeat(60));
-  lines.push('Generated by Kickman.org');
-  downloadBlob(lines.join('\n'), 'kickman-timeline-' + slugify(s.name) + '-' + new Date().toISOString().slice(0,10) + '.txt');
-}
-
-// ── Export All ────────────────────────────────────────────────────────────────
-async function exportAll(){
-  const s = getSession(activeId); if(!s) return;
-  const now = new Date().toISOString().slice(0,10);
-  const slug = slugify(s.name);
-
-  // Build combined document
-  const sections = [];
-
-  // Header
-  sections.push(
-    'KICKMAN — COMPLETE PROJECT EXPORT\n' +
-    'Project: ' + (s.name||'Untitled') + '\n' +
-    'Exported: ' + new Date().toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric'}) + '\n' +
-    'kickman.org\n\n' +
-    '╔' + '═'.repeat(58) + '╗\n' +
-    '║  This file contains: Product Alignment + Timeline + Chat  ║\n' +
-    '╚' + '═'.repeat(58) + '╝'
-  );
-
-  // Product Alignment
-  if(s.alignment && s.alignment.productName){
-    const a = s.alignment;
-    const al = ['\n\n' + '═'.repeat(60), 'SECTION 1 — PRODUCT ALIGNMENT DOCUMENT', '═'.repeat(60)];
-    if(a.productName){ al.push('\nPRODUCT NAME & DEFINITION\n' + '─'.repeat(40)); al.push(a.productName); if(a.definition) al.push(a.definition); }
-    if(a.internalDescription){ al.push('\nINTERNAL DESCRIPTION\n' + '─'.repeat(40)); al.push(a.internalDescription); }
-    if(a.features && a.features.length){ al.push('\nALL FEATURES\n' + '─'.repeat(40)); a.features.forEach(f=>al.push('• '+f)); }
-    if(a.benefits && a.benefits.length){ al.push('\nBENEFITS\n' + '─'.repeat(40)); a.benefits.forEach(b=>al.push('• '+b)); }
-    if(a.negativeThoughts && a.negativeThoughts.length){ al.push('\nRESISTANCE MAP — What Backers Might Think/Feel\n' + '─'.repeat(40)); a.negativeThoughts.forEach(t=>al.push('• "'+t+'"')); }
-    if(a.emotionalDestination && a.emotionalDestination.length){ al.push('\nEMOTIONAL DESTINATION — What We Want Them to Feel\n' + '─'.repeat(40)); a.emotionalDestination.forEach(t=>al.push('• "'+t+'"')); }
-    if(a.readinessScore){ al.push('\nREADINESS SCORE: ' + a.readinessScore + '/10'); if(a.readinessNotes) al.push(a.readinessNotes); }
-    sections.push(al.join('\n'));
+  html += section(1,'Product Name & Definition', `<p><strong>${a.productName||'—'}</strong>${a.definition?'<br>'+a.definition:''}</p>`);
+  html += section(2,'Internal Description', `<p>${a.internalDescription||'—'}</p>`);
+  html += section(3,'All Features', bullets(a.features));
+  html += section(4,'Benefits', bullets(a.benefits));
+  html += section(5,'What Backers Might Think or Feel — Resistance Map',
+    `<p style="color:#888;font-size:12px">Doubts and fears to preempt throughout the entire campaign:</p>` + quotes(a.negativeThoughts));
+  html += section(6,'What We Want People to Think and Feel — Emotional Destination',
+    `<p style="color:#888;font-size:12px">What a converted backer feels when they click Back:</p>` + quotes(a.emotionalDestination));
+  if(a.readinessScore){
+    html += `<div class="section"><h2>Readiness Score: ${a.readinessScore}/10</h2><p>${a.readinessNotes||''}</p></div>`;
   }
+  return html;
+}
 
-  // Timeline
+function timelineToHTML(s){
   const tl = s.timeline || DEFAULT_TIMELINE;
-  const tlLines = ['\n\n' + '═'.repeat(60), 'SECTION 2 — CAMPAIGN TIMELINE', '═'.repeat(60)];
-  const riskLabel = {low:'✓ Low Risk', medium:'● Watch', high:'⚠ High Risk'};
+  const riskColors = {low:'#2d9e6b',medium:'#d4a017',high:'#c0392b'};
+  let html = `<h1>Campaign Timeline</h1>
+    <div class="meta">Project: ${s.name||'Untitled'} &nbsp;·&nbsp; Exported: ${NOWSTR()} &nbsp;·&nbsp; kickman.org</div>`;
   tl.forEach((ms,i) => {
-    const date = ms.date||'TBD';
-    const risk = riskLabel[ms.risk]||'';
-    tlLines.push('\n'+(i+1)+'. '+ms.name+' — '+date+'  '+risk);
-    ms.subtasks.forEach(st => {
-      const st2 = st.status==='done'?'✓':st.status==='active'?'→':'○';
-      tlLines.push('   '+st2+' '+st.name+' — '+(st.date||'TBD'));
-    });
+    const color = riskColors[ms.risk]||'#888';
+    const date = ms.date || 'TBD';
+    const status = ms.status==='done'?'✓ Done':ms.status==='active'?'→ Active':'○ Pending';
+    html += `<div class="section">
+      <h2>${i+1}. ${ms.name}</h2>
+      <p><strong>Date:</strong> ${date} &nbsp;·&nbsp; <strong>Status:</strong> ${status} &nbsp;·&nbsp; <span style="color:${color}"><strong>Risk: ${(ms.risk||'').toUpperCase()}</strong></span></p>
+      ${ms.hint?`<p style="color:#888;font-size:12px">${ms.hint}</p>`:''}
+      <table><thead><tr><th>Subtask</th><th>Date</th><th>Status</th></tr></thead><tbody>
+      ${ms.subtasks.map(st=>`<tr><td>${st.name}</td><td>${st.date||'TBD'}</td><td>${st.status==='done'?'✓':st.status==='active'?'→':'○'}</td></tr>`).join('')}
+      </tbody></table></div>`;
   });
-  sections.push(tlLines.join('\n'));
+  return html;
+}
 
-  // Chat history
-  const chatLines = ['\n\n' + '═'.repeat(60), 'SECTION 3 — CONVERSATION HISTORY', '═'.repeat(60)];
+function chatToHTML(s){
+  let html = `<h1>Conversation History</h1>
+    <div class="meta">Project: ${s.name||'Untitled'} &nbsp;·&nbsp; Exported: ${NOWSTR()} &nbsp;·&nbsp; kickman.org</div>`;
+  s.history.filter(m=>m.content!=='Begin.').forEach(m => {
+    const role = m.role==='km'?'Kickman':'You';
+    const color = m.role==='km'?'#e8622a':'#333';
+    const text = typeof m.content==='string'?m.content:(m.content[0]?.text||'');
+    const clean = text.replace(/<!--[\s\S]*?-->/g,'').trim();
+    // Basic markdown to HTML
+    const formatted = clean
+      .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g,'<em>$1</em>')
+      .replace(/\n/g,'<br>');
+    html += `<div style="margin-bottom:20px;padding:14px;background:${m.role==='km'?'#fff8f5':'#f9f9f9'};border-left:3px solid ${color};">
+      <div style="font-size:11px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">${role}</div>
+      <div>${formatted}</div></div>`;
+  });
+  return html;
+}
+
+// ── Chat export ───────────────────────────────────────────────────────────────
+function exportChat(fmt='txt'){
+  const s = getSession(activeId); if(!s) return;
+  const base = 'kickman-chat-' + slugify(s.name) + '-' + TODAY();
+  if(fmt==='pdf'){ printAsPDF(chatToHTML(s), 'Chat — ' + (s.name||'Kickman')); return; }
+  const now = NOWSTR();
+  const lines = ['KICKMAN — CONVERSATION HISTORY','Project: '+(s.name||'Untitled'),'Exported: '+now,'','═'.repeat(60),''];
   s.history.filter(m=>m.content!=='Begin.').forEach(m => {
     const role = m.role==='km'?'KICKMAN':'YOU';
     const text = typeof m.content==='string'?m.content:(m.content[0]?.text||'');
     const clean = text.replace(/<!--[\s\S]*?-->/g,'').trim();
-    chatLines.push('\n['+role+']\n'+clean+'\n'+'─'.repeat(40));
+    if(fmt==='md'){
+      lines.push('### ' + role); lines.push(''); lines.push(clean); lines.push(''); lines.push('---'); lines.push('');
+    } else {
+      lines.push('['+role+']'); lines.push(clean); lines.push(''); lines.push('─'.repeat(40)); lines.push('');
+    }
   });
-  sections.push(chatLines.join('\n'));
+  downloadBlob(lines.join('\n'), base + (fmt==='md'?'.md':'.txt'));
+}
 
-  downloadBlob(sections.join('\n'), 'kickman-full-export-' + slug + '-' + now + '.txt');
+// ── Alignment export ──────────────────────────────────────────────────────────
+function downloadAlignment(fmt='txt'){
+  const session = getSession(activeId);
+  if(!session || !session.alignment || !session.alignment.productName){
+    alert('Product Alignment not yet generated. Complete Step 2 first.'); return;
+  }
+  if(fmt==='pdf'){ printAsPDF(alignmentToHTML(session), 'Product Alignment — ' + (session.name||'Kickman')); return; }
+  const text = buildAlignmentText(session);
+  const slug = slugify(session.alignment.productName || session.name);
+  if(fmt==='md'){
+    // Convert to Markdown formatting
+    const md = text
+      .replace(/═+/g,'---')
+      .replace(/─+/g,'')
+      .replace(/^(\d+\. .+)$/gm,'## $1')
+      .replace(/^• "(.+)"$/gm,'> "$1"')
+      .replace(/^• (.+)$/gm,'- $1');
+    downloadBlob(md, 'kickman-alignment-' + slug + '-' + TODAY() + '.md');
+  } else {
+    downloadBlob(text, 'kickman-alignment-' + slug + '-' + TODAY() + '.txt');
+  }
+}
+
+// ── Timeline export ───────────────────────────────────────────────────────────
+function exportTimeline(fmt='txt'){
+  const s = getSession(activeId); if(!s) return;
+  const tl = s.timeline || DEFAULT_TIMELINE;
+  const base = 'kickman-timeline-' + slugify(s.name) + '-' + TODAY();
+  if(fmt==='pdf'){ printAsPDF(timelineToHTML(s), 'Timeline — ' + (s.name||'Kickman')); return; }
+  const riskLabel = {low:'Low Risk', medium:'Watch', high:'High Risk'};
+  const now = NOWSTR();
+  const lines = ['KICKMAN — CAMPAIGN TIMELINE','Project: '+(s.name||'Untitled'),'Exported: '+now,'','═'.repeat(60),''];
+  tl.forEach((ms,i) => {
+    const risk = riskLabel[ms.risk]||'';
+    const date = ms.date||'TBD';
+    const status = ms.status==='done'?'[DONE]':ms.status==='active'?'[ACTIVE]':'[PENDING]';
+    if(fmt==='md'){
+      lines.push('## '+(i+1)+'. '+ms.name);
+      lines.push('**Date:** '+date+' · **Status:** '+status+' · **Risk:** '+risk);
+      if(ms.hint) lines.push('> '+ms.hint);
+      ms.subtasks.forEach(st=>{
+        const ic = st.status==='done'?'- [x]':st.status==='active'?'- [→]':'- [ ]';
+        lines.push(ic+' **'+st.name+'** — '+(st.date||'TBD'));
+      });
+      lines.push('');
+    } else {
+      lines.push((i+1)+'. '+ms.name);
+      lines.push('   '+status+' | '+date+' | '+risk);
+      if(ms.hint) lines.push('   '+ms.hint);
+      ms.subtasks.forEach(st=>{
+        const ic = st.status==='done'?'✓':st.status==='active'?'→':'○';
+        lines.push('   '+ic+' '+st.name+' — '+(st.date||'TBD'));
+      });
+      lines.push('');
+    }
+  });
+  lines.push('─'.repeat(60)); lines.push('kickman.org');
+  downloadBlob(lines.join('\n'), base + (fmt==='md'?'.md':'.txt'));
+}
+
+// ── Export All (.md) ──────────────────────────────────────────────────────────
+async function exportAll(){
+  const s = getSession(activeId); if(!s) return;
+  const sections = [];
+  sections.push('# Kickman — Complete Project Export\n**Project:** '+(s.name||'Untitled')+'  \n**Exported:** '+NOWSTR()+'  \n**Source:** kickman.org\n\n---\n');
+  const at = buildAlignmentText(s);
+  if(at) sections.push('# Section 1 — Product Alignment\n\n'+at.replace(/═+/g,'---').replace(/─+/g,'').replace(/^(\d+\. .+)$/gm,'## $1').replace(/^• "(.+)"$/gm,'> "$1"').replace(/^• (.+)$/gm,'- $1')+'\n\n---\n');
+  const tl = s.timeline||DEFAULT_TIMELINE;
+  const rl = {low:'Low',medium:'Watch',high:'HIGH'};
+  let tlMd = '# Section 2 — Campaign Timeline\n\n';
+  tl.forEach((ms,i)=>{ tlMd += '## '+(i+1)+'. '+ms.name+'\n**Date:** '+(ms.date||'TBD')+' · **Risk:** '+(rl[ms.risk]||'')+'\n'; ms.subtasks.forEach(st=>{ tlMd += (st.status==='done'?'- [x]':'- [ ]')+' '+st.name+' — '+(st.date||'TBD')+'\n'; }); tlMd+='\n'; });
+  sections.push(tlMd+'---\n');
+  let chatMd = '# Section 3 — Conversation History\n\n';
+  s.history.filter(m=>m.content!=='Begin.').forEach(m=>{ const role=m.role==='km'?'**Kickman**':'**You**'; const text=typeof m.content==='string'?m.content:(m.content[0]?.text||''); const clean=text.replace(/<!--[\s\S]*?-->/g,'').trim(); chatMd+=role+'\n\n'+clean+'\n\n---\n\n'; });
+  sections.push(chatMd);
+  downloadBlob(sections.join('\n'), 'kickman-full-export-'+slugify(s.name)+'-'+TODAY()+'.md');
 }
 </script>
 </body>
