@@ -135,6 +135,11 @@
   .step-empty-state{padding:48px 0;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--text-3);line-height:1.8;}
   .step-empty-icon{font-size:32px;display:block;margin-bottom:14px;opacity:.4;}
   .step-saved-badge{font-family:var(--font-mono);font-size:9px;color:var(--green);opacity:0;transition:opacity .3s;}
+  .so-btn{font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:7px 14px;border:1px solid var(--border);background:none;color:var(--text-2);cursor:pointer;transition:all .15s;white-space:nowrap;}
+  .so-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .so-btn.edit-mode{border-color:rgba(232,98,42,.35);color:var(--accent);background:var(--accent-dim2);}
+  .so-btn.save{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .so-btn.save:hover{opacity:.85;}
   .step-saved-badge.show{opacity:1;}
 
   .so-doc{max-width:720px;margin:0 auto;padding:40px 32px 80px;}
@@ -3190,19 +3195,91 @@ function renderGenericView(def, data){
     const val = data[f.key] || data[f.key+'_html'] || '';
     if(!String(val).trim()) return;
     html += '<div class="so-section"><div class="so-section-label">'+escHtml(f.label)+'</div>';
-    if(/<[a-z][\s\S]*>/i.test(String(val))){
-      html += '<div class="so-view">'+val+'</div>';
-    } else {
-      const lines = String(val).split('\n').filter(l=>l.trim());
-      if(lines.length > 1){
-        html += '<div class="so-view"><ul>'+lines.map(l=>'<li>'+escHtml(l.replace(/^[•\-\*]\s*/,'').trim())+'</li>').join('')+'</ul></div>';
-      } else {
-        html += '<div class="so-view"><p>'+escHtml(String(val))+'</p></div>';
-      }
-    }
+    html += '<div class="so-view">'+markdownToHTML(String(val))+'</div>';
     html += '</div>';
   });
   return html || '<div class="so-view"><p style="color:var(--text-3);font-style:italic;">No content saved yet.</p></div>';
+}
+
+// Convert markdown text to structured HTML — preserves headings, lists, bold
+function markdownToHTML(text){
+  if(!text) return '';
+  // If already has HTML tags, return as-is
+  if(/<[a-z][\s\S]*>/i.test(text)) return text;
+
+  const lines = text.split('\n');
+  let html = '';
+  let inUL = false, inOL = false;
+  let olIdx = 0;
+
+  const closeLists = () => {
+    if(inUL){ html += '</ul>'; inUL = false; }
+    if(inOL){ html += '</ol>'; inOL = false; olIdx = 0; }
+  };
+
+  const inlineFmt = str => str
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/`(.+?)`/g,'<code style="font-family:var(--font-mono);font-size:11px;background:rgba(255,255,255,.06);padding:1px 5px;">$1</code>');
+
+  for(let i=0; i<lines.length; i++){
+    const raw = lines[i];
+    const line = raw.trim();
+    if(!line){ closeLists(); html += '<div style="height:8px;"></div>'; continue; }
+
+    // H2 heading: ## or **ALLCAPS**
+    if(/^#{1,2}\s/.test(line)){
+      closeLists();
+      const t = line.replace(/^#{1,2}\s*/,'');
+      html += '<div style="font-family:var(--font-mono);font-size:9px;letter-spacing:2.5px;color:var(--accent);text-transform:uppercase;margin:20px 0 8px;padding-bottom:5px;border-bottom:1px solid rgba(232,98,42,.2);">'+inlineFmt(t)+'</div>';
+      continue;
+    }
+    // H3
+    if(/^###\s/.test(line)){
+      closeLists();
+      const t = line.replace(/^###\s*/,'');
+      html += '<div style="font-weight:600;font-size:13px;color:var(--text);margin:14px 0 6px;">'+inlineFmt(t)+'</div>';
+      continue;
+    }
+    // Standalone **BOLD LINE** (acts as subheading)
+    if(/^\*\*[^*]{2,}\*\*\s*$/.test(line)){
+      closeLists();
+      const t = line.replace(/\*+/g,'');
+      html += '<div style="font-weight:600;font-size:13px;color:var(--text);margin:14px 0 5px;">'+inlineFmt(t)+'</div>';
+      continue;
+    }
+    // Bullet list
+    if(/^[•\-\*]\s/.test(line)){
+      if(inOL){closeLists();}
+      if(!inUL){ html += '<ul style="padding-left:0;margin:6px 0;list-style:none;">'; inUL = true; }
+      const t = line.replace(/^[•\-\*]\s*/,'');
+      html += '<li style="padding:4px 0 4px 18px;position:relative;font-size:13px;color:var(--text-2);border-bottom:1px solid rgba(255,255,255,.03);">' +
+        '<span style="position:absolute;left:0;color:var(--accent);font-size:14px;line-height:1.4;">·</span>' +
+        inlineFmt(t)+'</li>';
+      continue;
+    }
+    // Numbered list
+    if(/^\d+\.\s/.test(line)){
+      if(inUL){closeLists();}
+      if(!inOL){ html += '<ol style="padding-left:24px;margin:6px 0;">'; inOL = true; olIdx=0; }
+      olIdx++;
+      const t = line.replace(/^\d+\.\s*/,'');
+      html += '<li style="padding:3px 0;font-size:13px;color:var(--text-2);">'+inlineFmt(t)+'</li>';
+      continue;
+    }
+    // Horizontal rule
+    if(/^[-=_]{3,}$/.test(line)){
+      closeLists();
+      html += '<hr style="border:none;border-top:1px solid var(--border);margin:16px 0;">';
+      continue;
+    }
+    // Regular paragraph
+    closeLists();
+    html += '<p style="margin:0 0 8px;font-size:13px;color:var(--text-2);line-height:1.75;">'+inlineFmt(line)+'</p>';
+  }
+  closeLists();
+  return html;
 }
 
 // ── Go/No-Go special render ──────────────────────────────────────────────────
