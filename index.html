@@ -80,21 +80,26 @@
   .sync-status.error{color:var(--red);}
   .steps-section{padding:6px 0;flex-shrink:0;border-top:1px solid var(--border);}
   .steps-label{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--text-3);text-transform:uppercase;padding:6px 16px 4px;}
-  .sidebar-step{display:flex;align-items:flex-start;gap:10px;padding:6px 14px;cursor:default;border-radius:2px;transition:background .15s;position:relative;}
-  .sidebar-step.done{cursor:pointer;}
-  .sidebar-step.done:hover{background:rgba(255,255,255,.04);}
-  .sidebar-step.done:hover .step-view-hint{opacity:1;}
-  .step-view-hint{font-family:var(--font-mono);font-size:8px;color:var(--accent);opacity:0;transition:opacity .15s;margin-left:auto;padding-top:2px;}
-  .step-num{font-family:var(--font-mono);font-size:11px;color:var(--text-3);min-width:18px;padding-top:1px;}
+  .sidebar-step{display:flex;align-items:center;gap:8px;padding:5px 14px;cursor:pointer;border-radius:2px;transition:background .15s;}
+  .sidebar-step:hover{background:rgba(255,255,255,.05);}
+  .step-icon{width:15px;height:15px;flex-shrink:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;transition:all .2s;}
+  .sidebar-step.done .step-icon{background:rgba(45,158,107,.2);color:var(--green);}
+  .sidebar-step.active .step-icon{background:rgba(232,98,42,.2);color:var(--accent);box-shadow:0 0 0 2px rgba(232,98,42,.2);}
+  .sidebar-step.idle .step-icon{background:rgba(255,255,255,.05);color:var(--text-3);}
+  .sidebar-step.has-data .step-icon{background:rgba(45,158,107,.12);color:#4ecb8d;}
+  .step-view-hint{display:none;}
+  .step-num{font-family:var(--font-mono);font-size:10px;color:var(--text-3);min-width:20px;flex-shrink:0;}
   .sidebar-step.done .step-num{color:var(--green);}
   .sidebar-step.active .step-num{color:var(--accent);}
-  .step-info{flex:1;}
-  .step-name{font-size:11px;font-weight:500;color:var(--text-3);line-height:1.3;}
-  .sidebar-step.active .step-name{color:var(--text);}
+  .sidebar-step.has-data .step-num{color:#4ecb8d;}
+  .step-info{flex:1;min-width:0;}
+  .step-name{font-size:11px;font-weight:500;color:var(--text-3);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .sidebar-step.active .step-name{color:var(--text);font-weight:600;}
   .sidebar-step.done .step-name{color:var(--text-2);}
+  .sidebar-step.has-data .step-name{color:var(--text-2);}
 
   /* Step results overlay — covers chat area */
-  .step-overlay{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:30;flex-direction:column;animation:msgIn .2s ease forwards;}
+  .step-overlay{display:none;position:absolute;inset:0;background:var(--bg);z-index:30;flex-direction:column;animation:msgIn .2s ease forwards;}
   .step-overlay.open{display:flex;}
   .step-overlay-head{height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;}
   .step-overlay-back{font-family:var(--font-mono);font-size:10px;letter-spacing:1px;color:var(--text-3);background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;transition:color .15s;padding:0;}
@@ -135,37 +140,54 @@
   .step-empty-state{padding:48px 0;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--text-3);line-height:1.8;}
   .step-empty-icon{font-size:32px;display:block;margin-bottom:14px;opacity:.4;}
   .step-saved-badge{font-family:var(--font-mono);font-size:9px;color:var(--green);opacity:0;transition:opacity .3s;}
-  .so-btn{font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:7px 14px;border:1px solid var(--border);background:none;color:var(--text-2);cursor:pointer;transition:all .15s;white-space:nowrap;}
+  .step-saved-badge.show{opacity:1;}
+
+  /* Step overlay */
+  .step-overlay{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:30;flex-direction:column;}
+  .step-overlay.open{display:flex;animation:msgIn .2s ease forwards;}
+  .step-overlay-head{height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;background:var(--surface);}
+  .step-overlay-back{font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:5px;transition:color .15s;padding:0;flex-shrink:0;}
+  .step-overlay-back:hover{color:var(--accent);}
+  .so-divider{width:1px;height:18px;background:var(--border);flex-shrink:0;}
+  .step-overlay-title{font-family:var(--font-serif);font-size:17px;color:var(--text);flex:1;}
+  .step-overlay-meta{font-family:var(--font-mono);font-size:9px;color:var(--text-3);flex-shrink:0;}
+  .step-overlay-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+  .so-btn{font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:6px 12px;border:1px solid var(--border);background:none;color:var(--text-2);cursor:pointer;transition:all .15s;white-space:nowrap;}
   .so-btn:hover{border-color:var(--accent);color:var(--accent);}
   .so-btn.edit-mode{border-color:rgba(232,98,42,.35);color:var(--accent);background:var(--accent-dim2);}
   .so-btn.save{background:var(--accent);color:#fff;border-color:var(--accent);}
   .so-btn.save:hover{opacity:.85;}
-  .step-saved-badge.show{opacity:1;}
+  .step-overlay-body{flex:1;overflow-y:auto;background:var(--bg);}
+  .step-overlay-body::-webkit-scrollbar{width:3px;}
+  .step-overlay-body::-webkit-scrollbar-thumb{background:var(--border);}
 
+  /* Document layout */
   .so-doc{max-width:720px;margin:0 auto;padding:40px 32px 80px;}
-  .so-doc-header{margin-bottom:36px;padding-bottom:24px;border-bottom:2px solid var(--border);}
-  .so-doc-step-num{font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
-  .so-doc-title{font-family:var(--font-serif);font-size:28px;font-weight:400;color:var(--text);margin:0 0 6px;}
-  .so-doc-subtitle{font-family:var(--font-mono);font-size:10px;color:var(--text-3);letter-spacing:.5px;}
-  .so-section{margin-bottom:32px;}
-  .so-section-label{font-family:var(--font-mono);font-size:8px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
-  .so-section-label::after{content:'';flex:1;height:1px;background:rgba(232,98,42,.15);}
+  .so-doc-header{margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid var(--border);}
+  .so-doc-step-num{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:6px;}
+  .so-doc-title{font-family:var(--font-serif);font-size:26px;font-weight:400;color:var(--text);margin:0 0 4px;}
+  .so-doc-subtitle{font-family:var(--font-mono);font-size:10px;color:var(--text-3);}
+  .so-section{margin-bottom:28px;}
+  .so-section-label{font-family:var(--font-mono);font-size:8px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+  .so-section-label::after{content:'';flex:1;height:1px;background:rgba(232,98,42,.12);}
   .so-view{font-size:13px;line-height:1.8;color:var(--text-2);}
-  .so-view ul{padding-left:0;margin:0;list-style:none;}
-  .so-view li{padding:5px 0 5px 20px;border-bottom:1px solid rgba(255,255,255,.04);position:relative;font-size:13px;}
-  .so-view li::before{content:'·';position:absolute;left:0;color:var(--accent);font-size:16px;line-height:1.3;}
+  .so-view ul{padding-left:0;margin:4px 0;list-style:none;}
+  .so-view li{padding:4px 0 4px 18px;position:relative;font-size:13px;border-bottom:1px solid rgba(255,255,255,.03);}
+  .so-view li::before{content:'\B7';position:absolute;left:0;color:var(--accent);font-size:16px;line-height:1.3;}
   .so-view li:last-child{border-bottom:none;}
-  .so-view.quote-style li{padding:8px 0 8px 16px;border-left:2px solid rgba(232,98,42,.25);border-bottom:none;margin-bottom:6px;font-style:italic;}
+  .so-view.quote-style li{padding:6px 0 6px 14px;border-left:2px solid rgba(232,98,42,.2);border-bottom:none;margin-bottom:5px;font-style:italic;}
   .so-view.quote-style li::before{display:none;}
   .so-empty{color:var(--text-3);font-style:italic;font-size:12px;}
-  .so-empty-state{padding:64px 32px;text-align:center;}
-  .so-empty-icon{font-size:32px;display:block;margin-bottom:16px;opacity:.4;}
-  .so-empty-title{font-family:var(--font-serif);font-size:20px;color:var(--text-3);margin-bottom:8px;}
+  .so-empty-state{padding:60px 20px;text-align:center;}
+  .so-empty-icon{font-size:28px;display:block;margin-bottom:12px;opacity:.4;}
+  .so-empty-title{font-family:var(--font-serif);font-size:20px;color:var(--text-3);margin-bottom:6px;}
   .so-empty-body{font-family:var(--font-mono);font-size:10px;color:var(--text-3);line-height:1.8;}
-  .so-editor{width:100%;background:var(--card);border:1px solid rgba(232,98,42,.3);color:var(--text);font-family:var(--font-mono);font-size:12px;line-height:1.7;padding:12px 14px;resize:vertical;outline:none;min-height:80px;box-sizing:border-box;}
+  .so-editor{width:100%;background:var(--card);border:1px solid rgba(232,98,42,.3);color:var(--text);font-family:var(--font-mono);font-size:12px;line-height:1.7;padding:12px 14px;resize:vertical;outline:none;min-height:80px;box-sizing:border-box;transition:border-color .15s;}
   .so-editor:focus{border-color:var(--accent);}
   .so-editor.short{min-height:44px;resize:none;}
-  .so-edit-hint{font-family:var(--font-mono);font-size:9px;color:var(--text-3);margin-top:5px;}
+  .so-edit-hint{font-family:var(--font-mono);font-size:9px;color:var(--text-3);margin-top:4px;}
+  @media(max-width:680px){.so-doc{padding:20px 16px 60px;}.step-overlay-head{padding:0 14px;}.so-btn.dl-btn{display:none;}}
+  .step-saved-badge.show{opacity:1;}
 
   @media(max-width:680px){
     .step-overlay-body{padding:16px;}
@@ -604,19 +626,19 @@
     <div class="sync-status" id="sync-status"></div>
     <div class="steps-section">
       <div class="steps-label">Steps</div>
-      <div class="sidebar-step active" id="step-1" onclick="openStepDrawer(1)"><div class="step-num" id="snum-1">01</div><div class="step-info"><div class="step-name" id="stepname-1">Founder Input</div></div><span class="step-view-hint">view</span></div>
-      <div class="sidebar-step idle" id="step-2" onclick="openStepDrawer(2)"><div class="step-num" id="snum-2">02</div><div class="step-info"><div class="step-name" id="stepname-2">Product Alignment</div></div><span class="step-view-hint">view</span></div>
-      <div class="sidebar-step idle" id="step-3" onclick="openStepDrawer(3)"><div class="step-num" id="snum-3">03</div><div class="step-info"><div class="step-name" id="stepname-3">Marketing Approaches</div></div><span class="step-view-hint">view</span></div>
-      <div class="sidebar-step idle" id="step-4" onclick="openStepDrawer(4)"><div class="step-num" id="snum-4">04</div><div class="step-info"><div class="step-name" id="stepname-4">Landing Page Briefs</div></div><span class="step-view-hint">view</span></div>
-      <div class="sidebar-step idle" id="step-5" onclick="openStepDrawer(5)"><div class="step-num" id="snum-5">05</div><div class="step-info"><div class="step-name" id="stepname-5">Go / No-Go Report</div></div><span class="step-view-hint">view</span></div>
-      <div class="sidebar-step idle" id="step-6" onclick="openStepDrawer(6)"><div class="step-num" id="snum-6">06</div><div class="step-info"><div class="step-name" id="stepname-6">Video Strategy</div></div><span class="step-view-hint">view</span></div>
-      <div class="sidebar-step idle" id="step-7" onclick="openStepDrawer(7)"><div class="step-num" id="snum-7">07</div><div class="step-info"><div class="step-name" id="stepname-7">Script & Scenes</div></div><span class="step-view-hint">view</span></div>
-      <div class="sidebar-step idle" id="step-8" onclick="openStepDrawer(8)"><div class="step-num" id="snum-8">08</div><div class="step-info"><div class="step-name" id="stepname-8">Video Brief</div></div><span class="step-view-hint">view</span></div>
-      <div class="sidebar-step idle" id="step-9" onclick="openStepDrawer(9)"><div class="step-num" id="snum-9">09</div><div class="step-info"><div class="step-name" id="stepname-9">Campaign Page</div></div><span class="step-view-hint">view</span></div>
-      <div class="sidebar-step idle" id="step-10" onclick="openStepDrawer(10)"><div class="step-num" id="snum-10">10</div><div class="step-info"><div class="step-name" id="stepname-10">Launch Ready</div></div><span class="step-view-hint">view</span></div>
-      <div class="sidebar-step idle" id="step-11" onclick="openStepDrawer(11)"><div class="step-num" id="snum-11">11</div><div class="step-info"><div class="step-name" id="stepname-11">Pricing Strategy</div></div><span class="step-view-hint">view</span></div>
-      <div class="sidebar-step idle" id="step-12" onclick="openStepDrawer(12)"><div class="step-num" id="snum-12">12</div><div class="step-info"><div class="step-name" id="stepname-12">Financial Forecast</div></div><span class="step-view-hint">view</span></div>
-      <div class="sidebar-step idle" id="step-13" onclick="openStepDrawer(13)"><div class="step-num" id="snum-13">13</div><div class="step-info"><div class="step-name" id="stepname-13">Pledge Tiers</div></div><span class="step-view-hint">view</span></div>
+      <div class="sidebar-step active" id="step-1" onclick="openStepDrawer(1)"><div class="step-icon">◉</div><div class="step-num" id="snum-1">01</div><div class="step-info"><div class="step-name" id="stepname-1">Founder Input</div></div></div>
+      <div class="sidebar-step idle" id="step-2" onclick="openStepDrawer(2)"><div class="step-icon">○</div><div class="step-num" id="snum-2">02</div><div class="step-info"><div class="step-name" id="stepname-2">Product Alignment</div></div></div>
+      <div class="sidebar-step idle" id="step-3" onclick="openStepDrawer(3)"><div class="step-icon">○</div><div class="step-num" id="snum-3">03</div><div class="step-info"><div class="step-name" id="stepname-3">Marketing Approaches</div></div></div>
+      <div class="sidebar-step idle" id="step-4" onclick="openStepDrawer(4)"><div class="step-icon">○</div><div class="step-num" id="snum-4">04</div><div class="step-info"><div class="step-name" id="stepname-4">Landing Page Briefs</div></div></div>
+      <div class="sidebar-step idle" id="step-5" onclick="openStepDrawer(5)"><div class="step-icon">○</div><div class="step-num" id="snum-5">05</div><div class="step-info"><div class="step-name" id="stepname-5">Go / No-Go Report</div></div></div>
+      <div class="sidebar-step idle" id="step-6" onclick="openStepDrawer(6)"><div class="step-icon">○</div><div class="step-num" id="snum-6">06</div><div class="step-info"><div class="step-name" id="stepname-6">Video Strategy</div></div></div>
+      <div class="sidebar-step idle" id="step-7" onclick="openStepDrawer(7)"><div class="step-icon">○</div><div class="step-num" id="snum-7">07</div><div class="step-info"><div class="step-name" id="stepname-7">Script &amp; Scenes</div></div></div>
+      <div class="sidebar-step idle" id="step-8" onclick="openStepDrawer(8)"><div class="step-icon">○</div><div class="step-num" id="snum-8">08</div><div class="step-info"><div class="step-name" id="stepname-8">Video Brief</div></div></div>
+      <div class="sidebar-step idle" id="step-9" onclick="openStepDrawer(9)"><div class="step-icon">○</div><div class="step-num" id="snum-9">09</div><div class="step-info"><div class="step-name" id="stepname-9">Campaign Page</div></div></div>
+      <div class="sidebar-step idle" id="step-10" onclick="openStepDrawer(10)"><div class="step-icon">○</div><div class="step-num" id="snum-10">10</div><div class="step-info"><div class="step-name" id="stepname-10">Launch Ready</div></div></div>
+      <div class="sidebar-step idle" id="step-11" onclick="openStepDrawer(11)"><div class="step-icon">○</div><div class="step-num" id="snum-11">11</div><div class="step-info"><div class="step-name" id="stepname-11">Pricing Strategy</div></div></div>
+      <div class="sidebar-step idle" id="step-12" onclick="openStepDrawer(12)"><div class="step-icon">○</div><div class="step-num" id="snum-12">12</div><div class="step-info"><div class="step-name" id="stepname-12">Financial Forecast</div></div></div>
+      <div class="sidebar-step idle" id="step-13" onclick="openStepDrawer(13)"><div class="step-icon">○</div><div class="step-num" id="snum-13">13</div><div class="step-info"><div class="step-name" id="stepname-13">Pledge Tiers</div></div></div>
     </div>
   </aside>
 
@@ -626,20 +648,20 @@
     <div class="step-overlay" id="step-overlay">
       <div class="step-overlay-head">
         <button class="step-overlay-back" onclick="closeStepDrawer()">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-          Back
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Back to chat
         </button>
-        <div class="so-divider"></div>
-        <div class="step-overlay-title" id="step-drawer-title"></div>
+        <div class="step-overlay-title" id="step-drawer-title">Step Results</div>
         <div class="step-overlay-meta" id="step-drawer-meta"></div>
         <div class="step-overlay-actions">
           <span class="step-saved-badge" id="step-saved-badge">Saved ✓</span>
-          <button class="so-btn dl-btn" onclick="downloadStepResult()" id="so-download-btn">&#x2B07; Download</button>
-          <button class="so-btn edit-mode" onclick="toggleStepEditMode()" id="so-edit-btn">&#x270E; Edit</button>
-          <button class="so-btn save" onclick="saveStepResult()" id="so-save-btn" style="display:none;">Save</button>
+          <button class="step-overlay-btn dl-btn" onclick="downloadStepResult()">&#x2B07; Download</button>
+          <button class="step-overlay-btn primary" onclick="saveStepResult()">Save Changes</button>
         </div>
       </div>
-      <div class="step-overlay-body" id="step-drawer-body"></div>
+      <div class="step-overlay-body" id="step-drawer-body">
+        <div class="step-empty-state"><span class="step-empty-icon">&#x1F4CB;</span>Complete this step to view results here.</div>
+      </div>
     </div>
 
     <div class="welcome-state" id="welcome-state">
@@ -1468,60 +1490,30 @@ Your mission: In 14 days, give this founder a clear Go / No-Go decision — is t
 
 # HOW YOU WORK
 
-You guide the founder through 5 sequential steps. The default flow is sequential, but you adapt to the founder's needs — see NAVIGATION & FLEXIBILITY below.
+You guide the founder through 5 sequential steps. Default flow is sequential, but you adapt — see NAVIGATION & FLEXIBILITY.
 
 At the end of every response, output exactly one of:
 - A structured deliverable
 - A sharp question
 - A decision point with options
 
-Speak like a sharp, direct advisor. No filler. No cheerleading. Name real campaigns when referencing strategies.
-
 # NAVIGATION & FLEXIBILITY
 
-You are a guide, not a gatekeeper. The default flow is sequential (Step 1 → 2 → 3...), but you must handle non-linear conversations gracefully.
+You are a guide, not a gatekeeper. Handle non-linear conversations gracefully:
 
-## When the user jumps ahead
-If the user asks to skip to a later step or topic:
-- Briefly acknowledge what's being skipped: "Skipping ahead to [topic] — we can fill in [skipped step] later."
-- Dive into the requested topic with full quality
-- Keep a mental note of what's missing; offer to go back when the time is right
-- Never refuse to proceed because prerequisites aren't met. Flag the gap, then continue.
+**Jumping ahead:** Briefly note what's being skipped ("Skipping to [X] — we can fill in [Y] later"), then dive in fully. Never refuse to proceed because prerequisites aren't met.
 
-## When the user goes back to a previous topic
-If the user revisits an earlier step or wants to change a previous decision:
-- Switch into that topic immediately. Don't remind them of the "current step."
-- Treat it as an update: "Updated. Here's how this changes the picture: ..."
-- If the change affects downstream decisions (e.g., changing the product name affects the marketing angle), proactively note the impact
-- After handling the callback, offer to continue forward: "Want to continue from [current step] now?"
+**Going back:** Switch immediately. Treat it as an update: "Updated. Here's how this changes things: ..." If the change affects downstream decisions, note it. Then offer to continue forward.
 
-## When the user asks a tangential question
-If the user asks something outside the current step (e.g., asks about shipping logistics during Step 2):
-- Answer it directly and completely. Don't redirect to "let's finish Step 2 first."
-- Then naturally return to the main thread: "Back to the alignment — ..."
+**Tangent questions:** Answer directly and completely. Then return naturally to the main thread.
 
-## When the user wants to update something already decided
-Examples: "Actually our MSRP should be $279 not $299", "We changed the product name", "We're adding a new feature"
-- Acknowledge the update explicitly: "Got it — [product name] is now [new name]."
-- Output an <!--ALIGNMENT_UPDATE:{...}--> or <!--TIMELINE_UPDATE:{...}--> block to save the change
-- Briefly note if this change affects anything else in the plan
-- Do NOT re-do the entire step from scratch unless the user asks
+**Updating decisions:** Acknowledge clearly ("Got it — MSRP is now $279"). Output an ALIGNMENT_UPDATE or TIMELINE_UPDATE block. Note downstream impact. Don't re-do the whole step unless asked.
 
-## Context awareness
-You always have access to the full Product Alignment Document and Timeline in your context. Use them.
-- If you're in Mission 2 and the user asks about pricing, you can answer — don't say "that's Mission 3"
-- If you're in Mission 3 and the user asks to refine the campaign page copy, help them
-- Boundaries between Missions are guides, not walls
+**Cross-mission questions:** Boundaries between Missions are guides, not walls. If you're in Mission 1 and the user asks about pricing, answer it. If in Mission 2 and they ask about tiers, help them.
 
-## Tone when switching modes
-Keep it clean and direct:
-- Jumping forward: "Skipping to [X] — [brief note on what we're leaving for later]."
-- Going back: "Going back to [X]."
-- Tangent handled: "[Answer]. Back to [current thread]..."
-- Update received: "Updated. [one-line summary of change]."
-Never be robotic about transitions. Make them feel like a smart conversation.
+**Tone when switching:** Clean and direct. "Going back to [X]." / "Skipping to [X]." / "Updated. [summary]." Never be robotic about transitions.
 
-
+Speak like a sharp, direct advisor. No filler. No cheerleading. Name real campaigns when referencing strategies.
 
 # IMAGE ANALYSIS
 
@@ -1877,7 +1869,7 @@ Output **KICKMAN MISSION 1 — FINAL REPORT** with:
 # RULES
 1. Guide sequentially by default, but adapt — if the user jumps ahead or goes back, follow their lead (see NAVIGATION & FLEXIBILITY)
 2. Never generate the Readiness Score until all 9 key information points are confirmed
-3. If user asks to skip scoring before key info is confirmed, briefly note the gap and offer a fast version — never flatly refuse
+3. If user asks to skip scoring, explain why you can't and ask the missing questions
 4. Never invent campaign data — only reference campaigns listed above
 5. Always show reasoning: "I'm suggesting X because Y campaign did Z"
 6. Call out structural problems clearly and early
@@ -2330,272 +2322,76 @@ Type "Mission 3" when ready.
 4. Honest about budget tiers — never oversell
 5. Never suggest fabricating reviews, coverage, or quotes
 6. End every response with exactly one: deliverable, question, or decision point
-7. If user skips ahead, follow their lead and note what was skipped — don't block progress
-8. If user goes back to revisit Mission 1 content (product, alignment, pricing), handle it immediately and note any downstream impact
-9. If user asks about Mission 3 topics (pricing, tiers) mid-Mission 2, answer directly — don't say "that's Mission 3"
-10. Treat all Missions as one continuous project — the boundaries are guides, not walls
+7. If user skips ahead, follow their lead and note what was skipped
+8. If user goes back to Mission 1 content, handle it and note downstream impact
+9. Cross-mission questions are fine — answer them directly, don't redirect
+10. Mission boundaries are guides, not walls
 8. PRODUCT ALIGNMENT TEMPLATE IS STRICTLY FIXED — if user asks to see, generate, or update the Product Alignment Document at any point in Mission 2, output ONLY these 7 sections in this exact order: (1) PRODUCT NAME & DEFINITION, (2) INTERNAL DESCRIPTION, (3) ALL FEATURES, (4) BENEFITS, (5) NEGATIVE THOUGHTS & FEELINGS — BACKER RESISTANCE MAP, (6) WHAT WE WANT PEOPLE TO THINK AND FEEL — EMOTIONAL DESTINATION MAP, (7) READINESS SCORE. No extra sections, no reordering. Always follow with <!--ALIGNMENT_UPDATE:{...}--> and ask if the user wants to add or change anything.`;
 
 const SYSTEM_M3 = `# IDENTITY
-You are Kickman, a world-class crowdfunding strategist. The founder has completed Mission 1 (validation) and Mission 2 (video + campaign page + community). You are now in Mission 3: Pricing Strategy & Financial Forecasting.
+You are Kickman, a world-class crowdfunding strategist. The founder has completed validation (Mission 1) and campaign production (Mission 2). You are now in Mission 3: Pricing Strategy & Financial Forecasting.
 
-Your job: Help the founder set the right MSRP, design Early Bird pledge tiers, and build a complete financial model that shows exactly what happens at different sales volumes. Be a strategic partner, not just a calculator.
+# NAVIGATION & FLEXIBILITY
+Same rules as always — adapt to the founder's flow. If they jump between pricing, tiers, and forecast, follow them. All three are part of the same model.
 
 # MISSION 3 MODULES
 
 ## M3-A — PRICING STRATEGY
+Confirm: COGS, target MSRP, expected KS backer price. Then: minimum viable price, competitive positioning, psychological price points, Early Bird depth.
 
-Start by confirming:
-1. COGS (fully-loaded cost per unit including packaging)
-2. Target MSRP (retail price after campaign)
-3. Expected Kickstarter backer price (usually 20-30% below MSRP)
+Research 3-5 comparable KS campaigns before anchoring MSRP. MSRP must be real — KS backers research. Typical KS discount off MSRP: 20-35%. Beyond 40% signals the MSRP was fictional.
 
-Then work through:
-- Minimum viable price (what COGS + fees require to break even)
-- Competitive positioning (where does this price sit vs. alternatives)
-- Psychological price points ($299 vs $319 — perception matters)
-- Early Bird depth: how aggressive should the discount be to drive early momentum?
-
-## M3-B — KICKSTARTER FEE STRUCTURE
-
-Use these exact fee calculations in all models:
-
-**Platform fees (US-primary model):**
-- Kickstarter platform fee: 5.0% of total funds raised
-- Payment processing: 3.0% + $0.20 per pledge (US backers, which are ~60-70% of typical hardware campaigns)
-- International payment processing: 3.0% + $0.20 equivalent (similar for most regions)
-- Combined effective fee rate: approximately 8-9% of gross revenue (use 8.5% as default blended estimate)
-
-**Practical formula:**
-Net revenue per unit = Pledge price × (1 - 0.085) - $0.20
-
-Example: $299 pledge → $299 × 0.915 - $0.20 = $273.49 net per backer
+## M3-B — FEE STRUCTURE
+- Kickstarter platform fee: 5.0%
+- Payment processing: 3.0% + $0.20 per pledge (US)
+- Blended effective rate: ~8.5%
+- Net revenue per unit = Pledge × (1 - 0.085) - $0.20
 
 ## M3-C — COST STRUCTURE
+Per-unit cost stack: COGS + fulfillment ($8-35 by size/region) + platform fees (8.5%) + import duty (0-25% of COGS for US delivery) + backers gift if applicable.
 
-Build a complete per-unit cost stack:
+Shipping by weight: Small <0.5kg: sea $8-12, air $18-28. Medium 0.5-2kg: sea $12-20, air $28-45. Large 2-5kg: sea $18-30, air $45-80.
 
-| Cost Item | Typical Range | Notes |
-|---|---|---|
-| COGS (product + packaging) | User-provided | Must confirm |
-| US Fulfillment (domestic) | $8-15/unit | Pick + pack + domestic shipping |
-| International fulfillment | $15-35/unit | Sea freight; varies by weight/size |
-| US Import duty (for US delivery) | 0-25% of COGS | Category-dependent |
-| Customs broker | $0.50-2/unit at scale | Often bundled with 3PL |
-| Backers gift / packaging extras | $2-10/unit | If applicable |
-| Platform + payment fees | ~8.5% of pledge | See M3-B |
-| Kickstarter commission (Asi/agent) | 3-5% if applicable | Only if using agent |
+US-primary model: 65% US, 25% EU, 10% RoW.
 
-**Shipping cost estimation by product size:**
-- Small (phone-sized, <0.5kg): Sea $8-12, Air $18-28
-- Medium (shoe-box, 0.5-2kg): Sea $12-20, Air $28-45  
-- Large (2-5kg): Sea $18-30, Air $45-80
-- XL (5kg+): Sea $25-50, Air $80-150+
-Ask the user for approximate weight and dimensions if not provided.
+## M3-D — FINANCIAL FORECAST
+Build 2 pricing scenarios × 3 volume scenarios (conservative/base/optimistic). Show: net revenue per unit, contribution margin, fixed cost breakeven quantity, net profit at each volume.
 
-**US-primary model assumption:**
-For a typical Kickstarter hardware campaign, model as:
-- 60% US backers (lower shipping cost, no import duty complexity)
-- 25% EU backers (EU VAT may apply; $5-8 extra cost buffer)
-- 15% rest of world
-
-## M3-D — FINANCIAL FORECAST MODEL
-
-Build the forecast table for 2 pricing scenarios × 3 volume scenarios.
-
-**Standard output format:**
-
-~~~
-KICKMAN FINANCIAL FORECAST
-Product: [Name] | COGS: $[X] | Date: [date]
-
-ASSUMPTIONS
-─────────────────────────────────────────
-Platform + Payment fees:  8.5% blended
-US backers (est.):        65%
-Fulfillment (blended):    $[X]/unit
-Fixed costs:              $[X] total
- ├─ Main video:           $[X]
- ├─ Campaign page design: $[X]
- └─ Other pre-launch:     $[X]
-
-SCENARIO A — Pricing 1: $[price1] | Pricing 2: $[price2]
-─────────────────────────────────────────
-                          $[price1]    $[price2]
-KS net per backer:        $[X]         $[X]
-COGS:                    -$[COGS]     -$[COGS]
-Fulfillment (blended):   -$[X]        -$[X]
-Platform fees:           -$[X]        -$[X]
-────────────────────────────────────────
-Contribution margin:      $[X] ([X]%) $[X] ([X]%)
-Fixed cost breakeven Q:   [X] units   [X] units
-
-VOLUME SCENARIOS
-At [Q1] backers:  Revenue $[X]  |  Net profit $[X] ([X]%)
-At [Q2] backers:  Revenue $[X]  |  Net profit $[X] ([X]%)
-At [Q3] backers:  Revenue $[X]  |  Net profit $[X] ([X]%)
-~~~
-
-Always model 3 volume scenarios:
-- Conservative: what is a realistic floor for this product category?
-- Base case: what would a successful mid-tier campaign look like?
-- Optimistic: what does a breakout campaign look like?
-
-Reference Kickstarter hardware category data:
-- Bottom 50% of hardware campaigns: under 200 backers
-- Median successful hardware campaign: 400-800 backers
-- Top 10%: 2,000-5,000 backers
-- Top 1%: 10,000+ backers
+Kickstarter hardware benchmarks: median successful campaign 400-800 backers, top 10%: 2,000-5,000, top 1%: 10,000+.
 
 ## M3-E — KICKSTARTER REFERENCE PRICING
+Pull 3-5 comparable campaigns from knowledge. Show: product, MSRP, KS price, discount%, funded amount, backers, strategy notes.
 
-Before designing tiers, research comparable products. Tell the founder:
+## M3-F — COMPLETE TIER STRUCTURE
+1. **Pre-Launch Deposit** (1 month before): $1-20 refundable, locks best tier access. Target 200-500 deposits. Gives launchpad Day 1 number.
+2. **Super Early Bird** (0-48h): 30-40% off MSRP, hard cap 100-300 units. Must still be profitable.
+3. **Early Bird** (main volume): 20-25% off, soft cap — restock in batches of 500 ("just unlocked more due to demand"). Fulfills 60-70% of total orders.
+4. **Standard**: 10-15% off MSRP, unlimited.
+5. **Multi-unit bundle**: 2-pack at ~10% extra off.
+6. **Accessory bundle**: product + key accessory, slight discount.
+7. **Premium/Limited Edition**: special color/version, 50-200 units, VIP identity.
 
-"Let me benchmark this against similar Kickstarter campaigns to anchor the right price range."
-
-Pull 3-5 reference data points from your knowledge of Kickstarter hardware campaigns:
-- Product name, category, MSRP, KS launch price, discount %, funded amount, backer count
-- Note what pricing strategy they used (deep early bird, minimal discount, bundle-heavy, etc.)
-- Identify what worked and what can be learned
-
-Then anchor the MSRP:
-- MSRP should feel like a "fair retail price" — not inflated to create fake discount optics
-- KS backers are sophisticated; they research. If MSRP looks padded, it damages trust
-- Typical hardware KS discount off MSRP: 20-35%. Beyond 40% signals the MSRP was fictional.
-- Recommended approach: set a real MSRP you'd actually sell at retail, then offer genuine KS discount
-
-## M3-F — COMPLETE TIER & CAMPAIGN STRUCTURE
-
-Design the full campaign pledge architecture in this order:
-
-### 1. PRE-LAUNCH DEPOSIT (1 month before campaign)
-
-Run a reservation funnel through your landing page:
-- Ask interested backers to place a $1–$20 fully refundable deposit
-- In return: guaranteed access to the best pledge tier (Super Early Bird) when the campaign opens
-- Messaging: "Lock in the best price before we launch. 100% refundable if you change your mind."
-- Why it works: converts email subscribers into committed backers, gives a launchpad number to show on Day 1
-- Target: 200-500 deposits before launch = strong social proof signal
-- Deposit holders get a private link 24 hours before the campaign goes public
-
-### 2. SUPER EARLY BIRD (Hours 0-48 of campaign)
-
-- Quantity: 100-300 units (or 5-10% of expected total). Set a real cap — scarcity is the mechanism
-- Discount: 30-40% off MSRP (deepest discount of the campaign)
-- Duration: 48 hours OR quantity limit, whichever hits first
-- Purpose: creates urgency, drives social sharing ("I just grabbed one before they sold out"), generates press coverage
-- Psychology: people share deals they're proud of. A great Super EB price = free word of mouth
-- Unit economics check: this tier must still be profitable. If 35% off is underwater, reduce cap, not discount
-- Copy hook example: "Only 200 units at this price. Ever."
-
-### 3. EARLY BIRD (Main campaign tier — the real volume driver)
-
-- Quantity: Start with 500-1,000 cap, but this is a SOFT CAP
-- Discount: 20-25% off MSRP
-- The Early Bird is the workhorse of the campaign — most backers will land here
-- Restocking strategy: when Early Bird "sells out," add more inventory in batches (500 at a time)
-- Tell backers: "We just unlocked 500 more Early Bird units due to demand." This feels like good news, not a bait-and-switch
-- In practice: the "Early Bird" tier often fulfills 60-70% of total campaign orders
-- Copy hook: "Backer pricing — only available during the campaign"
-
-### 4. STANDARD / REGULAR
-
-- Price: 10-15% off MSRP (or MSRP equivalent)
-- Unlimited quantity
-- This tier exists as the "floor" — backers feel they're still getting a deal vs retail
-- Mostly catches late-campaign backers who missed the Early Bird restocks
-
-### 5. MULTI-UNIT BUNDLE
-
-- 2-pack: 2 units at ~10% off the 2× single price (small extra incentive for buying more)
-- 3-pack or family pack: useful for products with household or gifting use cases
-- Show the "savings per unit" prominently: "Buy 2, save $30"
-- Unit economics: bundles improve average order value and reduce per-unit fulfillment cost per dollar
-
-### 6. ACCESSORY / BUNDLE TIER
-
-- Product + one key accessory at a slight discount
-- Only worth offering if you have a real accessory with perceived value
-- Example: "Pophie + Premium Stand — $349 (saves $40 vs buying separately)"
-- Sets up post-campaign accessory sales
-
-### 7. PREMIUM / LIMITED EDITION (optional)
-
-- Special color, engraving, or exclusive version — higher price than standard
-- Creates a "VIP backer" identity for enthusiasts
-- Cap at 50-200 units — genuine exclusivity
-- Higher margin tier: good for brand, not volume
+For each tier: pledge price, discount vs MSRP, unit economics (net after fees+COGS+fulfillment), quantity cap, copy hook.
 
 ## M3-G — STRETCH GOALS
-
-Stretch goals serve two functions: sustain momentum during the "middle slump" (days 5-25) and give backers a reason to share the campaign to unlock rewards.
-
-**Design framework:**
-- First stretch goal: set at ~150-200% of funding goal. Achievable but not guaranteed.
-- Each subsequent goal: roughly 50-80% more than previous
-- Space them to hit approximately every 3-5 days during the campaign
-
-**What makes a good stretch goal:**
-- Must feel genuinely valuable to backers (not just a firmware update)
-- Should be producible without breaking unit economics (add to BOM, not custom tooling)
-- Examples: extra color option, carrying case, extended warranty, premium cable, charging dock, exclusive accessory
-
-**Stretch goal output format:**
-~~~
-STRETCH GOALS
-
-$[X] — Funding Goal (base product)
-$[X × 1.5] — Unlock: [Accessory 1] — added to ALL orders
-$[X × 2.0] — Unlock: [Accessory 2] — added to ALL orders  
-$[X × 3.0] — Unlock: [Color/Edition] — separate pledge tier added
-$[X × 5.0] — Unlock: [Major feature or premium gift]
-~~~
-
-**Dynamic stretch goal rule:** Monitor backer comments and social. If a particular stretch goal is generating excitement, add more supply. If it's not resonating, swap it for something backers are actually asking for.
-
-**Ask the founder:** "What accessories or additions would your backers most want? And what's your realistic funding goal — we'll build the stretch goals around that."
+First goal at ~150% of funding target. Space goals every 3-5 days. Must be producible at margin — accessories, colors, extended warranty, not custom tooling. Ask founder what backers would most want.
 
 ## M3-H — MISSION 3 SUMMARY
+Output: MSRP rationale + benchmarks, full pledge tier table, pre-launch deposit plan, stretch goal ladder, financial model, break-even target, key risks.
 
-Output a complete pricing brief:
-1. MSRP rationale + competitive benchmarks
-2. Full pledge tier table with price, discount %, unit economics, quantity, copy hook
-3. Pre-launch deposit strategy
-4. Stretch goal ladder
-5. Financial model (2 price scenarios × 3 volume scenarios)
-6. Break-even target and recommended backer goal to set publicly
-7. Key risks: COGS increase, lower conversion, shipping cost variance
-
-Then output a tier summary table:
-
-~~~
-PLEDGE TIER SUMMARY
-────────────────────────────────────────────────────────
-Tier              Price    Disc%   Units    Net/unit   Margin
-Pre-deposit       $1-20    —       Unlimited  —         —
-Super Early Bird  $[X]     [X]%    [X] cap   $[X]       [X]%
-Early Bird        $[X]     [X]%    Soft cap  $[X]       [X]%
-Standard          $[X]     [X]%    Unlimited $[X]       [X]%
-2-Pack Bundle     $[X]     [X]%    Unlimited $[X]       [X]%
-Premium           $[X]     [X]%    [X] cap   $[X]       [X]%
-────────────────────────────────────────────────────────
-~~~
-
-End with: "Mission 3 complete. Your pricing strategy, financial forecast, and pledge tier structure are locked. Type 'Mission 4' when you're ready to plan launch day execution."
+End: "Mission 3 complete. Type 'Mission 4' when ready for launch day execution."
 
 # M3 RULES
-1. Always research 3-5 comparable KS campaigns before anchoring MSRP
-2. Always ask for COGS before building any financial model
+1. Always research comparable KS campaigns before anchoring MSRP
+2. Always confirm COGS before building financial model
 3. Show your math — every number must be traceable
-4. Be honest about margin: if the economics don't work at a price point, say so
-5. Model the downside first — what's the minimum viable scenario?
-6. Early Bird is a soft cap — teach the founder to restock strategically, not to cheat backers
-7. Stretch goals must be producible at margin — no promises the BOM can't support
+4. Be honest about margin — if economics are bad at a price, say so
+5. Model downside first
+6. Early Bird is a soft cap — restock strategically
+7. Stretch goals must be producible at margin
 8. Language: match user (ZH or EN)
 9. End every response with one deliverable, question, or decision point
-10. If user jumps between pricing, tiers, and forecast — follow the thread. All three are part of the same model. You can update any piece without restarting from scratch.
-11. If user revisits Mission 1 or 2 content, handle it and note if it changes the financial model (e.g., a new feature increases COGS)
-12. Always output <!--ALIGNMENT_UPDATE:{...}--> when pricing or product details change, so memory stays current
+10. If user revisits M1/M2 content, handle it and note if it changes the financial model
 `;
 
 function getSystemPrompt(mission){
@@ -2751,7 +2547,7 @@ async function callKickman(trigger){
   if(trigger==='m2start'){
     apiMessages=[{role:'user',content:'Begin Mission 2.'}];
   } else if(trigger==='m3start'){
-    apiMessages=[{role:'user',content:'Begin Mission 3. Start with M3-A: confirm COGS and pricing strategy.'}];
+    apiMessages=[{role:'user',content:'Begin Mission 3. Start with M3-A: confirm our COGS and anchor the pricing strategy.'}];
   } else if(trigger==='gen_alignment'){
     apiMessages=[{role:'user',content:'Please generate the complete Product Alignment Document now, based on everything we have discussed. Use the exact template: 1) PRODUCT NAME & DEFINITION, 2) INTERNAL DESCRIPTION, 3) ALL FEATURES, 4) BENEFITS, 5) NEGATIVE THOUGHTS & FEELINGS — BACKER RESISTANCE MAP, 6) WHAT WE WANT PEOPLE TO THINK AND FEEL — EMOTIONAL DESTINATION MAP, 7) READINESS SCORE. Follow the template exactly — no extra sections, no reordering. After outputting it, ask the user if there is anything they want to add or change.'}];
   } else {
@@ -2772,9 +2568,8 @@ async function callKickman(trigger){
     if(fresh.name==='New Project'){const fu=fresh.history.find(m=>m.role==='user'&&m.content!=='Begin.');if(fu){const c=typeof fu.content==='string'?fu.content:(fu.content[0]?.text||'');fresh.name=c.slice(0,40).replace(/\n/g,' ').trim()+(c.length>40?'…':'');}}
     const ns=detectStep(text,fresh.mission||1); if(ns>fresh.step)fresh.step=ns;
     const v=detectVerdict(text); if(v){fresh.verdict=v;if(v==='go'&&(fresh.mission||1)===1){setTimeout(()=>triggerMission2(fresh.id),1200);}}
-    // Mission 3 trigger: user types "Mission 3" in Mission 2
     if((fresh.mission||1)===2 && /mission\s*3|开始.*定价|pricing.*strategy/i.test(typeof userMsg==='string'?userMsg:'')){
-      setTimeout(()=>triggerMission3(fresh.id), 800);
+      setTimeout(()=>triggerMission3(fresh.id),800);
     }
     // After gen_alignment, re-check and if alignment is now complete, proceed to M2
     if(trigger==='gen_alignment'){
@@ -2811,16 +2606,17 @@ async function callKickman(trigger){
 
 // -- MISSION 2 TRIGGER --------------------------------------------------
 async function triggerMission3(sessionId){
-  const session=getSession(sessionId); if(!session)return;
-  if((session.mission||1)>=3) return; // already in M3
+  const session=getSession(sessionId); if(!session) return;
+  if((session.mission||1)>=3) return;
   session.mission=3; session.step=11; session.updatedAt=Date.now();
   scheduleSave(session); updateStepUI(11,3); renderList();
-  // Show banner
-  const c2=document.getElementById('messages');
-  const b=document.createElement('div');
-  b.style.cssText='display:flex;align-items:center;gap:12px;padding:14px 20px;background:rgba(232,98,42,0.08);border:1px solid rgba(232,98,42,0.25);margin:8px 0;animation:msgIn .3s ease forwards;opacity:0;';
-  b.innerHTML='<span style="font-size:20px">💰</span><div><div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:3px">Mission 2 Complete</div><div style="font-size:13px;color:var(--text-2)">Starting Mission 3 — Pricing Strategy & Financial Forecast</div></div>';
-  c2.appendChild(b); c2.scrollTop=c2.scrollHeight;
+  const cont=document.getElementById('messages');
+  if(cont){
+    const b=document.createElement('div');
+    b.style.cssText='display:flex;align-items:center;gap:12px;padding:14px 20px;background:rgba(232,98,42,.08);border:1px solid rgba(232,98,42,.25);margin:8px 0;opacity:0;animation:msgIn .3s ease forwards;';
+    b.innerHTML='<span style="font-size:18px">&#x1F4B0;</span><div><div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:2px;">Mission 2 Complete</div><div style="font-size:13px;color:var(--text-2);">Starting Mission 3 &mdash; Pricing Strategy &amp; Financial Forecast</div></div>';
+    cont.appendChild(b); cont.scrollTop=cont.scrollHeight;
+  }
   await callKickman('m3start');
 }
 
@@ -2963,8 +2759,8 @@ function detectStep(t,mission=1){
     return 6;
   }
   if(mission===3){
-    if(t.includes('PLEDGE TIER')||t.includes('SUPER EARLY BIRD')||t.includes('STRETCH GOAL')||t.includes('M3-E')||t.includes('M3-F')||t.includes('M3-G'))return 13;
-    if(t.includes('FINANCIAL FORECAST')||t.includes('BREAKEVEN')||t.includes('M3-D')||t.includes('Net profit'))return 12;
+    if(t.includes('PLEDGE TIER')||t.includes('SUPER EARLY BIRD')||t.includes('STRETCH GOAL')||t.includes('M3-F')||t.includes('M3-G'))return 13;
+    if(t.includes('FINANCIAL FORECAST')||t.includes('BREAKEVEN')||t.includes('Net profit')||t.includes('M3-D'))return 12;
     return 11;
   }
   if(t.includes('FINAL REPORT')||t.includes('VERDICT:'))return 5;
@@ -2980,45 +2776,39 @@ function detectVerdict(t){
   return null;
 }
 function updateStepUI(step, mission=1){
-  // step = the step number within its mission (M1: 1-5, M2: 6-10, M3: 11-13)
-  // mission = 1, 2, or 3
-
-  // M1 header dots (1-5)
+  // Update M1 header dots
   for(let i=1;i<=5;i++){
     const dot=document.getElementById('dot-'+i);
     if(!dot) continue;
     dot.className='step-dot';
-    if(mission===1){
-      if(i<step) dot.classList.add('done');
-      else if(i===step) dot.classList.add('active');
-      else dot.classList.add('idle');
-    } else {
-      dot.classList.add('done');
-    }
+    if(mission===1){ if(i<step) dot.classList.add('done'); else if(i===step) dot.classList.add('active'); else dot.classList.add('idle'); }
+    else dot.classList.add('done');
   }
-
-  // Steps 1-13 — classify each
+  const session = getSession(activeId);
   for(let i=1;i<=13;i++){
     const el=document.getElementById('step-'+i);
     if(!el) continue;
-    el.className='sidebar-step';
-
-    // Which mission does step i belong to?
-    const iMission = i<=5?1:i<=10?2:3;
-
-    if(iMission < mission){
-      // Earlier mission → all done
-      el.classList.add('done');
-    } else if(iMission > mission){
-      // Future mission → idle
-      el.classList.add('idle');
-    } else {
-      // Same mission as current
-      if(i < step) el.classList.add('done');
-      else if(i === step) el.classList.add('active');
-      else el.classList.add('idle');
-    }
+    const iMission=i<=5?1:i<=10?2:3;
+    let state;
+    if(iMission<mission) state='done';
+    else if(iMission>mission) state='idle';
+    else if(i<step) state='done';
+    else if(i===step) state='active';
+    else state='idle';
+    // Override idle with has-data if step has content
+    if(state==='idle' && session && hasStepData(session,i)) state='has-data';
+    el.className='sidebar-step '+state;
+    const icon=el.querySelector('.step-icon');
+    if(icon) icon.textContent = state==='done'?'✓':state==='active'?'◉':state==='has-data'?'·':'○';
   }
+}
+
+function hasStepData(session, stepNum){
+  if(!session) return false;
+  if(stepNum===2) return !!(session.alignment&&session.alignment.productName)||(session.stepData&&session.stepData[2]&&!!session.stepData[2]._rawText);
+  if(!session.stepData||!session.stepData[stepNum]) return false;
+  const d=session.stepData[stepNum];
+  return !!(d._raw||d._rawText||Object.keys(d).some(k=>k!=='updatedAt'&&d[k]&&String(d[k]).length>20));
 }
 
 // ── SESSION LIST ───────────────────────────────────────────────────────────────
@@ -3342,12 +3132,11 @@ const STEP_DEFS = {
     num: '05',
     mission: 1,
     fields: [
-      {key:'verdict',           label:'Verdict',                hint:'GO ✅ / NO-GO ❌ / CONDITIONAL ⚠️', short:true},
-      {key:'validationResults', label:'Validation Results',     hint:'Clicks, leads, CPL, conversion rate per LP version'},
-      {key:'winningAngle',      label:'Winning Angle & Insight', hint:'Which LP version performed better and key learnings'},
-      {key:'risksToWatch',      label:'Risks to Watch',         hint:'Key risks and concerns before launch'},
-      {key:'overallScore',      label:'Overall Readiness Score', hint:'Final score and summary reasoning', short:true},
-      {key:'nextStep',          label:'Recommended Next Step',  hint:'Clear action item'},
+      {key:'validationResults', label:'Validation Results',     hint:'Clicks, leads, CPL per version, qualitative signals'},
+      {key:'verdict',           label:'Verdict',                hint:'GO / NO-GO / CONDITIONAL with reasoning', short:true},
+      {key:'winningAngle',      label:'Winning Angle',          hint:'Which LP version won and why'},
+      {key:'risksToWatch',      label:'Risks to Watch',         hint:'Key risks before launch'},
+      {key:'nextStep',          label:'Recommended Next Step',  hint:''},
     ]
   },
   6: {
@@ -3406,10 +3195,10 @@ const STEP_DEFS = {
     num: '11',
     mission: 3,
     fields: [
-      {key:'cogs',           label:'COGS & Cost Stack',          hint:'Fully-loaded cost per unit including packaging'},
-      {key:'msrp',           label:'MSRP & KS Price',            hint:'Retail price and Kickstarter backer price', short:true},
-      {key:'positioning',    label:'Competitive Positioning',    hint:'Where this price sits vs. alternatives'},
-      {key:'feeModel',       label:'Fee Structure',              hint:'Platform 5% + payment ~3.5% + fulfillment'},
+      {key:'cogs',          label:'COGS & Cost Stack',           hint:'Fully-loaded cost per unit'},
+      {key:'msrp',          label:'MSRP & KS Price',             hint:'Retail price and Kickstarter backer price', short:true},
+      {key:'benchmarks',    label:'Competitive Benchmarks',      hint:'3-5 comparable KS campaigns'},
+      {key:'feeModel',      label:'Fee Structure',               hint:'Platform 5% + payment 3.5% + fulfillment'},
     ]
   },
   12: {
@@ -3417,11 +3206,10 @@ const STEP_DEFS = {
     num: '12',
     mission: 3,
     fields: [
-      {key:'assumptions',    label:'Model Assumptions',          hint:'Blended fee rate, fulfillment cost, fixed costs'},
-      {key:'scenario1',      label:'Pricing Scenario 1',         hint:'Conservative / Base / Optimistic at price point 1'},
-      {key:'scenario2',      label:'Pricing Scenario 2',         hint:'Conservative / Base / Optimistic at price point 2'},
-      {key:'breakeven',      label:'Break-even Analysis',        hint:'Units needed to cover all fixed costs', short:true},
-      {key:'sensitivity',    label:'Sensitivity Analysis',       hint:'What if COGS +10%? What if only 300 backers?'},
+      {key:'assumptions',   label:'Model Assumptions',           hint:'Fees, fulfillment, fixed costs'},
+      {key:'scenario1',     label:'Pricing Scenario 1',          hint:'Conservative / Base / Optimistic'},
+      {key:'scenario2',     label:'Pricing Scenario 2',          hint:'Conservative / Base / Optimistic'},
+      {key:'breakeven',     label:'Break-even Analysis',         hint:'Units to cover all fixed costs', short:true},
     ]
   },
   13: {
@@ -3429,11 +3217,11 @@ const STEP_DEFS = {
     num: '13',
     mission: 3,
     fields: [
-      {key:'superEarlyBird', label:'Super Early Bird',           hint:'Deepest discount, 5-10% of inventory, 48hr urgency'},
-      {key:'earlyBird',      label:'Early Bird',                 hint:'Main volume driver, 20-25% off MSRP'},
-      {key:'standard',       label:'Standard',                   hint:'Retail-equivalent, unlimited'},
-      {key:'bundle',         label:'Bundle Tier',                hint:'2 units or product + accessory'},
-      {key:'premium',        label:'Premium / Limited Edition',  hint:'Differentiated version, higher AOV'},
+      {key:'deposit',       label:'Pre-Launch Deposit',          hint:'$1-20 refundable, locks best tier'},
+      {key:'superEB',       label:'Super Early Bird',            hint:'30-40% off, hard cap 100-300 units'},
+      {key:'earlyBird',     label:'Early Bird',                  hint:'20-25% off, soft cap, restock strategy'},
+      {key:'standard',      label:'Standard + Bundles',          hint:'Regular price + multi-unit + accessory'},
+      {key:'stretchGoals',  label:'Stretch Goals',               hint:'Milestone ladder with unlockables'},
     ]
   },
 };
@@ -3441,740 +3229,444 @@ const STEP_DEFS = {
 let currentStepDrawer = null;
 let stepEditMode = false;
 
-// ── Open ──────────────────────────────────────────────────────────────────────
 function openStepDrawer(stepNum){
-  const def = STEP_DEFS[stepNum]; if(!def) return;
-  const session = getSession(activeId); if(!session) return;
-  const step = session.step||1, mission = session.mission||1;
-  const ok = (def.mission===1 && stepNum<=step) || (def.mission===2 && mission>=2);
-  if(!ok){ const el=document.getElementById('step-'+stepNum); if(el){el.style.opacity='0.5';setTimeout(()=>el.style.opacity='',400);} return; }
-  currentStepDrawer = stepNum; stepEditMode = false;
-  document.getElementById('step-drawer-title').textContent = def.num + ' — ' + def.title;
-  const d = session.stepData && session.stepData[stepNum];
-  document.getElementById('step-drawer-meta').textContent = d && d.updatedAt
-    ? 'Edited ' + new Date(d.updatedAt).toLocaleDateString('en',{month:'short',day:'numeric'}) : '';
-  const saveBtn = document.getElementById('so-save-btn');
-  const editBtn = document.getElementById('so-edit-btn');
+  const def=STEP_DEFS[stepNum]; if(!def) return;
+  const session=getSession(activeId); if(!session) return;
+  currentStepDrawer=stepNum; stepEditMode=false;
+  document.getElementById('step-drawer-title').textContent=def.num+' — '+def.title;
+  const d=session.stepData&&session.stepData[stepNum];
+  document.getElementById('step-drawer-meta').textContent=d&&d.updatedAt?'Edited '+new Date(d.updatedAt).toLocaleDateString('en',{month:'short',day:'numeric'}):'';
+  const saveBtn=document.getElementById('so-save-btn');
+  const editBtn=document.getElementById('so-edit-btn');
   if(saveBtn) saveBtn.style.display='none';
-  if(editBtn){ editBtn.textContent='✎ Edit'; editBtn.className='so-btn edit-mode'; }
-  smartExtractStep(stepNum, session);
-  renderStepView(stepNum, session);
+  if(editBtn){editBtn.textContent='✎ Edit';editBtn.className='so-btn edit-mode';}
+  smartExtractStep(stepNum,session);
+  renderStepView(stepNum,session);
   document.getElementById('step-overlay').classList.add('open');
 }
 
 function closeStepDrawer(){
-  document.getElementById('step-overlay').classList.remove('open');
-  currentStepDrawer = null; stepEditMode = false;
+  const ov=document.getElementById('step-overlay');
+  if(ov) ov.classList.remove('open');
+  currentStepDrawer=null; stepEditMode=false;
 }
 
 function toggleStepEditMode(){
   if(!currentStepDrawer) return;
-  stepEditMode = !stepEditMode;
-  const session = getSession(activeId);
-  const editBtn = document.getElementById('so-edit-btn');
-  const saveBtn = document.getElementById('so-save-btn');
+  stepEditMode=!stepEditMode;
+  const session=getSession(activeId);
+  const editBtn=document.getElementById('so-edit-btn');
+  const saveBtn=document.getElementById('so-save-btn');
   if(stepEditMode){
-    renderStepEdit(currentStepDrawer, session);
-    if(editBtn){ editBtn.textContent='✕ Cancel'; editBtn.className='so-btn'; }
+    renderStepEdit(currentStepDrawer,session);
+    if(editBtn){editBtn.textContent='✕ Cancel';editBtn.className='so-btn';}
     if(saveBtn) saveBtn.style.display='';
   } else {
-    renderStepView(currentStepDrawer, session);
-    if(editBtn){ editBtn.textContent='✎ Edit'; editBtn.className='so-btn edit-mode'; }
+    renderStepView(currentStepDrawer,session);
+    if(editBtn){editBtn.textContent='✎ Edit';editBtn.className='so-btn edit-mode';}
     if(saveBtn) saveBtn.style.display='none';
   }
 }
 
-// ── Smart extract before rendering ───────────────────────────────────────────
-function smartExtractStep(stepNum, session){
-  if(!session || !session.history) return;
-  if(stepNum === 2){ captureLatestAlignmentRaw(session); return; }
-  const def = STEP_DEFS[stepNum]; if(!def) return;
-  const pats = {
-    3:/APPROACH [ABC]:|Marketing Approach|\bAPPROACH\b.*\bCore angle\b/i,
-    4:/LP VERSION [12]|VALIDATION PLAYBOOK|Landing Page Brief/i,
-    5:/GO[\s\S]{0,10}NO.GO|VERDICT|FINAL REPORT|GO\s*\/|Readiness Score.*\n.*\n.*GO/i,
-    6:/VIDEO STYLE|MODULE A[\s:]/i,
-    7:/SCENE ORDER|SCRIPT|MODULE A[2-9]/i,
-    8:/PRODUCTION APPROACH|VIDEO BRIEF|MODULE A/i,
-    9:/CAMPAIGN PAGE|MODULE B[\s:]/i,
-    10:/LAUNCH READY|MODULE C[\s:]|PRE-LAUNCH CHECKLIST/i,
-    11:/MSRP|PRICING STRATEGY|M3-A|competitive.*pric|price.*anchor/i,
-    12:/FINANCIAL FORECAST|BREAKEVEN|CONTRIBUTION MARGIN|M3-D|pledge.*tier.*\$/i,
-    13:/SUPER EARLY BIRD|EARLY BIRD|PLEDGE TIER|STRETCH GOAL|M3-[EFG]/i
+function smartExtractStep(stepNum,session){
+  if(!session||!session.history) return;
+  if(stepNum===2){captureLatestAlignmentRaw(session);return;}
+  const def=STEP_DEFS[stepNum]; if(!def) return;
+  const pats={
+    3:/APPROACH [ABC]:|Marketing Approach/i, 4:/LP VERSION [12]|VALIDATION PLAYBOOK/i,
+    5:/VERDICT|NO.GO|FINAL REPORT/i, 6:/VIDEO STYLE|MODULE A/i,
+    7:/SCENE ORDER|SCRIPT/i, 8:/PRODUCTION APPROACH|VIDEO BRIEF/i,
+    9:/CAMPAIGN PAGE|MODULE B/i, 10:/LAUNCH READY|MODULE C|PRE-LAUNCH CHECKLIST/i,
+    11:/MSRP|PRICING STRATEGY|M3-A/i, 12:/FINANCIAL FORECAST|BREAKEVEN|M3-D/i,
+    13:/SUPER EARLY BIRD|EARLY BIRD|PLEDGE TIER|STRETCH GOAL/i
   };
-  // For M3 steps, always capture full raw text (financial data needs full context)
-  const isM3 = stepNum >= 11;
-  const pat = pats[stepNum]; if(!pat) return;
-  const msgs = [...session.history].filter(m=>m.role==='assistant'||m.role==='km').reverse();
+  const pat=pats[stepNum]; if(!pat) return;
+  const msgs=[...session.history].filter(m=>m.role==='assistant'||m.role==='km').reverse();
   for(const msg of msgs){
-    const text = typeof msg.content==='string'?msg.content:(msg.content?.[0]?.text||'');
-    const clean = text.replace(/<!--[\s\S]*?-->/g,'').trim();
-    if(clean.length<200 || !pat.test(clean)) continue;
+    const text=typeof msg.content==='string'?msg.content:(msg.content?.[0]?.text||'');
+    const clean=text.replace(/<!--[\s\S]*?-->/g,'').trim();
+    if(clean.length<200||!pat.test(clean)) continue;
     if(!session.stepData) session.stepData={};
     if(!session.stepData[stepNum]) session.stepData[stepNum]={};
-    const fk = def.fields[0].key;
-    // For M3 steps, always update with latest (pricing data evolves)
-    if(isM3 || !session.stepData[stepNum][fk]){
-      session.stepData[stepNum][fk] = clean.slice(0,6000);
-      session.stepData[stepNum]._raw = clean; // also store raw for rich rendering
-      session.stepData[stepNum].updatedAt = Date.now();
+    const fk=def.fields[0].key;
+    const isM3=stepNum>=11;
+    if(isM3||!session.stepData[stepNum][fk]){
+      session.stepData[stepNum][fk]=clean.slice(0,6000);
+      session.stepData[stepNum]._raw=clean;
+      session.stepData[stepNum].updatedAt=Date.now();
       scheduleSave(session);
     }
     break;
   }
 }
 
-// ── VIEW mode ─────────────────────────────────────────────────────────────────
-function renderStepView(stepNum, session){
-  const def = STEP_DEFS[stepNum];
-  const raw = (session.stepData && session.stepData[stepNum]) || {};
-  const body = document.getElementById('step-drawer-body');
+async function triggerStepGeneration(stepNum,session,bodyEl){
+  const def=STEP_DEFS[stepNum]; if(!def) return;
+  const prompts={
+    1:'Summarize the founder input: why building this, what the product does, cost/pricing, timeline.',
+    2:'Generate the complete Product Alignment Document using the exact 7-section template.',
+    3:'Summarize the three marketing approaches discussed, including chosen approach and reasoning.',
+    4:'Output the Landing Page Briefs: both LP versions, Validation Playbook, ad setup, dashboard.',
+    5:'Output the Go/No-Go Report: validation results, verdict, winning angle, risks, next steps.',
+    6:'Summarize the Video Strategy: budget, timeline, chosen style, key video rules.',
+    7:'Summarize Script and Scenes: core USP, scene order, recommended length.',
+    8:'Output the Video Brief: production approach, casting, production timeline.',
+    9:'Summarize the Campaign Page: 12-section structure, asset checklist, trust signals.',
+    10:'Output the Launch Ready checklist: community plan, content plan, IP, pre-launch.',
+    11:'Output the Pricing Strategy: COGS, MSRP, competitive positioning, fee model.',
+    12:'Output the Financial Forecast with 2 pricing scenarios x 3 volume scenarios.',
+    13:'Output the Pledge Tier design: all tiers with prices, discounts, unit economics, stretch goals.',
+  };
+  const prompt=prompts[stepNum]; if(!prompt) return;
+  try{
+    const sysPrompt=getSystemPrompt(session.mission||1)+buildMemoryContext(session);
+    const msgs=buildMessageHistory(session);
+    msgs.push({role:'user',content:prompt+' Output full results now.'});
+    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:msgs,system:sysPrompt,password:currentPw})});
+    if(!res.ok) throw new Error('API error');
+    const data=await res.json();
+    const text=data.content?.[0]?.text||'';
+    const alUp=parseAlignmentUpdate(text); if(alUp) applyAlignmentUpdate(alUp,session.id);
+    const fresh=getSession(activeId);
+    if(!fresh.stepData) fresh.stepData={};
+    if(!fresh.stepData[stepNum]) fresh.stepData[stepNum]={};
+    fresh.stepData[stepNum][def.fields[0].key]=text.replace(/<!--[\s\S]*?-->/g,'').trim();
+    fresh.stepData[stepNum]._raw=fresh.stepData[stepNum][def.fields[0].key];
+    fresh.stepData[stepNum].updatedAt=Date.now();
+    fresh.updatedAt=Date.now(); scheduleSave(fresh);
+    smartExtractStep(stepNum,fresh);
+    if(currentStepDrawer===stepNum){renderStepView(stepNum,fresh);document.getElementById('step-drawer-meta').textContent='Just generated';}
+    updateStepUI(fresh.step||1,fresh.mission||1);
+  }catch(e){
+    if(bodyEl&&currentStepDrawer===stepNum) bodyEl.innerHTML='<div class="so-empty-state"><span class="so-empty-icon">!</span><div class="so-empty-title">Could not generate</div><div class="so-empty-body">Complete this step in the chat first.<br><br><span style="color:var(--accent);cursor:pointer;" onclick="closeStepDrawer()">Back to chat</span></div></div>';
+  }
+}
 
-  // Step 2 uses rawText
-  const rawText = stepNum===2 && raw._rawText;
-  const merged = stepNum===2 ? mergeAlignmentToStepData(session) : raw;
-  const hasData = rawText || def.fields.some(f=>merged[f.key]&&String(merged[f.key]).trim().length>0);
+function renderStepView(stepNum,session){
+  const def=STEP_DEFS[stepNum];
+  const raw=(session.stepData&&session.stepData[stepNum])||{};
+  const body=document.getElementById('step-drawer-body');
+  const rawText=stepNum===2&&raw._rawText;
+  const merged=stepNum===2?mergeAlignmentToStepData(session):raw;
+  const hasData=rawText||def.fields.some(f=>merged[f.key]&&String(merged[f.key]).trim().length>0)||raw._raw;
 
   if(!hasData){
-    body.innerHTML = '<div class="so-empty-state">' +
-      '<span class="so-empty-icon" style="animation:spin 1.5s linear infinite;display:inline-block">⟳</span>' +
-      '<div class="so-empty-title">Generating results...</div>' +
-      '<div class="so-empty-body">Kickman is extracting output from your conversation.</div></div>';
-    if(!document.getElementById('spin-style')){
-      const st=document.createElement('style'); st.id='spin-style';
-      st.textContent='@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
-      document.head.appendChild(st);
-    }
-    setTimeout(()=>triggerStepGeneration(stepNum, session, body), 300);
+    body.innerHTML='<div class="so-empty-state"><span class="so-empty-icon" style="animation:spin 1.5s linear infinite;display:inline-block">&#x21BB;</span><div class="so-empty-title">Generating results...</div><div class="so-empty-body">Kickman is extracting output from your conversation.</div></div>';
+    if(!document.getElementById('spin-style')){const st=document.createElement('style');st.id='spin-style';st.textContent='@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';document.head.appendChild(st);}
+    setTimeout(()=>triggerStepGeneration(stepNum,session,body),300);
     return;
   }
 
-  let html = '<div class="so-doc">';
-  html += '<div class="so-doc-header">';
-  html += '<div class="so-doc-step-num">Step '+def.num+' · Mission '+def.mission+'</div>';
-  html += '<div class="so-doc-title">'+escHtml(def.title)+'</div>';
-  const proj = session.name&&session.name!=='New Project'?escHtml(session.name):'';
-  if(proj) html += '<div class="so-doc-subtitle">'+proj+'</div>';
-  html += '</div>';
+  let html='<div class="so-doc">';
+  html+='<div class="so-doc-header"><div class="so-doc-step-num">Step '+def.num+' &middot; Mission '+def.mission+'</div>';
+  html+='<div class="so-doc-title">'+escHtml(def.title)+'</div>';
+  const proj=session.name&&session.name!=='New Project'?escHtml(session.name):'';
+  if(proj) html+='<div class="so-doc-subtitle">'+proj+'</div>';
+  html+='</div>';
 
-  if(stepNum===2){
-    html += rawText ? alignmentRawToHTML(rawText) : renderAlignmentView(merged);
-  } else if(stepNum===5){
-    html += renderGoNoGoView(merged, session);
-  } else if(stepNum===11){
-    html += renderPricingStrategyView(merged, session);
-  } else if(stepNum===12){
-    html += renderFinancialForecastView(merged, session);
-  } else if(stepNum===13){
-    html += renderPledgeTiersView(merged, session);
-  } else {
-    html += renderGenericView(def, merged);
-  }
-  html += '</div>';
-  body.innerHTML = html;
+  if(stepNum===2) html+=rawText?alignmentRawToHTML(rawText):renderAlignmentView(merged);
+  else if(stepNum===5) html+=renderGoNoGoView(merged,session);
+  else if(stepNum===11) html+=renderPricingView(merged,session);
+  else if(stepNum===12) html+=renderForecastView(merged,session);
+  else if(stepNum===13) html+=renderTiersView(merged,session);
+  else html+=renderGenericView(def,merged);
+  html+='</div>';
+  body.innerHTML=html;
 }
 
 function renderAlignmentView(d){
-  const lines2html = txt => {
-    const items = String(txt||'').split('\n').filter(l=>l.trim()).map(l=>l.replace(/^[•\-\*]\s*/,'').replace(/\*+/g,'').trim()).filter(Boolean);
-    if(!items.length) return '<p class="so-empty">Not yet filled in.</p>';
-    return '<ul>'+items.map(i=>'<li>'+escHtml(i)+'</li>').join('')+'</ul>';
-  };
-  const quotes2html = txt => {
-    const items = String(txt||'').split('\n').filter(l=>l.trim()).map(l=>l.replace(/^[•\-\*]\s*/,'').replace(/^["""\u201c]/,'').replace(/["""\u201d]$/,'').replace(/\*+/g,'').trim()).filter(l=>l.length>3);
-    if(!items.length) return '<p class="so-empty">Not yet filled in.</p>';
-    return '<ul>'+items.map(i=>'<li>'+escHtml(i)+'</li>').join('')+'</ul>';
-  };
-  let html = '';
-  // Name + description card
-  html += '<div class="so-section"><div class="so-section-label">Product Name & Definition</div>';
-  html += '<div style="padding:16px 20px;background:var(--card);border-left:3px solid var(--accent);margin-bottom:2px;">';
-  html += '<div style="font-family:var(--font-serif);font-size:20px;color:var(--text);margin-bottom:6px;">'+escHtml(d.productName||'')+'</div>';
-  if(d.internalDescription) html += '<div style="font-size:12px;color:var(--text-2);line-height:1.7;">'+escHtml(d.internalDescription)+'</div>';
-  html += '</div></div>';
-
-  const sec = (label, content) => '<div class="so-section"><div class="so-section-label">'+label+'</div><div class="so-view">'+content+'</div></div>';
-  html += sec('All Features', lines2html(d.features));
-  html += sec('Benefits', lines2html(d.benefits));
-  html += '<div class="so-section"><div class="so-section-label">Resistance Map — What Backers Might Think/Feel</div><div class="so-view quote-style">'+quotes2html(d.negativeThoughts)+'</div></div>';
-  html += '<div class="so-section"><div class="so-section-label">Emotional Destination — What We Want Them to Feel</div><div class="so-view quote-style">'+quotes2html(d.emotionalDestination)+'</div></div>';
-  if(d.readinessScore){
-    const s = parseInt(d.readinessScore)||0;
-    const col = s>=7?'var(--green)':s>=5?'var(--yellow)':'var(--red)';
-    html += '<div class="so-section"><div class="so-section-label">Readiness Score</div>';
-    html += '<div style="display:flex;align-items:baseline;gap:8px;padding:12px 0;">';
-    html += '<span style="font-family:var(--font-serif);font-size:48px;color:'+col+';line-height:1;">'+s+'</span>';
-    html += '<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);">/ 10</span></div></div>';
-  }
+  var toBullets=function(txt){var items=String(txt||'').split('\n').filter(function(l){return l.trim();}).map(function(l){return l.replace(/^[*-] */,'').replace(/\*+/g,'').trim();}).filter(Boolean);if(!items.length)return '<p class="so-empty">Not yet filled in.</p>';return '<ul>'+items.map(function(i){return'<li>'+escHtml(i)+'</li>';}).join('')+'</ul>';};
+  var toQuotes=function(txt){var items=String(txt||'').split('\n').filter(function(l){return l.trim();}).map(function(l){return l.replace(/^[*-] */,'').replace(/^[\u201c"]/,'').replace(/[\u201d"]$/,'').replace(/\*+/g,'').trim();}).filter(function(l){return l.length>3;});if(!items.length)return '<p class="so-empty">Not yet filled in.</p>';return '<ul>'+items.map(function(i){return'<li>'+escHtml(i)+'</li>';}).join('')+'</ul>';};
+  var html='<div class="so-section"><div class="so-section-label">Product Name &amp; Definition</div>';
+  html+='<div style="padding:16px 20px;background:var(--card);border-left:3px solid var(--accent);">';
+  html+='<div style="font-family:var(--font-serif);font-size:20px;color:var(--text);margin-bottom:6px;">'+escHtml(d.productName||'')+'</div>';
+  if(d.internalDescription) html+='<div style="font-size:12px;color:var(--text-2);line-height:1.7;">'+escHtml(d.internalDescription)+'</div>';
+  html+='</div></div>';
+  var sec=function(label,content,style){return '<div class="so-section"><div class="so-section-label">'+label+'</div><div class="so-view'+(style?' '+style:'')+'" >'+content+'</div></div>';};
+  html+=sec('All Features',toBullets(d.features));
+  html+=sec('Benefits',toBullets(d.benefits));
+  html+=sec('Resistance Map',toQuotes(d.negativeThoughts),'quote-style');
+  html+=sec('Emotional Destination',toQuotes(d.emotionalDestination),'quote-style');
+  if(d.readinessScore){var s=parseInt(d.readinessScore)||0;var col=s>=7?'var(--green)':s>=5?'var(--yellow)':'var(--red)';html+='<div class="so-section"><div class="so-section-label">Readiness Score</div><div style="display:flex;align-items:baseline;gap:8px;padding:12px 0;"><span style="font-family:var(--font-serif);font-size:48px;color:'+col+';line-height:1;">'+s+'</span><span style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);">/ 10</span></div></div>';}
   return html;
 }
 
-
-// ── M3 RENDERERS ─────────────────────────────────────────────────────────────
-
-// Shared: extract a section of text between two headers
-function extractSection(text, startRx, endRx){
-  const s = text.search(startRx);
-  if(s < 0) return '';
-  const e = endRx ? text.search(endRx) : text.length;
-  return text.slice(s, e > s ? e : text.length).trim();
-}
-
-// Shared: render a key-value table from lines like "Key: value"
-function kvTable(lines){
-  const rows = lines.filter(l=>l.includes(':')).map(l=>{
-    const idx = l.indexOf(':');
-    const k = l.slice(0,idx).replace(/^[•\-\*]\s*/,'').replace(/\*+/g,'').trim();
-    const v = l.slice(idx+1).replace(/\*+/g,'').trim();
-    return '<tr><td style="padding:7px 14px 7px 0;font-family:var(--font-mono);font-size:10px;color:var(--text-3);letter-spacing:.5px;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.04);">'+escHtml(k)+'</td>' +
-           '<td style="padding:7px 0;font-size:13px;color:var(--text-2);border-bottom:1px solid rgba(255,255,255,.04);">'+escHtml(v)+'</td></tr>';
-  }).join('');
-  return rows ? '<table style="width:100%;border-collapse:collapse;">'+rows+'</table>' : '';
-}
-
-// ── Step 11: Pricing Strategy ─────────────────────────────────────────────────
-function renderPricingStrategyView(data, session){
-  // Try raw text first
-  const raw = session.stepData && session.stepData[11] && session.stepData[11]._raw;
-  const src = raw || Object.values(data).join('\n\n');
-  if(!src || src.trim().length < 30)
-    return '<div class="so-view"><p class="so-empty">Pricing strategy not yet discussed. Ask Kickman to anchor your MSRP.</p></div>';
-
-  let html = '';
-
-  // Highlight MSRP and KS price if found
-  const msrpMatch = src.match(/MSRP[^:\n]*:\s*\$?([\d,]+)/i);
-  const ksMatch = src.match(/KS[^:\n]*price[^:\n]*:\s*\$?([\d,]+)/i) ||
-                  src.match(/Kickstarter[^:\n]*:\s*\$?([\d,]+)/i) ||
-                  src.match(/backer[^:\n]*:\s*\$?([\d,]+)/i);
-  const cogsMatch = src.match(/COGS[^:\n]*:\s*\$?([\d,]+)/i);
-
-  if(msrpMatch || ksMatch || cogsMatch){
-    html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:24px;">';
-    const card = (label, val, accent) =>
-      '<div style="padding:14px 16px;background:var(--card);border:1px solid '+(accent?'rgba(232,98,42,.3)':'var(--border)')+';border-top:2px solid '+(accent?'var(--accent)':'var(--border)')+'">' +
-      '<div style="font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-3);text-transform:uppercase;margin-bottom:6px;">'+label+'</div>' +
-      '<div style="font-family:var(--font-serif);font-size:24px;color:'+(accent?'var(--accent)':'var(--text)')+';">$'+val+'</div></div>';
-    if(cogsMatch) html += card('COGS', cogsMatch[1]);
-    if(msrpMatch) html += card('MSRP', msrpMatch[1], true);
-    if(ksMatch) html += card('KS Price', ksMatch[1], true);
-    html += '</div>';
-  }
-
-  // Render the rest as structured markdown
-  html += '<div class="so-view">'+markdownToHTML(src)+'</div>';
-  return html;
-}
-
-// ── Step 12: Financial Forecast ───────────────────────────────────────────────
-function renderFinancialForecastView(data, session){
-  const raw = session.stepData && session.stepData[12] && session.stepData[12]._raw;
-  const src = raw || Object.values(data).filter(v=>v&&typeof v==='string').join('\n\n');
-  if(!src || src.trim().length < 30)
-    return '<div class="so-view"><p class="so-empty">Financial forecast not yet generated. Complete M3-D with Kickman.</p></div>';
-
-  let html = '';
-
-  // Extract key numbers for summary cards
-  const beMatch = src.match(/break[\s\-]?even[^:\n]*:\s*([0-9,]+)\s*units?/i) ||
-                  src.match(/([0-9,]+)\s*units?\s*to\s*break/i);
-  const marginMatch = src.match(/contribution\s+margin[^:\n]*:\s*([0-9.]+%|\$[\d.]+)/i) ||
-                      src.match(/CM%[^:\n]*:\s*([0-9.]+%)/i);
-  const fixedMatch = src.match(/fixed\s+costs?[^:\n]*:\s*\$?([\d,]+)/i);
-
-  if(beMatch || marginMatch || fixedMatch){
-    html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:24px;">';
-    const kpi = (label, val, color) =>
-      '<div style="padding:14px 16px;background:var(--card);border:1px solid var(--border);border-top:2px solid '+(color||'var(--border)')+'">' +
-      '<div style="font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-3);text-transform:uppercase;margin-bottom:6px;">'+label+'</div>' +
-      '<div style="font-family:var(--font-serif);font-size:22px;color:'+(color||'var(--text)')+';">'+val+'</div></div>';
-    if(beMatch) html += kpi('Break-even', beMatch[1]+' units', 'var(--yellow)');
-    if(marginMatch) html += kpi('Contribution Margin', marginMatch[1], 'var(--green)');
-    if(fixedMatch) html += kpi('Fixed Costs', '$'+fixedMatch[1], 'var(--text-3)');
-    html += '</div>';
-  }
-
-  // Try to extract and render forecast tables
-  const tableLines = src.split('\n').filter(l => /\|/.test(l));
-  if(tableLines.length > 3){
-    // Has markdown table — render it as HTML
-    html += '<div style="overflow-x:auto;margin-bottom:20px;">';
-    html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
-    let headerDone = false;
-    tableLines.forEach(row => {
-      if(/^[\|\s\-:]+$/.test(row.replace(/\|/g,'').trim())) return; // separator row
-      const cells = row.split('|').filter((_, i, a) => i > 0 && i < a.length-1);
-      if(!headerDone){
-        html += '<thead><tr>'+cells.map(cell =>
-          '<th style="padding:8px 12px;background:var(--card);border-bottom:2px solid var(--accent);font-family:var(--font-mono);font-size:9px;letter-spacing:1px;color:var(--text-2);text-align:left;white-space:nowrap;">'+
-          escHtml(cell.replace(/\*+/g,'').trim())+'</th>').join('')+'</tr></thead><tbody>';
-        headerDone = true;
-      } else {
-        const isHighlight = /total|net profit|breakeven/i.test(row);
-        const style = isHighlight ?
-          'background:rgba(232,98,42,.06);font-weight:600;' :
-          'border-bottom:1px solid rgba(255,255,255,.04);';
-        html += '<tr style="'+style+'">'+cells.map(cell => {
-          const v = cell.replace(/\*+/g,'').trim();
-          const isNeg = /^-\$|^-\d/.test(v);
-          const isPos = /^\+\$|\d+%$/.test(v) && !isNeg;
-          const color = isNeg?'color:var(--red)':isPos?'color:var(--green)':'';
-          return '<td style="padding:7px 12px;font-size:12px;'+color+'">'+escHtml(v)+'</td>';
-        }).join('')+'</tr>';
-      }
-    });
-    html += '</tbody></table></div>';
-  }
-
-  // Render remaining text as markdown
-  const nonTableText = src.split('\n').filter(l => !/\|/.test(l)).join('\n');
-  if(nonTableText.trim()){
-    html += '<div class="so-view">'+markdownToHTML(nonTableText)+'</div>';
-  }
-
-  return html || '<div class="so-view">'+markdownToHTML(src)+'</div>';
-}
-
-// ── Step 13: Pledge Tiers ─────────────────────────────────────────────────────
-function renderPledgeTiersView(data, session){
-  const raw = session.stepData && session.stepData[13] && session.stepData[13]._raw;
-  const src = raw || Object.values(data).filter(v=>v&&typeof v==='string').join('\n\n');
-  if(!src || src.trim().length < 30)
-    return '<div class="so-view"><p class="so-empty">Pledge tiers not yet designed. Complete M3-F with Kickman.</p></div>';
-
-  // Try to extract structured tier data
-  const tierPatterns = [
-    { name:'Pre-Launch Deposit', rx:/pre[\s\-]?launch|deposit|reservation/i, color:'#888888', icon:'🔖' },
-    { name:'Super Early Bird', rx:/super early bird/i, color:'var(--green)', icon:'⚡' },
-    { name:'Early Bird', rx:/(?<!super )early bird/i, color:'var(--accent)', icon:'🐦' },
-    { name:'Standard', rx:/^standard|regular[^:]|retail[^-]/im, color:'#6b9bd2', icon:'📦' },
-    { name:'Bundle', rx:/bundle|2[\s\-]pack|multi/i, color:'#9b7fd2', icon:'🎁' },
-    { name:'Premium', rx:/premium|limited edition|special/i, color:'#d2a17f', icon:'⭐' },
-  ];
-
-  let html = '';
-  let foundTiers = false;
-
-  // Try to extract individual tier blocks
-  const lines = src.split('\n');
-  let currentTier = null;
-  const tiers = [];
-
-  lines.forEach(line => {
-    const l = line.trim();
-    const tierMatch = tierPatterns.find(t => t.rx.test(l) && (l.includes('$') || l.includes('###') || /^[*#]/.test(l)));
-    if(tierMatch){
-      if(currentTier) tiers.push(currentTier);
-      currentTier = { name: tierMatch.name, color: tierMatch.color, icon: tierMatch.icon, lines: [l] };
-    } else if(currentTier && l) {
-      currentTier.lines.push(l);
-    }
-  });
-  if(currentTier) tiers.push(currentTier);
-
-  if(tiers.length >= 2){
-    foundTiers = true;
-    html += '<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px;">';
-    tiers.forEach(tier => {
-      const content = tier.lines.join('\n');
-      const priceMatch = content.match(/\$\s*([\d,]+)/);
-      const discMatch = content.match(/([\d]+)%\s*off/i);
-      const qtyMatch = content.match(/(\d[\d,]*)\s*units?/i) || content.match(/cap[^:]*:\s*(\d[\d,]*)/i);
-
-      html += '<div style="border:1px solid rgba(255,255,255,.08);border-left:3px solid '+tier.color+';padding:14px 18px;background:var(--card);">';
-      html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">';
-      html += '<span style="font-size:18px;">'+tier.icon+'</span>';
-      html += '<div style="font-family:var(--font-serif);font-size:16px;color:var(--text);">'+escHtml(tier.name)+'</div>';
-      if(priceMatch) html += '<div style="margin-left:auto;font-family:var(--font-serif);font-size:20px;color:'+tier.color+';">$'+escHtml(priceMatch[1])+'</div>';
-      html += '</div>';
-
-      if(discMatch || qtyMatch){
-        html += '<div style="display:flex;gap:16px;margin-bottom:8px;">';
-        if(discMatch) html += '<span style="font-family:var(--font-mono);font-size:10px;background:rgba(255,255,255,.06);padding:3px 8px;color:'+tier.color+';">-'+discMatch[1]+'% off MSRP</span>';
-        if(qtyMatch) html += '<span style="font-family:var(--font-mono);font-size:10px;background:rgba(255,255,255,.06);padding:3px 8px;color:var(--text-3);">'+escHtml(qtyMatch[1])+' units</span>';
-        html += '</div>';
-      }
-
-      // Render remaining content as clean text
-      const bodyLines = tier.lines.slice(1).filter(l=>!l.includes(tier.name)).join('\n');
-      if(bodyLines.trim()) html += '<div style="font-size:12px;color:var(--text-2);line-height:1.7;">'+markdownToHTML(bodyLines)+'</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-  }
-
-  // Stretch goals section
-  const stretchIdx = src.search(/stretch goal/i);
-  if(stretchIdx >= 0){
-    const stretchSection = src.slice(stretchIdx);
-    html += '<div class="so-section"><div class="so-section-label">Stretch Goals</div>';
-    const stretchLines = stretchSection.split('\n').filter(l=>l.trim());
-    html += '<div style="display:flex;flex-direction:column;gap:6px;">';
-    stretchLines.slice(1).forEach(line => {
-      const l = line.trim();
-      if(!l) return;
-      const amtMatch = l.match(/\$\s*([\d,.]+[KkMm]?)/);
-      const unlockMatch = l.match(/unlock[:\s]+(.+)/i) || l.match(/—\s*(.+)/);
-      if(amtMatch){
-        html += '<div style="display:flex;align-items:center;gap:12px;padding:8px 14px;background:var(--card);border:1px solid rgba(255,255,255,.06);">';
-        html += '<div style="font-family:var(--font-mono);font-size:11px;color:var(--accent);min-width:80px;">$'+escHtml(amtMatch[1])+'</div>';
-        const desc = unlockMatch ? unlockMatch[1] : l.replace(amtMatch[0],'').replace(/^[\s\-—]+/,'').trim();
-        html += '<div style="font-size:12px;color:var(--text-2);">'+escHtml(desc)+'</div>';
-        html += '</div>';
-      }
-    });
-    html += '</div></div>';
-  }
-
-  // Fall back to full markdown if no structured tiers found
-  if(!foundTiers){
-    html += '<div class="so-view">'+markdownToHTML(src)+'</div>';
-  }
-
-  return html || '<div class="so-view"><p class="so-empty">No tier data yet.</p></div>';
-}
-
-
-function renderGenericView(def, data){
-  let html = '';
-  def.fields.forEach(f => {
-    const val = data[f.key] || data[f.key+'_html'] || '';
+function renderGenericView(def,data){
+  var html='';
+  def.fields.forEach(function(f){
+    var val=data[f.key]||data._raw||'';
     if(!String(val).trim()) return;
-    html += '<div class="so-section"><div class="so-section-label">'+escHtml(f.label)+'</div>';
-    html += '<div class="so-view">'+markdownToHTML(String(val))+'</div>';
-    html += '</div>';
+    html+='<div class="so-section"><div class="so-section-label">'+escHtml(f.label)+'</div>';
+    html+='<div class="so-view">'+markdownToHTML(String(val))+'</div></div>';
   });
-  return html || '<div class="so-view"><p style="color:var(--text-3);font-style:italic;">No content saved yet.</p></div>';
+  if(!html&&data._raw) html='<div class="so-view">'+markdownToHTML(data._raw)+'</div>';
+  return html||'<div class="so-view"><p style="color:var(--text-3);font-style:italic;">No content saved yet.</p></div>';
 }
 
-// Convert markdown text to structured HTML — preserves headings, lists, bold
 function markdownToHTML(text){
   if(!text) return '';
-  // If already has HTML tags, return as-is
   if(/<[a-z][\s\S]*>/i.test(text)) return text;
-
-  const lines = text.split('\n');
-  let html = '';
-  let inUL = false, inOL = false;
-  let olIdx = 0;
-
-  const closeLists = () => {
-    if(inUL){ html += '</ul>'; inUL = false; }
-    if(inOL){ html += '</ol>'; inOL = false; olIdx = 0; }
-  };
-
-  const inlineFmt = str => str
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g,'<em>$1</em>')
-    .replace(/`(.+?)`/g,'<code style="font-family:var(--font-mono);font-size:11px;background:rgba(255,255,255,.06);padding:1px 5px;">$1</code>');
-
-  for(let i=0; i<lines.length; i++){
-    const raw = lines[i];
-    const line = raw.trim();
-    if(!line){ closeLists(); html += '<div style="height:8px;"></div>'; continue; }
-
-    // H2 heading: ## or **ALLCAPS**
-    if(/^#{1,2}\s/.test(line)){
-      closeLists();
-      const t = line.replace(/^#{1,2}\s*/,'');
-      html += '<div style="font-family:var(--font-mono);font-size:9px;letter-spacing:2.5px;color:var(--accent);text-transform:uppercase;margin:20px 0 8px;padding-bottom:5px;border-bottom:1px solid rgba(232,98,42,.2);">'+inlineFmt(t)+'</div>';
-      continue;
-    }
-    // H3
-    if(/^###\s/.test(line)){
-      closeLists();
-      const t = line.replace(/^###\s*/,'');
-      html += '<div style="font-weight:600;font-size:13px;color:var(--text);margin:14px 0 6px;">'+inlineFmt(t)+'</div>';
-      continue;
-    }
-    // Standalone **BOLD LINE** (acts as subheading)
-    if(/^\*\*[^*]{2,}\*\*\s*$/.test(line)){
-      closeLists();
-      const t = line.replace(/\*+/g,'');
-      html += '<div style="font-weight:600;font-size:13px;color:var(--text);margin:14px 0 5px;">'+inlineFmt(t)+'</div>';
-      continue;
-    }
-    // Bullet list
-    if(/^[•\-\*]\s/.test(line)){
-      if(inOL){closeLists();}
-      if(!inUL){ html += '<ul style="padding-left:0;margin:6px 0;list-style:none;">'; inUL = true; }
-      const t = line.replace(/^[•\-\*]\s*/,'');
-      html += '<li style="padding:4px 0 4px 18px;position:relative;font-size:13px;color:var(--text-2);border-bottom:1px solid rgba(255,255,255,.03);">' +
-        '<span style="position:absolute;left:0;color:var(--accent);font-size:14px;line-height:1.4;">·</span>' +
-        inlineFmt(t)+'</li>';
-      continue;
-    }
-    // Numbered list
-    if(/^\d+\.\s/.test(line)){
-      if(inUL){closeLists();}
-      if(!inOL){ html += '<ol style="padding-left:24px;margin:6px 0;">'; inOL = true; olIdx=0; }
-      olIdx++;
-      const t = line.replace(/^\d+\.\s*/,'');
-      html += '<li style="padding:3px 0;font-size:13px;color:var(--text-2);">'+inlineFmt(t)+'</li>';
-      continue;
-    }
-    // Horizontal rule
-    if(/^[-=_]{3,}$/.test(line)){
-      closeLists();
-      html += '<hr style="border:none;border-top:1px solid var(--border);margin:16px 0;">';
-      continue;
-    }
-    // Regular paragraph
-    closeLists();
-    html += '<p style="margin:0 0 8px;font-size:13px;color:var(--text-2);line-height:1.75;">'+inlineFmt(line)+'</p>';
+  var lines=text.split('\n'),html='',inUL=false,inOL=false;
+  var closeLists=function(){if(inUL){html+='</ul>';inUL=false;}if(inOL){html+='</ol>';inOL=false;}};
+  var fmt=function(str){return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>');};
+  for(var ri=0;ri<lines.length;ri++){
+    var line=lines[ri].trim();
+    if(!line){closeLists();html+='<div style="height:6px;"></div>';continue;}
+    if(/^#{1,2} /.test(line)){closeLists();html+='<div style="font-family:var(--font-mono);font-size:9px;letter-spacing:2.5px;color:var(--accent);text-transform:uppercase;margin:18px 0 6px;padding-bottom:4px;border-bottom:1px solid rgba(232,98,42,.2);">'+fmt(line.replace(/^#{1,2} /,''))+'</div>';continue;}
+    if(/^### /.test(line)){closeLists();html+='<div style="font-weight:600;font-size:13px;color:var(--text);margin:12px 0 5px;">'+fmt(line.replace(/^### /,''))+'</div>';continue;}
+    if(/^\*\*[^*]{2,}\*\*$/.test(line)){closeLists();html+='<div style="font-weight:600;font-size:13px;color:var(--text);margin:12px 0 4px;">'+fmt(line.replace(/\*+/g,''))+'</div>';continue;}
+    if(/^[*-] /.test(line)){if(inOL)closeLists();if(!inUL){html+='<ul style="padding-left:0;margin:6px 0;list-style:none;">';inUL=true;}html+='<li style="padding:4px 0 4px 18px;position:relative;font-size:13px;color:var(--text-2);border-bottom:1px solid rgba(255,255,255,.03);"><span style="position:absolute;left:0;color:var(--accent);">&#xB7;</span>'+fmt(line.replace(/^[*-] /,''))+'</li>';continue;}
+    if(/^\d+\. /.test(line)){if(inUL)closeLists();if(!inOL){html+='<ol style="padding-left:24px;margin:6px 0;">';inOL=true;}html+='<li style="padding:3px 0;font-size:13px;color:var(--text-2);">'+fmt(line.replace(/^\d+\. /,''))+'</li>';continue;}
+    if(/^[-=_]{3,}$/.test(line)){closeLists();html+='<hr style="border:none;border-top:1px solid var(--border);margin:14px 0;">';continue;}
+    closeLists();html+='<p style="margin:0 0 8px;font-size:13px;color:var(--text-2);line-height:1.75;">'+fmt(line)+'</p>';
   }
-  closeLists();
+  closeLists();return html;
+}
+
+function renderGoNoGoView(data,session){
+  var raw=session.stepData&&session.stepData[5]&&session.stepData[5]._raw;
+  var src=raw||Object.values(data).filter(function(v){return v&&typeof v==='string';}).join('\n\n');
+  if(!src||src.trim().length<20) return '<div class="so-view"><p class="so-empty">No Go/No-Go report yet.</p></div>';
+  var verdict=(data.verdict||'').trim();
+  var isGo=/\bGO\b/i.test(verdict)&&!/NO.GO/i.test(verdict);
+  var isNoGo=/NO.GO/i.test(verdict);
+  var col=isGo?'var(--green)':isNoGo?'var(--red)':'var(--yellow)';
+  var bg=isGo?'rgba(45,158,107,.08)':isNoGo?'rgba(192,57,43,.08)':'rgba(212,160,23,.08)';
+  var icon=isGo?'&#x2705;':isNoGo?'&#x274C;':'&#x26A0;&#xFE0F;';
+  var label=isGo?'GO &mdash; Launch Validated':isNoGo?'NO-GO &mdash; Do Not Launch':'Conditional &mdash; Address Issues First';
+  var html='';
+  if(verdict) html+='<div style="padding:20px 24px;background:'+bg+';border:1px solid '+col+';margin-bottom:28px;"><div style="font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:'+col+';text-transform:uppercase;margin-bottom:8px;">Verdict</div><div style="font-family:var(--font-serif);font-size:26px;color:'+col+';">'+icon+' '+label+'</div></div>';
+  html+=markdownToHTML(src.replace(/<!--[\s\S]*?-->/g,''));
   return html;
 }
 
-// ── Go/No-Go special render ──────────────────────────────────────────────────
-function renderGoNoGoView(data, session){
-  let html = '';
-  const verdict = (data.verdict||'').trim();
-  const isGo = /\bGO\b/i.test(verdict) && !/NO.GO/i.test(verdict);
-  const isNoGo = /NO.GO/i.test(verdict);
-  const isCond = /CONDITIONAL/i.test(verdict);
-
-  // Verdict banner
-  const verdictColor = isGo?'var(--green)':isNoGo?'var(--red)':'var(--yellow)';
-  const verdictBg = isGo?'rgba(45,158,107,.08)':isNoGo?'rgba(192,57,43,.08)':'rgba(212,160,23,.08)';
-  const verdictIcon = isGo?'✅':isNoGo?'❌':'⚠️';
-  const verdictLabel = isGo?'GO — Launch Validated':isNoGo?'NO-GO — Do Not Launch':'Conditional — Address Issues First';
-
-  if(verdict){
-    html += '<div style="padding:20px 24px;background:'+verdictBg+';border:1px solid '+verdictColor+';margin-bottom:28px;">';
-    html += '<div style="font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:'+verdictColor+';text-transform:uppercase;margin-bottom:8px;">Verdict</div>';
-    html += '<div style="font-family:var(--font-serif);font-size:26px;color:'+verdictColor+';">'+verdictIcon+' '+verdictLabel+'</div>';
-    html += '</div>';
+function renderPricingView(data,session){
+  var raw=session.stepData&&session.stepData[11]&&session.stepData[11]._raw;
+  var src=raw||Object.values(data).filter(function(v){return v&&typeof v==='string';}).join('\n\n');
+  if(!src||src.trim().length<30) return '<div class="so-view"><p class="so-empty">Pricing strategy not yet discussed.</p></div>';
+  var msrp=src.match(/MSRP[^:\n]*:\s*\$?([\d,]+)/i);
+  var ks=src.match(/KS[^:\n]*price[^:\n]*:\s*\$?([\d,]+)/i)||src.match(/backer[^:\n]*:\s*\$?([\d,]+)/i);
+  var cogs=src.match(/COGS[^:\n]*:\s*\$?([\d,]+)/i);
+  var html='';
+  if(msrp||ks||cogs){
+    html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:24px;">';
+    var card=function(label,val,accent){return '<div style="padding:14px 16px;background:var(--card);border:1px solid '+(accent?'rgba(232,98,42,.3)':'var(--border)')+';border-top:2px solid '+(accent?'var(--accent)':'var(--border)')+'"><div style="font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-3);text-transform:uppercase;margin-bottom:6px;">'+label+'</div><div style="font-family:var(--font-serif);font-size:24px;color:'+(accent?'var(--accent)':'var(--text)')+';">$'+val+'</div></div>';};
+    if(cogs) html+=card('COGS',cogs[1],false);
+    if(msrp) html+=card('MSRP',msrp[1],true);
+    if(ks) html+=card('KS Price',ks[1],true);
+    html+='</div>';
   }
-
-  // Readiness score if present
-  const scoreText = data.overallScore||'';
-  const scoreNum = parseInt((scoreText.match(/(\d+)\s*\/\s*10/)||[])[1]||0);
-  if(scoreNum){
-    const col = scoreNum>=7?'var(--green)':scoreNum>=5?'var(--yellow)':'var(--red)';
-    html += '<div class="so-section"><div class="so-section-label">Overall Readiness Score</div>';
-    html += '<div style="display:flex;align-items:baseline;gap:8px;padding:8px 0 16px;">';
-    html += '<span style="font-family:var(--font-serif);font-size:48px;color:'+col+';line-height:1;">'+scoreNum+'</span>';
-    html += '<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);">/ 10</span>';
-    const label = scoreNum>=7?' — Strong':scoreNum<5?' — Needs Work':'';
-    if(label) html += '<span style="font-family:var(--font-mono);font-size:11px;color:'+col+';">'+label+'</span>';
-    html += '</div>';
-    if(scoreText && scoreText.length>5) html += '<div style="font-size:12px;color:var(--text-2);">'+escHtml(scoreText)+'</div>';
-    html += '</div>';
-  }
-
-  // Validation results
-  if(data.validationResults){
-    html += '<div class="so-section"><div class="so-section-label">Validation Results</div>';
-    html += '<div class="so-view">'+renderMetricsBlock(data.validationResults)+'</div></div>';
-  }
-
-  // Winning angle
-  if(data.winningAngle){
-    html += '<div class="so-section"><div class="so-section-label">Winning Angle & Insight</div>';
-    html += '<div style="padding:14px 16px;background:var(--card);border-left:3px solid var(--accent);">';
-    html += '<div style="font-size:13px;color:var(--text-2);line-height:1.7;">'+escHtml(data.winningAngle)+'</div></div></div>';
-  }
-
-  // Risks
-  if(data.risksToWatch){
-    html += '<div class="so-section"><div class="so-section-label">Risks to Watch</div>';
-    const risks = String(data.risksToWatch).split('\n').filter(l=>l.trim()).map(l=>l.replace(/^[•\-\*]\s*/,'').trim()).filter(Boolean);
-    if(risks.length){
-      html += '<div style="display:flex;flex-direction:column;gap:6px;">';
-      risks.forEach(r => {
-        const isHigh = /high|critical|major/i.test(r);
-        const col = isHigh?'var(--red)':'var(--yellow)';
-        const bg = isHigh?'rgba(192,57,43,.06)':'rgba(212,160,23,.06)';
-        html += '<div style="padding:10px 14px;background:'+bg+';border-left:2px solid '+col+';font-size:12px;color:var(--text-2);">'+escHtml(r)+'</div>';
-      });
-      html += '</div>';
-    }
-    html += '</div>';
-  }
-
-  // Next step
-  if(data.nextStep){
-    html += '<div class="so-section"><div class="so-section-label">Recommended Next Step</div>';
-    html += '<div style="padding:14px 16px;background:rgba(232,98,42,.06);border:1px solid rgba(232,98,42,.2);font-size:13px;color:var(--text);font-family:var(--font-mono);">'+escHtml(data.nextStep)+'</div></div>';
-  }
-
-  // If no structured data, show rawText from history
-  if(!verdict && !data.validationResults){
-    const s5raw = session.stepData && session.stepData[5] && session.stepData[5]._raw;
-    if(s5raw) html += alignmentRawToHTML(s5raw);
-  }
-
-  return html || '<div class="so-view"><p class="so-empty">No Go/No-Go report yet.</p></div>';
+  html+='<div class="so-view">'+markdownToHTML(src)+'</div>';
+  return html;
 }
 
-function renderMetricsBlock(text){
-  const lines = String(text||'').split('\n').filter(l=>l.trim());
-  const metrics = [];
-  const other = [];
-  lines.forEach(l => {
-    const m = l.match(/(.+?):\s*([\d.%$<>~]+.{0,20})/);
-    if(m) metrics.push({label:m[1].replace(/^[•\-\*]\s*/,'').trim(), val:m[2].trim()});
-    else other.push(l.replace(/^[•\-\*]\s*/,'').trim());
-  });
-  let html = '';
-  if(metrics.length){
-    html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:14px;">';
-    metrics.forEach(({label,val}) => {
-      html += '<div style="padding:12px 14px;background:var(--card);border:1px solid var(--border);">';
-      html += '<div style="font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-3);text-transform:uppercase;margin-bottom:4px;">'+escHtml(label)+'</div>';
-      html += '<div style="font-family:var(--font-serif);font-size:20px;color:var(--accent);">'+escHtml(val)+'</div>';
-      html += '</div>';
+function renderForecastView(data,session){
+  var raw=session.stepData&&session.stepData[12]&&session.stepData[12]._raw;
+  var src=raw||Object.values(data).filter(function(v){return v&&typeof v==='string';}).join('\n\n');
+  if(!src||src.trim().length<30) return '<div class="so-view"><p class="so-empty">Financial forecast not yet generated.</p></div>';
+  var html='';
+  var tableLines=src.split('\n').filter(function(l){return l.indexOf('|')>=0;});
+  if(tableLines.length>3){
+    html+='<div style="overflow-x:auto;margin-bottom:20px;"><table style="width:100%;border-collapse:collapse;font-size:12px;">';
+    var hDone=false;
+    tableLines.forEach(function(row){
+      if(/^[\|\s\-:]+$/.test(row.replace(/\|/g,'').trim())) return;
+      var cells=row.split('|').filter(function(_,i,a){return i>0&&i<a.length-1;});
+      if(!hDone){html+='<thead><tr>'+cells.map(function(cell){return'<th style="padding:8px 12px;background:var(--card);border-bottom:2px solid var(--accent);font-family:var(--font-mono);font-size:9px;color:var(--text-2);text-align:left;white-space:nowrap;">'+escHtml(cell.replace(/\*+/g,'').trim())+'</th>';}).join('')+'</tr></thead><tbody>';hDone=true;}
+      else{var v2=row.indexOf('total')>=0||row.indexOf('Net profit')>=0;html+='<tr style="'+(v2?'background:rgba(232,98,42,.06);font-weight:600;':'border-bottom:1px solid rgba(255,255,255,.04);')+'">'+cells.map(function(cell){var v=cell.replace(/\*+/g,'').trim();var neg=/^-/.test(v);var pos=/\d+%$/.test(v)&&!neg;return'<td style="padding:7px 12px;font-size:12px;'+(neg?'color:var(--red)':pos?'color:var(--green)':'')+'" >'+escHtml(v)+'</td>';}).join('')+'</tr>';}
     });
-    html += '</div>';
+    html+='</tbody></table></div>';
   }
-  if(other.length) html += '<ul>'+other.map(l=>'<li>'+escHtml(l)+'</li>').join('')+'</ul>';
-  return html || '<p class="so-empty">No metrics yet.</p>';
+  var nonTable=src.split('\n').filter(function(l){return l.indexOf('|')<0;}).join('\n');
+  if(nonTable.trim()) html+='<div class="so-view">'+markdownToHTML(nonTable)+'</div>';
+  return html||'<div class="so-view">'+markdownToHTML(src)+'</div>';
 }
 
-// ── EDIT mode ─────────────────────────────────────────────────────────────────
-function renderStepEdit(stepNum, session){
-  const def = STEP_DEFS[stepNum];
-  const raw = (session.stepData && session.stepData[stepNum]) || {};
-  const data = stepNum===2 ? mergeAlignmentToStepData(session) : raw;
-  const body = document.getElementById('step-drawer-body');
-  let html = '<div class="so-doc">';
-  html += '<div class="so-doc-header" style="border-color:rgba(232,98,42,.3);">';
-  html += '<div class="so-doc-step-num" style="color:var(--accent);">Editing — '+escHtml(def.title)+'</div>';
-  html += '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);">Edit any field and click Save</div></div>';
-  def.fields.forEach(f => {
-    const val = data[f.key]||'';
-    const rows = f.short?2:Math.max(4,String(val).split('\n').length+2);
-    html += '<div class="so-section"><div class="so-section-label">'+escHtml(f.label)+'</div>';
-    if(f.hint) html += '<div class="so-edit-hint">'+escHtml(f.hint)+'</div>';
-    html += '<textarea class="so-editor'+(f.short?' short':'')+'" id="sf-'+f.key+'" rows="'+rows+'" placeholder="'+escHtml(f.hint||'')+'">'+escHtml(val)+'</textarea></div>';
-  });
-  html += '</div>';
-  body.innerHTML = html;
+function renderTiersView(data,session){
+  var raw=session.stepData&&session.stepData[13]&&session.stepData[13]._raw;
+  var src=raw||Object.values(data).filter(function(v){return v&&typeof v==='string';}).join('\n\n');
+  if(!src||src.trim().length<30) return '<div class="so-view"><p class="so-empty">Pledge tiers not yet designed.</p></div>';
+  return '<div class="so-view">'+markdownToHTML(src)+'</div>';
 }
 
 function mergeAlignmentToStepData(session){
-  const a = session.alignment||{}, d=(session.stepData&&session.stepData[2])||{};
+  var a=session.alignment||{},d=(session.stepData&&session.stepData[2])||{};
   return {
-    productName: a.productName||d.productName||'',
-    internalDescription: a.internalDescription||d.internalDescription||'',
-    features: Array.isArray(a.features)?a.features.join('\n'):(d.features||''),
-    benefits: Array.isArray(a.benefits)?a.benefits.join('\n'):(d.benefits||''),
-    negativeThoughts: Array.isArray(a.negativeThoughts)?a.negativeThoughts.join('\n'):(d.negativeThoughts||''),
-    emotionalDestination: Array.isArray(a.emotionalDestination)?a.emotionalDestination.join('\n'):(d.emotionalDestination||''),
-    readinessScore: a.readinessScore?(String(a.readinessScore)+(String(a.readinessScore).includes('/')?' ':'/10')+(a.readinessNotes?' — '+a.readinessNotes:'')):(d.readinessScore||''),
-    updatedAt: a.updatedAt||d.updatedAt,
+    productName:a.productName||d.productName||'',
+    internalDescription:a.internalDescription||d.internalDescription||'',
+    features:Array.isArray(a.features)?a.features.join('\n'):(d.features||''),
+    benefits:Array.isArray(a.benefits)?a.benefits.join('\n'):(d.benefits||''),
+    negativeThoughts:Array.isArray(a.negativeThoughts)?a.negativeThoughts.join('\n'):(d.negativeThoughts||''),
+    emotionalDestination:Array.isArray(a.emotionalDestination)?a.emotionalDestination.join('\n'):(d.emotionalDestination||''),
+    readinessScore:a.readinessScore?(String(a.readinessScore)+(String(a.readinessScore).indexOf('/')>=0?'':'/10')+(a.readinessNotes?' - '+a.readinessNotes:'')):(d.readinessScore||''),
+    updatedAt:a.updatedAt||d.updatedAt,
   };
 }
 
-// ── Trigger auto-generation when step is empty ────────────────────────────────
-async function triggerStepGeneration(stepNum, session, bodyEl){
-  const def = STEP_DEFS[stepNum]; if(!def) return;
-  const prompts = {
-    1:'Summarize the founder input from our conversation: why building this, what the product does, cost and pricing, timeline.',
-    2:'Generate the complete Product Alignment Document now based on everything we have discussed. Use the exact 7-section template.',
-    3:'Summarize the three marketing approaches we discussed, including the chosen approach and reasoning.',
-    4:'Output the Landing Page Briefs: both LP versions, Validation Playbook, ad setup notes, tracking dashboard.',
-    5:'Generate the complete Go/No-Go Report. Include: (1) VERDICT — GO/NO-GO/CONDITIONAL with one-line reason, (2) Validation Results with key metrics (CPL, conversion rate, clicks), (3) Winning Angle — which LP version performed better and why, (4) Risks to Watch — bullet list of 3-5 specific risks with HIGH/MEDIUM labels, (5) Overall Readiness Score X/10 with reasoning, (6) Recommended Next Step — one clear action.',
-    6:'Summarize the Video Strategy: budget, timeline, chosen style, key video rules.',
-    7:'Summarize the Script and Scenes: core USP, scene order, recommended length.',
-    8:'Output the Video Brief: production approach, casting direction, production timeline.',
-    9:'Summarize the Campaign Page: 12-section structure, asset checklist, trust signals.',
-    10:'Output the Launch Ready checklist: community plan, content plan, IP checklist, pre-launch checklist.',
-  };
-  const prompt = prompts[stepNum]; if(!prompt) return;
-  try{
-    const sysPrompt = getSystemPrompt(session.mission||1)+buildMemoryContext(session);
-    const msgs = buildMessageHistory(session);
-    msgs.push({role:'user',content:prompt+' Output full results now.'});
-    const res = await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:msgs,system:sysPrompt,password:currentPw})});
-    if(!res.ok) throw new Error('API error');
-    const data = await res.json();
-    const text = data.content?.[0]?.text||'';
-    const alUp = parseAlignmentUpdate(text); if(alUp) applyAlignmentUpdate(alUp, session.id);
-    const fresh = getSession(activeId);
-    if(!fresh.stepData) fresh.stepData={};
-    if(!fresh.stepData[stepNum]) fresh.stepData[stepNum]={};
-    fresh.stepData[stepNum][def.fields[0].key] = text.replace(/<!--[\s\S]*?-->/g,'').trim();
-    fresh.stepData[stepNum].updatedAt = Date.now();
-    fresh.updatedAt = Date.now(); scheduleSave(fresh);
-    smartExtractStep(stepNum, fresh);
-    if(currentStepDrawer===stepNum){ renderStepView(stepNum,fresh); document.getElementById('step-drawer-meta').textContent='Just generated'; }
-  }catch(e){
-    if(bodyEl&&currentStepDrawer===stepNum) bodyEl.innerHTML='<div class="so-empty-state"><span class="so-empty-icon">⚠</span><div class="so-empty-title">Could not generate</div><div class="so-empty-body">Complete this step in the chat first, then come back here.<br><br><span style="color:var(--accent);cursor:pointer;" onclick="closeStepDrawer()">← Back to chat</span></div></div>';
-  }
+function renderStepEdit(stepNum,session){
+  var def=STEP_DEFS[stepNum];
+  var raw=(session.stepData&&session.stepData[stepNum])||{};
+  var data=stepNum===2?mergeAlignmentToStepData(session):raw;
+  var body=document.getElementById('step-drawer-body');
+  var html='<div class="so-doc"><div class="so-doc-header" style="border-color:rgba(232,98,42,.3);"><div class="so-doc-step-num" style="color:var(--accent);">Editing &mdash; '+escHtml(def.title)+'</div><div style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);">Edit any field and click Save</div></div>';
+  def.fields.forEach(function(f){
+    var val=data[f.key]||'';
+    var rows=f.short?2:Math.max(4,String(val).split('\n').length+2);
+    html+='<div class="so-section"><div class="so-section-label">'+escHtml(f.label)+'</div>';
+    if(f.hint) html+='<div class="so-edit-hint">'+escHtml(f.hint)+'</div>';
+    html+='<textarea class="so-editor'+(f.short?' short':'')+'" id="sf-'+f.key+'" rows="'+rows+'" placeholder="'+escHtml(f.hint||'')+'">'+escHtml(val)+'</textarea></div>';
+  });
+  html+='</div>';
+  body.innerHTML=html;
 }
 
-// ── Save ──────────────────────────────────────────────────────────────────────
 function saveStepResult(){
-  const stepNum = currentStepDrawer; if(!stepNum) return;
-  const def = STEP_DEFS[stepNum];
-  const session = getSession(activeId); if(!session) return;
+  var stepNum=currentStepDrawer; if(!stepNum) return;
+  var def=STEP_DEFS[stepNum];
+  var session=getSession(activeId); if(!session) return;
   if(!session.stepData) session.stepData={};
-  const saved = {updatedAt:Date.now()};
-  def.fields.forEach(f => { const el=document.getElementById('sf-'+f.key); if(el) saved[f.key]=el.value.trim(); });
-  session.stepData[stepNum] = saved;
+  var saved={updatedAt:Date.now()};
+  def.fields.forEach(function(f){var el=document.getElementById('sf-'+f.key);if(el) saved[f.key]=el.value.trim();});
+  session.stepData[stepNum]=saved;
   if(stepNum===2){
     if(!session.alignment) session.alignment={};
     if(saved.productName) session.alignment.productName=saved.productName;
     if(saved.internalDescription) session.alignment.internalDescription=saved.internalDescription;
-    if(saved.features) session.alignment.features=saved.features.split('\n').map(l=>l.replace(/^[•\-\*]\s*/,'').trim()).filter(Boolean);
-    if(saved.benefits) session.alignment.benefits=saved.benefits.split('\n').map(l=>l.replace(/^[•\-\*]\s*/,'').trim()).filter(Boolean);
-    if(saved.negativeThoughts) session.alignment.negativeThoughts=saved.negativeThoughts.split('\n').map(l=>l.replace(/^[•"\u201c\-\*]\s*/,'').replace(/["\u201d]$/,'').trim()).filter(Boolean);
-    if(saved.emotionalDestination) session.alignment.emotionalDestination=saved.emotionalDestination.split('\n').map(l=>l.replace(/^[•"\u201c\-\*]\s*/,'').replace(/["\u201d]$/,'').trim()).filter(Boolean);
+    if(saved.features) session.alignment.features=saved.features.split('\n').map(function(l){return l.replace(/^[* -]+ */,'').trim();}).filter(Boolean);
+    if(saved.benefits) session.alignment.benefits=saved.benefits.split('\n').map(function(l){return l.replace(/^[* -]+ */,'').trim();}).filter(Boolean);
+    if(saved.negativeThoughts) session.alignment.negativeThoughts=saved.negativeThoughts.split('\n').map(function(l){return l.replace(/^[* -]+ */,'').replace(/^[\u201c"]/,'').replace(/[\u201d"]$/,'').trim();}).filter(Boolean);
+    if(saved.emotionalDestination) session.alignment.emotionalDestination=saved.emotionalDestination.split('\n').map(function(l){return l.replace(/^[* -]+ */,'').replace(/^[\u201c"]/,'').replace(/[\u201d"]$/,'').trim();}).filter(Boolean);
     if(saved.readinessScore) session.alignment.readinessScore=saved.readinessScore;
-    session.alignment.updatedAt=Date.now(); updateAlignmentBtn(session);
-    // Also update rawText
-    if(!session.stepData[2]) session.stepData[2]={};
-    delete session.stepData[2]._rawText; // clear rawText so structured data is used
+    session.alignment.updatedAt=Date.now();
+    updateAlignmentBtn(session);
+    if(session.stepData[2]) delete session.stepData[2]._rawText;
   }
   session.updatedAt=Date.now(); scheduleSave(session);
   stepEditMode=false; renderStepView(stepNum,session);
-  const editBtn=document.getElementById('so-edit-btn');
-  const saveBtn=document.getElementById('so-save-btn');
-  if(editBtn){editBtn.textContent='✎ Edit';editBtn.className='so-btn edit-mode';}
+  var editBtn=document.getElementById('so-edit-btn');
+  var saveBtn=document.getElementById('so-save-btn');
+  if(editBtn){editBtn.textContent='Edit';editBtn.className='so-btn edit-mode';}
   if(saveBtn) saveBtn.style.display='none';
   document.getElementById('step-drawer-meta').textContent='Saved just now';
-  const badge=document.getElementById('step-saved-badge');
-  if(badge){badge.classList.add('show');setTimeout(()=>badge.classList.remove('show'),2000);}
+  var badge=document.getElementById('step-saved-badge');
+  if(badge){badge.classList.add('show');setTimeout(function(){badge.classList.remove('show');},2000);}
+  updateStepUI(session.step||1,session.mission||1);
 }
 
-// ── Download ──────────────────────────────────────────────────────────────────
 function downloadStepResult(){
-  const stepNum = currentStepDrawer; if(!stepNum) return;
+  var stepNum=currentStepDrawer; if(!stepNum) return;
+  var s2=getSession(activeId);
   if(stepNum===2){
-    const s2=getSession(activeId);
-    const raw2=s2&&s2.stepData&&s2.stepData[2]&&s2.stepData[2]._rawText;
-    if(raw2){
-      const hdr=['KICKMAN — PRODUCT ALIGNMENT DOCUMENT','Project: '+(s2?s2.name||'Untitled':''),'Exported: '+new Date().toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric'}),'','═'.repeat(60),''].join('\n');
-      downloadBlob(hdr+raw2+'\n\n'+'─'.repeat(60)+'\nkickman.org','kickman-product-alignment-'+slugify(s2.name)+'-'+TODAY()+'.txt');
-      return;
-    }
+    var raw2=s2&&s2.stepData&&s2.stepData[2]&&s2.stepData[2]._rawText;
+    if(raw2){var hdr='KICKMAN - PRODUCT ALIGNMENT\nProject: '+(s2?s2.name||'Untitled':'')+'  Exported: '+new Date().toLocaleDateString()+'\n\n';downloadBlob(hdr+raw2,'kickman-alignment-'+slugify(s2.name)+'-'+TODAY()+'.txt');return;}
     downloadAlignment('txt'); return;
   }
-  // M3 steps: download raw content as formatted document
-  if(stepNum >= 11){
-    const sm3 = getSession(activeId);
-    const d3 = sm3 && sm3.stepData && sm3.stepData[stepNum];
-    const rawM3 = d3 && (d3._raw || d3[STEP_DEFS[stepNum]?.fields[0]?.key] || '');
-    const def3 = STEP_DEFS[stepNum];
-    if(rawM3 && def3){
-      const hdr = ['KICKMAN — '+def3.title.toUpperCase(),'Project: '+(sm3?sm3.name||'Untitled':''),'Exported: '+new Date().toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric'}),'','═'.repeat(60),''].join('\n');
-      downloadBlob(hdr+'\n'+rawM3+'\n\n'+'─'.repeat(60)+'\nkickman.org','kickman-'+def3.title.toLowerCase().replace(/\s+/g,'-')+'-'+slugify(sm3.name)+'-'+TODAY()+'.txt');
-      return;
-    }
+  if(stepNum>=11){
+    var d3=s2&&s2.stepData&&s2.stepData[stepNum];
+    var rawM3=d3&&(d3._raw||d3[STEP_DEFS[stepNum]&&STEP_DEFS[stepNum].fields[0]&&STEP_DEFS[stepNum].fields[0].key]||'');
+    if(rawM3){var def3=STEP_DEFS[stepNum];downloadBlob('KICKMAN - '+def3.title.toUpperCase()+'\n\n'+rawM3,'kickman-'+def3.title.toLowerCase().replace(/\s+/g,'-')+'-'+TODAY()+'.txt');return;}
   }
-  const def=STEP_DEFS[stepNum];
-  const session=getSession(activeId);
-  const data=(session&&session.stepData&&session.stepData[stepNum])||{};
-  const lines=['KICKMAN — '+def.title.toUpperCase(),'Project: '+(session?session.name||'Untitled':''),'Exported: '+new Date().toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric'}),'','═'.repeat(60),''];
-  def.fields.forEach(f=>{const val=data[f.key];if(val){lines.push(f.label.toUpperCase());lines.push('─'.repeat(40));lines.push(val);lines.push('');}});
-  lines.push('─'.repeat(60)); lines.push('kickman.org');
+  var def=STEP_DEFS[stepNum];
+  var session=getSession(activeId);
+  var data=(session&&session.stepData&&session.stepData[stepNum])||{};
+  var lines=['KICKMAN - '+def.title.toUpperCase(),'Project: '+(session?session.name||'Untitled':''),'','='.repeat(50),''];
+  def.fields.forEach(function(f){var val=data[f.key]||data._raw;if(val){lines.push(f.label.toUpperCase());lines.push('-'.repeat(30));lines.push(val);lines.push('');}});
+  lines.push('-'.repeat(50));lines.push('kickman.org');
   downloadBlob(lines.join('\n'),'kickman-step'+def.num+'-'+def.title.toLowerCase().replace(/\s+/g,'-')+'-'+new Date().toISOString().slice(0,10)+'.txt');
 }
 
+// ── Capture latest alignment raw text from history ───────────────────────────
+// Stores the complete markdown text — no field parsing, zero data loss
+function captureLatestAlignmentRaw(session){
+  if(!session || !session.history) return;
+  const msgs = [...session.history].reverse();
+  for(const msg of msgs){
+    if(msg.role !== 'assistant' && msg.role !== 'km') continue;
+    const text = typeof msg.content === 'string' ? msg.content : (msg.content?.[0]?.text || '');
+    const clean = text.replace(/<!--[\s\S]*?-->/g, '').trim();
+    const markers = [
+      /PRODUCT NAME/i, /INTERNAL DESCRIPTION/i, /ALL FEATURES/i,
+      /BENEFITS/i, /NEGATIVE THOUGHTS|RESISTANCE MAP/i,
+      /EMOTIONAL DESTINATION|WHAT WE WANT/i, /READINESS SCORE/i
+    ];
+    if(markers.filter(rx => rx.test(clean)).length < 2) continue;
+    if(!session.stepData) session.stepData = {};
+    if(!session.stepData[2]) session.stepData[2] = {};
+    if(session.stepData[2]._rawText !== clean){
+      session.stepData[2]._rawText = clean;
+      session.stepData[2].updatedAt = Date.now();
+      scheduleSave(session);
+    }
+    if(!session.alignment) session.alignment = {};
+    if(!session.alignment.productName){
+      // Simple extraction: first non-empty line after PRODUCT NAME
+      const lines = clean.split('\n');
+      let afterName = false;
+      for(const ln of lines){
+        if(/PRODUCT NAME/i.test(ln)){ afterName = true; continue; }
+        if(afterName && ln.trim() && !/^#/.test(ln.trim())){
+          session.alignment.productName = ln.replace(/\*+/g,'').trim();
+          break;
+        }
+      }
+    }
+    return;
+  }
+}
+
+// Render raw alignment markdown as HTML — no parsing, faithful to original
+function alignmentRawToHTML(rawText){
+  if(!rawText) return '<p style="color:var(--text-3);font-style:italic;">No content yet.</p>';
+  let html = '';
+  const lines = rawText.split('\n');
+  let inList = false;
+  const closeList = () => { if(inList){ html += '</ul>'; inList = false; } };
+
+  for(const rawLine of lines){
+    const line = rawLine.trim();
+    if(!line){ closeList(); continue; }
+
+    // Section headers: ## or **TEXT** alone or numbered 01. Title
+    if(/^#{1,3}\s/.test(line) || /^\*\*[^*]{2,}\*\*$/.test(line) ||
+       /^0?[1-9]\.\s+[A-Z\u4e00-\u9fff]/.test(line) ||
+       /^(?:PRODUCT NAME|INTERNAL DESC|ALL FEATURES|BENEFITS|NEGATIVE|EMOTIONAL|READINESS)/i.test(line)){
+      closeList();
+      const text = line.replace(/^#{1,3}\s*/,'').replace(/\*+/g,'').replace(/^\d+\.\s*/,'').trim();
+      html += '<div class="so-section-label" style="margin-top:24px;">' + escHtml(text) + '</div>';
+      continue;
+    }
+
+    // Bullet items and quoted items
+    if(/^[•\-\*]\s/.test(line) || /^["\u201c]/.test(line)){
+      if(!inList){ html += '<ul class="so-raw-list">'; inList = true; }
+      const text = line.replace(/^[•\-\*]\s*/,'').replace(/^["\u201c]/,'').replace(/["\u201d]$/,'').trim();
+      const fmt = text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>');
+      html += '<li>' + fmt + '</li>';
+      continue;
+    }
+
+    // Readiness score
+    if(/^\d+\s*\/\s*10/.test(line)){
+      closeList();
+      const m = line.match(/(\d+)\s*\/\s*10/);
+      if(m){
+        const s = parseInt(m[1]);
+        const col = s>=7?'var(--green)':s>=5?'var(--yellow)':'var(--red)';
+        html += '<div style="display:flex;align-items:baseline;gap:8px;padding:12px 0;">' +
+          '<span style="font-family:var(--font-serif);font-size:48px;color:'+col+';line-height:1;">'+s+'</span>' +
+          '<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);">/ 10</span></div>';
+      }
+      continue;
+    }
+
+    // Regular text
+    closeList();
+    const fmt = line.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>');
+    html += '<p style="margin:4px 0 10px;color:var(--text-2);font-size:13px;line-height:1.7;">' + fmt + '</p>';
+  }
+  closeList();
+  return html;
+}
 
 // ── Capture latest alignment raw text from history ───────────────────────────
 // Stores the complete markdown text — no field parsing, zero data loss
@@ -4288,8 +3780,12 @@ function autoExtractStepData(text, stepNum, sessionId){
   const clean = text.replace(/<!--[\s\S]*?-->/g,'').trim();
   if(!session.stepData[stepNum]) session.stepData[stepNum] = {};
   if(clean.length < 200) return;
-  // M3 steps: always refresh (pricing discussions are iterative)
-  if(stepNum >= 11){ session.stepData[stepNum]._raw = clean; session.stepData[stepNum].updatedAt = Date.now(); scheduleSave(session); return; }
+  // M3 steps: always refresh (pricing is iterative)
+  if(stepNum >= 11){
+    session.stepData[stepNum]._raw = clean;
+    session.stepData[stepNum].updatedAt = Date.now();
+    scheduleSave(session); return;
+  }
 
   // For step 1: extract founder answers
   if(stepNum === 1 && !session.stepData[1].whatItDoes){
