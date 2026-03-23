@@ -2733,14 +2733,15 @@ function updateAlignmentBtn(session){
   const btn = document.getElementById('alignment-download-btn');
   if(btn) btn.style.display = hasAlignment ? 'flex' : 'none';
 
-  // Update the export menu alignment section
+  // Export menu: alignment buttons are ALWAYS clickable
+  // downloadAlignment() handles the "not ready" case gracefully
   const label = document.getElementById('export-alignment-item');
   const row = document.getElementById('export-alignment-row');
-  if(label) label.style.opacity = hasAlignment ? '1' : '0.4';
+  if(label) label.style.opacity = '1';
   if(row){
-    row.style.opacity = hasAlignment ? '1' : '0.4';
-    row.style.pointerEvents = hasAlignment ? 'auto' : 'none';
-    row.title = hasAlignment ? '' : 'Complete Step 2 first to unlock Product Alignment export';
+    row.style.opacity = '1';
+    row.style.pointerEvents = 'auto';
+    row.title = '';
   }
 }
 
@@ -2820,22 +2821,6 @@ function buildAlignmentText(session){
   lines.push('kickman.org');
 
   return lines.join('\n');
-}
-
-function downloadAlignment(){
-  const session = getSession(activeId);
-  if(!session || !session.alignment || !session.alignment.productName){
-    alert('Product Alignment not yet generated. Complete Step 2 first.');
-    return;
-  }
-  const text = buildAlignmentText(session);
-  if(!text) return;
-  const a = session.alignment;
-  const filename = (a.productName || session.name || 'product')
-    .slice(0,30).replace(/[^a-z0-9]/gi,'-').toLowerCase();
-  el.download = 'kickman-alignment-' + filename + '-' + new Date().toISOString().slice(0,10) + '.txt';
-  el.click();
-  URL.revokeObjectURL(el.href);
 }
 
 // ── EXPORT ────────────────────────────────────────────────────────────────────
@@ -2972,16 +2957,62 @@ function exportChat(fmt='txt'){
 }
 
 // ── Alignment export ──────────────────────────────────────────────────────────
-function downloadAlignment(fmt='txt'){
-  const session = getSession(activeId);
-  if(!session || !session.alignment || !session.alignment.productName){
-    alert('Product Alignment not yet generated. Complete Step 2 first.'); return;
+// Extract alignment data from conversation history as fallback
+// Used when Kickman didn't output an ALIGNMENT_UPDATE JSON block
+function extractAlignmentFromHistory(session){
+  if(!session || !session.history) return null;
+  // Find the last assistant message containing PRODUCT NAME & DEFINITION
+  const msgs = session.history.filter(m => m.role==='assistant' || m.role==='km');
+  for(let i = msgs.length-1; i >= 0; i--){
+    const text = typeof msgs[i].content==='string' ? msgs[i].content : (msgs[i].content?.[0]?.text||'');
+    if(text.includes('PRODUCT NAME') || text.includes('INTERNAL DESCRIPTION')){
+      // Build a minimal alignment from what we can find
+      const alignment = {};
+      // Product name — look for bold text after PRODUCT NAME section
+      const nameMatch = text.match(/PRODUCT NAME[^\n]*\n+\*?\*?([^\n*]+)/);
+      if(nameMatch) alignment.productName = nameMatch[1].trim().replace(/\*+/g,'');
+      // Features
+      const featSection = text.match(/ALL FEATURES[\s\S]*?(?=BENEFITS|WHAT MIGHT|NEGATIVE|$)/i);
+      if(featSection){
+        alignment.features = featSection[0].match(/[•\-\*] (.+)/g)?.map(f=>f.replace(/^[•\-\*] /,'').trim()) || [];
+      }
+      // Negative thoughts
+      const negSection = text.match(/NEGATIVE THOUGHTS[\s\S]*?(?=WHAT WE WANT|EMOTIONAL|READINESS|$)/i);
+      if(negSection){
+        alignment.negativeThoughts = negSection[0].match(/[•\-\*] ["“]?(.+)["”]?/g)?.map(f=>f.replace(/^[•\-\*] ["“]?/,'').replace(/["”]?$/,'').trim()) || [];
+      }
+      if(alignment.productName) return alignment;
+    }
   }
+  return null;
+}
+
+function downloadAlignment(fmt='txt'){
+  let session = getSession(activeId);
+  if(!session) return;
+
+  // If no stored alignment, try extracting from history
+  if(!session.alignment || !session.alignment.productName){
+    const extracted = extractAlignmentFromHistory(session);
+    if(extracted){
+      session.alignment = extracted;
+      session.alignment.updatedAt = Date.now();
+      scheduleSave(session);
+      updateAlignmentBtn(session);
+    } else {
+      if(confirm('Product Alignment not found in storage.\n\nWould you like to ask Kickman to generate it now?\n\n(Click OK to open the chat, then type: "Please generate the Product Alignment Document now")')){
+        const input = document.getElementById('user-input');
+        if(input){ input.value='Please generate the Product Alignment Document now'; input.focus(); }
+      }
+      return;
+    }
+  }
+
   if(fmt==='pdf'){ printAsPDF(alignmentToHTML(session), 'Product Alignment — ' + (session.name||'Kickman')); return; }
   const text = buildAlignmentText(session);
+  if(!text){ alert('Could not build alignment document. Please ask Kickman to regenerate it.'); return; }
   const slug = slugify(session.alignment.productName || session.name);
   if(fmt==='md'){
-    // Convert to Markdown formatting
     const md = text
       .replace(/═+/g,'---')
       .replace(/─+/g,'')
