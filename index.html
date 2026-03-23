@@ -609,6 +609,9 @@
       <div class="sidebar-step idle" id="step-3" onclick="openStepDrawer(3)"><div class="step-num" id="snum-3">03</div><div class="step-info"><div class="step-name" id="stepname-3">Marketing Approaches</div></div><span class="step-view-hint">view</span></div>
       <div class="sidebar-step idle" id="step-4" onclick="openStepDrawer(4)"><div class="step-num" id="snum-4">04</div><div class="step-info"><div class="step-name" id="stepname-4">Landing Page Briefs</div></div><span class="step-view-hint">view</span></div>
       <div class="sidebar-step idle" id="step-5" onclick="openStepDrawer(5)"><div class="step-num" id="snum-5">05</div><div class="step-info"><div class="step-name" id="stepname-5">Go / No-Go Report</div></div><span class="step-view-hint">view</span></div>
+      <div class="sidebar-step idle" id="step-11" onclick="openStepDrawer(11)"><div class="step-num" id="snum-11">11</div><div class="step-info"><div class="step-name" id="stepname-11">Pricing Strategy</div></div><span class="step-view-hint">view</span></div>
+      <div class="sidebar-step idle" id="step-12" onclick="openStepDrawer(12)"><div class="step-num" id="snum-12">12</div><div class="step-info"><div class="step-name" id="stepname-12">Financial Forecast</div></div><span class="step-view-hint">view</span></div>
+      <div class="sidebar-step idle" id="step-13" onclick="openStepDrawer(13)"><div class="step-num" id="snum-13">13</div><div class="step-info"><div class="step-name" id="stepname-13">Pledge Tiers</div></div><span class="step-view-hint">view</span></div>
     </div>
   </aside>
 
@@ -2279,7 +2282,267 @@ Type "Mission 3" when ready.
 7. If user tries to skip, explain why and offer faster version
 8. PRODUCT ALIGNMENT TEMPLATE IS STRICTLY FIXED — if user asks to see, generate, or update the Product Alignment Document at any point in Mission 2, output ONLY these 7 sections in this exact order: (1) PRODUCT NAME & DEFINITION, (2) INTERNAL DESCRIPTION, (3) ALL FEATURES, (4) BENEFITS, (5) NEGATIVE THOUGHTS & FEELINGS — BACKER RESISTANCE MAP, (6) WHAT WE WANT PEOPLE TO THINK AND FEEL — EMOTIONAL DESTINATION MAP, (7) READINESS SCORE. No extra sections, no reordering. Always follow with <!--ALIGNMENT_UPDATE:{...}--> and ask if the user wants to add or change anything.`;
 
+const SYSTEM_M3 = `# IDENTITY
+You are Kickman, a world-class crowdfunding strategist. The founder has completed Mission 1 (validation) and Mission 2 (video + campaign page + community). You are now in Mission 3: Pricing Strategy & Financial Forecasting.
+
+Your job: Help the founder set the right MSRP, design Early Bird pledge tiers, and build a complete financial model that shows exactly what happens at different sales volumes. Be a strategic partner, not just a calculator.
+
+# MISSION 3 MODULES
+
+## M3-A — PRICING STRATEGY
+
+Start by confirming:
+1. COGS (fully-loaded cost per unit including packaging)
+2. Target MSRP (retail price after campaign)
+3. Expected Kickstarter backer price (usually 20-30% below MSRP)
+
+Then work through:
+- Minimum viable price (what COGS + fees require to break even)
+- Competitive positioning (where does this price sit vs. alternatives)
+- Psychological price points ($299 vs $319 — perception matters)
+- Early Bird depth: how aggressive should the discount be to drive early momentum?
+
+## M3-B — KICKSTARTER FEE STRUCTURE
+
+Use these exact fee calculations in all models:
+
+**Platform fees (US-primary model):**
+- Kickstarter platform fee: 5.0% of total funds raised
+- Payment processing: 3.0% + $0.20 per pledge (US backers, which are ~60-70% of typical hardware campaigns)
+- International payment processing: 3.0% + $0.20 equivalent (similar for most regions)
+- Combined effective fee rate: approximately 8-9% of gross revenue (use 8.5% as default blended estimate)
+
+**Practical formula:**
+Net revenue per unit = Pledge price × (1 - 0.085) - $0.20
+
+Example: $299 pledge → $299 × 0.915 - $0.20 = $273.49 net per backer
+
+## M3-C — COST STRUCTURE
+
+Build a complete per-unit cost stack:
+
+| Cost Item | Typical Range | Notes |
+|---|---|---|
+| COGS (product + packaging) | User-provided | Must confirm |
+| US Fulfillment (domestic) | $8-15/unit | Pick + pack + domestic shipping |
+| International fulfillment | $15-35/unit | Sea freight; varies by weight/size |
+| US Import duty (for US delivery) | 0-25% of COGS | Category-dependent |
+| Customs broker | $0.50-2/unit at scale | Often bundled with 3PL |
+| Backers gift / packaging extras | $2-10/unit | If applicable |
+| Platform + payment fees | ~8.5% of pledge | See M3-B |
+| Kickstarter commission (Asi/agent) | 3-5% if applicable | Only if using agent |
+
+**Shipping cost estimation by product size:**
+- Small (phone-sized, <0.5kg): Sea $8-12, Air $18-28
+- Medium (shoe-box, 0.5-2kg): Sea $12-20, Air $28-45  
+- Large (2-5kg): Sea $18-30, Air $45-80
+- XL (5kg+): Sea $25-50, Air $80-150+
+Ask the user for approximate weight and dimensions if not provided.
+
+**US-primary model assumption:**
+For a typical Kickstarter hardware campaign, model as:
+- 60% US backers (lower shipping cost, no import duty complexity)
+- 25% EU backers (EU VAT may apply; $5-8 extra cost buffer)
+- 15% rest of world
+
+## M3-D — FINANCIAL FORECAST MODEL
+
+Build the forecast table for 2 pricing scenarios × 3 volume scenarios.
+
+**Standard output format:**
+
+~~~
+KICKMAN FINANCIAL FORECAST
+Product: [Name] | COGS: $[X] | Date: [date]
+
+ASSUMPTIONS
+─────────────────────────────────────────
+Platform + Payment fees:  8.5% blended
+US backers (est.):        65%
+Fulfillment (blended):    $[X]/unit
+Fixed costs:              $[X] total
+ ├─ Main video:           $[X]
+ ├─ Campaign page design: $[X]
+ └─ Other pre-launch:     $[X]
+
+SCENARIO A — Pricing 1: $[price1] | Pricing 2: $[price2]
+─────────────────────────────────────────
+                          $[price1]    $[price2]
+KS net per backer:        $[X]         $[X]
+COGS:                    -$[COGS]     -$[COGS]
+Fulfillment (blended):   -$[X]        -$[X]
+Platform fees:           -$[X]        -$[X]
+────────────────────────────────────────
+Contribution margin:      $[X] ([X]%) $[X] ([X]%)
+Fixed cost breakeven Q:   [X] units   [X] units
+
+VOLUME SCENARIOS
+At [Q1] backers:  Revenue $[X]  |  Net profit $[X] ([X]%)
+At [Q2] backers:  Revenue $[X]  |  Net profit $[X] ([X]%)
+At [Q3] backers:  Revenue $[X]  |  Net profit $[X] ([X]%)
+~~~
+
+Always model 3 volume scenarios:
+- Conservative: what is a realistic floor for this product category?
+- Base case: what would a successful mid-tier campaign look like?
+- Optimistic: what does a breakout campaign look like?
+
+Reference Kickstarter hardware category data:
+- Bottom 50% of hardware campaigns: under 200 backers
+- Median successful hardware campaign: 400-800 backers
+- Top 10%: 2,000-5,000 backers
+- Top 1%: 10,000+ backers
+
+## M3-E — KICKSTARTER REFERENCE PRICING
+
+Before designing tiers, research comparable products. Tell the founder:
+
+"Let me benchmark this against similar Kickstarter campaigns to anchor the right price range."
+
+Pull 3-5 reference data points from your knowledge of Kickstarter hardware campaigns:
+- Product name, category, MSRP, KS launch price, discount %, funded amount, backer count
+- Note what pricing strategy they used (deep early bird, minimal discount, bundle-heavy, etc.)
+- Identify what worked and what can be learned
+
+Then anchor the MSRP:
+- MSRP should feel like a "fair retail price" — not inflated to create fake discount optics
+- KS backers are sophisticated; they research. If MSRP looks padded, it damages trust
+- Typical hardware KS discount off MSRP: 20-35%. Beyond 40% signals the MSRP was fictional.
+- Recommended approach: set a real MSRP you'd actually sell at retail, then offer genuine KS discount
+
+## M3-F — COMPLETE TIER & CAMPAIGN STRUCTURE
+
+Design the full campaign pledge architecture in this order:
+
+### 1. PRE-LAUNCH DEPOSIT (1 month before campaign)
+
+Run a reservation funnel through your landing page:
+- Ask interested backers to place a $1–$20 fully refundable deposit
+- In return: guaranteed access to the best pledge tier (Super Early Bird) when the campaign opens
+- Messaging: "Lock in the best price before we launch. 100% refundable if you change your mind."
+- Why it works: converts email subscribers into committed backers, gives a launchpad number to show on Day 1
+- Target: 200-500 deposits before launch = strong social proof signal
+- Deposit holders get a private link 24 hours before the campaign goes public
+
+### 2. SUPER EARLY BIRD (Hours 0-48 of campaign)
+
+- Quantity: 100-300 units (or 5-10% of expected total). Set a real cap — scarcity is the mechanism
+- Discount: 30-40% off MSRP (deepest discount of the campaign)
+- Duration: 48 hours OR quantity limit, whichever hits first
+- Purpose: creates urgency, drives social sharing ("I just grabbed one before they sold out"), generates press coverage
+- Psychology: people share deals they're proud of. A great Super EB price = free word of mouth
+- Unit economics check: this tier must still be profitable. If 35% off is underwater, reduce cap, not discount
+- Copy hook example: "Only 200 units at this price. Ever."
+
+### 3. EARLY BIRD (Main campaign tier — the real volume driver)
+
+- Quantity: Start with 500-1,000 cap, but this is a SOFT CAP
+- Discount: 20-25% off MSRP
+- The Early Bird is the workhorse of the campaign — most backers will land here
+- Restocking strategy: when Early Bird "sells out," add more inventory in batches (500 at a time)
+- Tell backers: "We just unlocked 500 more Early Bird units due to demand." This feels like good news, not a bait-and-switch
+- In practice: the "Early Bird" tier often fulfills 60-70% of total campaign orders
+- Copy hook: "Backer pricing — only available during the campaign"
+
+### 4. STANDARD / REGULAR
+
+- Price: 10-15% off MSRP (or MSRP equivalent)
+- Unlimited quantity
+- This tier exists as the "floor" — backers feel they're still getting a deal vs retail
+- Mostly catches late-campaign backers who missed the Early Bird restocks
+
+### 5. MULTI-UNIT BUNDLE
+
+- 2-pack: 2 units at ~10% off the 2× single price (small extra incentive for buying more)
+- 3-pack or family pack: useful for products with household or gifting use cases
+- Show the "savings per unit" prominently: "Buy 2, save $30"
+- Unit economics: bundles improve average order value and reduce per-unit fulfillment cost per dollar
+
+### 6. ACCESSORY / BUNDLE TIER
+
+- Product + one key accessory at a slight discount
+- Only worth offering if you have a real accessory with perceived value
+- Example: "Pophie + Premium Stand — $349 (saves $40 vs buying separately)"
+- Sets up post-campaign accessory sales
+
+### 7. PREMIUM / LIMITED EDITION (optional)
+
+- Special color, engraving, or exclusive version — higher price than standard
+- Creates a "VIP backer" identity for enthusiasts
+- Cap at 50-200 units — genuine exclusivity
+- Higher margin tier: good for brand, not volume
+
+## M3-G — STRETCH GOALS
+
+Stretch goals serve two functions: sustain momentum during the "middle slump" (days 5-25) and give backers a reason to share the campaign to unlock rewards.
+
+**Design framework:**
+- First stretch goal: set at ~150-200% of funding goal. Achievable but not guaranteed.
+- Each subsequent goal: roughly 50-80% more than previous
+- Space them to hit approximately every 3-5 days during the campaign
+
+**What makes a good stretch goal:**
+- Must feel genuinely valuable to backers (not just a firmware update)
+- Should be producible without breaking unit economics (add to BOM, not custom tooling)
+- Examples: extra color option, carrying case, extended warranty, premium cable, charging dock, exclusive accessory
+
+**Stretch goal output format:**
+~~~
+STRETCH GOALS
+
+$[X] — Funding Goal (base product)
+$[X × 1.5] — Unlock: [Accessory 1] — added to ALL orders
+$[X × 2.0] — Unlock: [Accessory 2] — added to ALL orders  
+$[X × 3.0] — Unlock: [Color/Edition] — separate pledge tier added
+$[X × 5.0] — Unlock: [Major feature or premium gift]
+~~~
+
+**Dynamic stretch goal rule:** Monitor backer comments and social. If a particular stretch goal is generating excitement, add more supply. If it's not resonating, swap it for something backers are actually asking for.
+
+**Ask the founder:** "What accessories or additions would your backers most want? And what's your realistic funding goal — we'll build the stretch goals around that."
+
+## M3-H — MISSION 3 SUMMARY
+
+Output a complete pricing brief:
+1. MSRP rationale + competitive benchmarks
+2. Full pledge tier table with price, discount %, unit economics, quantity, copy hook
+3. Pre-launch deposit strategy
+4. Stretch goal ladder
+5. Financial model (2 price scenarios × 3 volume scenarios)
+6. Break-even target and recommended backer goal to set publicly
+7. Key risks: COGS increase, lower conversion, shipping cost variance
+
+Then output a tier summary table:
+
+~~~
+PLEDGE TIER SUMMARY
+────────────────────────────────────────────────────────
+Tier              Price    Disc%   Units    Net/unit   Margin
+Pre-deposit       $1-20    —       Unlimited  —         —
+Super Early Bird  $[X]     [X]%    [X] cap   $[X]       [X]%
+Early Bird        $[X]     [X]%    Soft cap  $[X]       [X]%
+Standard          $[X]     [X]%    Unlimited $[X]       [X]%
+2-Pack Bundle     $[X]     [X]%    Unlimited $[X]       [X]%
+Premium           $[X]     [X]%    [X] cap   $[X]       [X]%
+────────────────────────────────────────────────────────
+~~~
+
+End with: "Mission 3 complete. Your pricing strategy, financial forecast, and pledge tier structure are locked. Type 'Mission 4' when you're ready to plan launch day execution."
+
+# M3 RULES
+1. Always research 3-5 comparable KS campaigns before anchoring MSRP
+2. Always ask for COGS before building any financial model
+3. Show your math — every number must be traceable
+4. Be honest about margin: if the economics don't work at a price point, say so
+5. Model the downside first — what's the minimum viable scenario?
+6. Early Bird is a soft cap — teach the founder to restock strategically, not to cheat backers
+7. Stretch goals must be producible at margin — no promises the BOM can't support
+8. Language: match user (ZH or EN)
+9. End every response with one deliverable, question, or decision point
+`;
+
 function getSystemPrompt(mission){
+  if(mission===3) return SYSTEM_M3;
   return mission===2 ? SYSTEM_M2 : SYSTEM_M1;
 }
 
@@ -2430,6 +2693,8 @@ async function callKickman(trigger){
   let apiMessages;
   if(trigger==='m2start'){
     apiMessages=[{role:'user',content:'Begin Mission 2.'}];
+  } else if(trigger==='m3start'){
+    apiMessages=[{role:'user',content:'Begin Mission 3. Start with M3-A: confirm COGS and pricing strategy.'}];
   } else if(trigger==='gen_alignment'){
     apiMessages=[{role:'user',content:'Please generate the complete Product Alignment Document now, based on everything we have discussed. Use the exact template: 1) PRODUCT NAME & DEFINITION, 2) INTERNAL DESCRIPTION, 3) ALL FEATURES, 4) BENEFITS, 5) NEGATIVE THOUGHTS & FEELINGS — BACKER RESISTANCE MAP, 6) WHAT WE WANT PEOPLE TO THINK AND FEEL — EMOTIONAL DESTINATION MAP, 7) READINESS SCORE. Follow the template exactly — no extra sections, no reordering. After outputting it, ask the user if there is anything they want to add or change.'}];
   } else {
@@ -2450,6 +2715,10 @@ async function callKickman(trigger){
     if(fresh.name==='New Project'){const fu=fresh.history.find(m=>m.role==='user'&&m.content!=='Begin.');if(fu){const c=typeof fu.content==='string'?fu.content:(fu.content[0]?.text||'');fresh.name=c.slice(0,40).replace(/\n/g,' ').trim()+(c.length>40?'…':'');}}
     const ns=detectStep(text,fresh.mission||1); if(ns>fresh.step)fresh.step=ns;
     const v=detectVerdict(text); if(v){fresh.verdict=v;if(v==='go'&&(fresh.mission||1)===1){setTimeout(()=>triggerMission2(fresh.id),1200);}}
+    // Mission 3 trigger: user types "Mission 3" in Mission 2
+    if((fresh.mission||1)===2 && /mission\s*3|开始.*定价|pricing.*strategy/i.test(typeof userMsg==='string'?userMsg:'')){
+      setTimeout(()=>triggerMission3(fresh.id), 800);
+    }
     // After gen_alignment, re-check and if alignment is now complete, proceed to M2
     if(trigger==='gen_alignment'){
       const nowHasAlignment = fresh.alignment && fresh.alignment.productName && fresh.alignment.negativeThoughts && fresh.alignment.negativeThoughts.length > 0;
@@ -2484,6 +2753,20 @@ async function callKickman(trigger){
 
 
 // -- MISSION 2 TRIGGER --------------------------------------------------
+async function triggerMission3(sessionId){
+  const session=getSession(sessionId); if(!session)return;
+  if((session.mission||1)>=3) return; // already in M3
+  session.mission=3; session.step=11; session.updatedAt=Date.now();
+  scheduleSave(session); updateStepUI(11,3); renderList();
+  // Show banner
+  const c2=document.getElementById('messages');
+  const b=document.createElement('div');
+  b.style.cssText='display:flex;align-items:center;gap:12px;padding:14px 20px;background:rgba(232,98,42,0.08);border:1px solid rgba(232,98,42,0.25);margin:8px 0;animation:msgIn .3s ease forwards;opacity:0;';
+  b.innerHTML='<span style="font-size:20px">💰</span><div><div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:3px">Mission 2 Complete</div><div style="font-size:13px;color:var(--text-2)">Starting Mission 3 — Pricing Strategy & Financial Forecast</div></div>';
+  c2.appendChild(b); c2.scrollTop=c2.scrollHeight;
+  await callKickman('m3start');
+}
+
 async function triggerMission2(sessionId){
   const session=getSession(sessionId); if(!session)return;
 
@@ -3031,6 +3314,41 @@ const STEP_DEFS = {
       {key:'launchChecklist',label:'Launch Checklist',           hint:'Everything confirmed before going live'},
     ]
   },
+  11: {
+    title: 'Pricing Strategy',
+    num: '11',
+    mission: 3,
+    fields: [
+      {key:'cogs',           label:'COGS & Cost Stack',          hint:'Fully-loaded cost per unit including packaging'},
+      {key:'msrp',           label:'MSRP & KS Price',            hint:'Retail price and Kickstarter backer price', short:true},
+      {key:'positioning',    label:'Competitive Positioning',    hint:'Where this price sits vs. alternatives'},
+      {key:'feeModel',       label:'Fee Structure',              hint:'Platform 5% + payment ~3.5% + fulfillment'},
+    ]
+  },
+  12: {
+    title: 'Financial Forecast',
+    num: '12',
+    mission: 3,
+    fields: [
+      {key:'assumptions',    label:'Model Assumptions',          hint:'Blended fee rate, fulfillment cost, fixed costs'},
+      {key:'scenario1',      label:'Pricing Scenario 1',         hint:'Conservative / Base / Optimistic at price point 1'},
+      {key:'scenario2',      label:'Pricing Scenario 2',         hint:'Conservative / Base / Optimistic at price point 2'},
+      {key:'breakeven',      label:'Break-even Analysis',        hint:'Units needed to cover all fixed costs', short:true},
+      {key:'sensitivity',    label:'Sensitivity Analysis',       hint:'What if COGS +10%? What if only 300 backers?'},
+    ]
+  },
+  13: {
+    title: 'Pledge Tiers',
+    num: '13',
+    mission: 3,
+    fields: [
+      {key:'superEarlyBird', label:'Super Early Bird',           hint:'Deepest discount, 5-10% of inventory, 48hr urgency'},
+      {key:'earlyBird',      label:'Early Bird',                 hint:'Main volume driver, 20-25% off MSRP'},
+      {key:'standard',       label:'Standard',                   hint:'Retail-equivalent, unlimited'},
+      {key:'bundle',         label:'Bundle Tier',                hint:'2 units or product + accessory'},
+      {key:'premium',        label:'Premium / Limited Edition',  hint:'Differentiated version, higher AOV'},
+    ]
+  },
 };
 
 let currentStepDrawer = null;
@@ -3092,8 +3410,13 @@ function smartExtractStep(stepNum, session){
     7:/SCENE ORDER|SCRIPT|MODULE A[2-9]/i,
     8:/PRODUCTION APPROACH|VIDEO BRIEF|MODULE A/i,
     9:/CAMPAIGN PAGE|MODULE B[\s:]/i,
-    10:/LAUNCH READY|MODULE C[\s:]|PRE-LAUNCH CHECKLIST/i
+    10:/LAUNCH READY|MODULE C[\s:]|PRE-LAUNCH CHECKLIST/i,
+    11:/MSRP|PRICING STRATEGY|M3-A|competitive.*pric|price.*anchor/i,
+    12:/FINANCIAL FORECAST|BREAKEVEN|CONTRIBUTION MARGIN|M3-D|pledge.*tier.*\$/i,
+    13:/SUPER EARLY BIRD|EARLY BIRD|PLEDGE TIER|STRETCH GOAL|M3-[EFG]/i
   };
+  // For M3 steps, always capture full raw text (financial data needs full context)
+  const isM3 = stepNum >= 11;
   const pat = pats[stepNum]; if(!pat) return;
   const msgs = [...session.history].filter(m=>m.role==='assistant'||m.role==='km').reverse();
   for(const msg of msgs){
@@ -3103,8 +3426,10 @@ function smartExtractStep(stepNum, session){
     if(!session.stepData) session.stepData={};
     if(!session.stepData[stepNum]) session.stepData[stepNum]={};
     const fk = def.fields[0].key;
-    if(!session.stepData[stepNum][fk]){
-      session.stepData[stepNum][fk] = clean.slice(0,5000);
+    // For M3 steps, always update with latest (pricing data evolves)
+    if(isM3 || !session.stepData[stepNum][fk]){
+      session.stepData[stepNum][fk] = clean.slice(0,6000);
+      session.stepData[stepNum]._raw = clean; // also store raw for rich rendering
       session.stepData[stepNum].updatedAt = Date.now();
       scheduleSave(session);
     }
@@ -3147,6 +3472,14 @@ function renderStepView(stepNum, session){
 
   if(stepNum===2){
     html += rawText ? alignmentRawToHTML(rawText) : renderAlignmentView(merged);
+  } else if(stepNum===5){
+    html += renderGoNoGoView(merged, session);
+  } else if(stepNum===11){
+    html += renderPricingStrategyView(merged, session);
+  } else if(stepNum===12){
+    html += renderFinancialForecastView(merged, session);
+  } else if(stepNum===13){
+    html += renderPledgeTiersView(merged, session);
   } else {
     html += renderGenericView(def, merged);
   }
@@ -3188,6 +3521,232 @@ function renderAlignmentView(d){
   }
   return html;
 }
+
+
+// ── M3 RENDERERS ─────────────────────────────────────────────────────────────
+
+// Shared: extract a section of text between two headers
+function extractSection(text, startRx, endRx){
+  const s = text.search(startRx);
+  if(s < 0) return '';
+  const e = endRx ? text.search(endRx) : text.length;
+  return text.slice(s, e > s ? e : text.length).trim();
+}
+
+// Shared: render a key-value table from lines like "Key: value"
+function kvTable(lines){
+  const rows = lines.filter(l=>l.includes(':')).map(l=>{
+    const idx = l.indexOf(':');
+    const k = l.slice(0,idx).replace(/^[•\-\*]\s*/,'').replace(/\*+/g,'').trim();
+    const v = l.slice(idx+1).replace(/\*+/g,'').trim();
+    return '<tr><td style="padding:7px 14px 7px 0;font-family:var(--font-mono);font-size:10px;color:var(--text-3);letter-spacing:.5px;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.04);">'+escHtml(k)+'</td>' +
+           '<td style="padding:7px 0;font-size:13px;color:var(--text-2);border-bottom:1px solid rgba(255,255,255,.04);">'+escHtml(v)+'</td></tr>';
+  }).join('');
+  return rows ? '<table style="width:100%;border-collapse:collapse;">'+rows+'</table>' : '';
+}
+
+// ── Step 11: Pricing Strategy ─────────────────────────────────────────────────
+function renderPricingStrategyView(data, session){
+  // Try raw text first
+  const raw = session.stepData && session.stepData[11] && session.stepData[11]._raw;
+  const src = raw || Object.values(data).join('\n\n');
+  if(!src || src.trim().length < 30)
+    return '<div class="so-view"><p class="so-empty">Pricing strategy not yet discussed. Ask Kickman to anchor your MSRP.</p></div>';
+
+  let html = '';
+
+  // Highlight MSRP and KS price if found
+  const msrpMatch = src.match(/MSRP[^:\n]*:\s*\$?([\d,]+)/i);
+  const ksMatch = src.match(/KS[^:\n]*price[^:\n]*:\s*\$?([\d,]+)/i) ||
+                  src.match(/Kickstarter[^:\n]*:\s*\$?([\d,]+)/i) ||
+                  src.match(/backer[^:\n]*:\s*\$?([\d,]+)/i);
+  const cogsMatch = src.match(/COGS[^:\n]*:\s*\$?([\d,]+)/i);
+
+  if(msrpMatch || ksMatch || cogsMatch){
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:24px;">';
+    const card = (label, val, accent) =>
+      '<div style="padding:14px 16px;background:var(--card);border:1px solid '+(accent?'rgba(232,98,42,.3)':'var(--border)')+';border-top:2px solid '+(accent?'var(--accent)':'var(--border)')+'">' +
+      '<div style="font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-3);text-transform:uppercase;margin-bottom:6px;">'+label+'</div>' +
+      '<div style="font-family:var(--font-serif);font-size:24px;color:'+(accent?'var(--accent)':'var(--text)')+';">$'+val+'</div></div>';
+    if(cogsMatch) html += card('COGS', cogsMatch[1]);
+    if(msrpMatch) html += card('MSRP', msrpMatch[1], true);
+    if(ksMatch) html += card('KS Price', ksMatch[1], true);
+    html += '</div>';
+  }
+
+  // Render the rest as structured markdown
+  html += '<div class="so-view">'+markdownToHTML(src)+'</div>';
+  return html;
+}
+
+// ── Step 12: Financial Forecast ───────────────────────────────────────────────
+function renderFinancialForecastView(data, session){
+  const raw = session.stepData && session.stepData[12] && session.stepData[12]._raw;
+  const src = raw || Object.values(data).filter(v=>v&&typeof v==='string').join('\n\n');
+  if(!src || src.trim().length < 30)
+    return '<div class="so-view"><p class="so-empty">Financial forecast not yet generated. Complete M3-D with Kickman.</p></div>';
+
+  let html = '';
+
+  // Extract key numbers for summary cards
+  const beMatch = src.match(/break[\s\-]?even[^:\n]*:\s*([0-9,]+)\s*units?/i) ||
+                  src.match(/([0-9,]+)\s*units?\s*to\s*break/i);
+  const marginMatch = src.match(/contribution\s+margin[^:\n]*:\s*([0-9.]+%|\$[\d.]+)/i) ||
+                      src.match(/CM%[^:\n]*:\s*([0-9.]+%)/i);
+  const fixedMatch = src.match(/fixed\s+costs?[^:\n]*:\s*\$?([\d,]+)/i);
+
+  if(beMatch || marginMatch || fixedMatch){
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:24px;">';
+    const kpi = (label, val, color) =>
+      '<div style="padding:14px 16px;background:var(--card);border:1px solid var(--border);border-top:2px solid '+(color||'var(--border)')+'">' +
+      '<div style="font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-3);text-transform:uppercase;margin-bottom:6px;">'+label+'</div>' +
+      '<div style="font-family:var(--font-serif);font-size:22px;color:'+(color||'var(--text)')+';">'+val+'</div></div>';
+    if(beMatch) html += kpi('Break-even', beMatch[1]+' units', 'var(--yellow)');
+    if(marginMatch) html += kpi('Contribution Margin', marginMatch[1], 'var(--green)');
+    if(fixedMatch) html += kpi('Fixed Costs', '$'+fixedMatch[1], 'var(--text-3)');
+    html += '</div>';
+  }
+
+  // Try to extract and render forecast tables
+  const tableLines = src.split('\n').filter(l => /\|/.test(l));
+  if(tableLines.length > 3){
+    // Has markdown table — render it as HTML
+    html += '<div style="overflow-x:auto;margin-bottom:20px;">';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+    let headerDone = false;
+    tableLines.forEach(row => {
+      if(/^[\|\s\-:]+$/.test(row.replace(/\|/g,'').trim())) return; // separator row
+      const cells = row.split('|').filter((_, i, a) => i > 0 && i < a.length-1);
+      if(!headerDone){
+        html += '<thead><tr>'+cells.map(cell =>
+          '<th style="padding:8px 12px;background:var(--card);border-bottom:2px solid var(--accent);font-family:var(--font-mono);font-size:9px;letter-spacing:1px;color:var(--text-2);text-align:left;white-space:nowrap;">'+
+          escHtml(cell.replace(/\*+/g,'').trim())+'</th>').join('')+'</tr></thead><tbody>';
+        headerDone = true;
+      } else {
+        const isHighlight = /total|net profit|breakeven/i.test(row);
+        const style = isHighlight ?
+          'background:rgba(232,98,42,.06);font-weight:600;' :
+          'border-bottom:1px solid rgba(255,255,255,.04);';
+        html += '<tr style="'+style+'">'+cells.map(cell => {
+          const v = cell.replace(/\*+/g,'').trim();
+          const isNeg = /^-\$|^-\d/.test(v);
+          const isPos = /^\+\$|\d+%$/.test(v) && !isNeg;
+          const color = isNeg?'color:var(--red)':isPos?'color:var(--green)':'';
+          return '<td style="padding:7px 12px;font-size:12px;'+color+'">'+escHtml(v)+'</td>';
+        }).join('')+'</tr>';
+      }
+    });
+    html += '</tbody></table></div>';
+  }
+
+  // Render remaining text as markdown
+  const nonTableText = src.split('\n').filter(l => !/\|/.test(l)).join('\n');
+  if(nonTableText.trim()){
+    html += '<div class="so-view">'+markdownToHTML(nonTableText)+'</div>';
+  }
+
+  return html || '<div class="so-view">'+markdownToHTML(src)+'</div>';
+}
+
+// ── Step 13: Pledge Tiers ─────────────────────────────────────────────────────
+function renderPledgeTiersView(data, session){
+  const raw = session.stepData && session.stepData[13] && session.stepData[13]._raw;
+  const src = raw || Object.values(data).filter(v=>v&&typeof v==='string').join('\n\n');
+  if(!src || src.trim().length < 30)
+    return '<div class="so-view"><p class="so-empty">Pledge tiers not yet designed. Complete M3-F with Kickman.</p></div>';
+
+  // Try to extract structured tier data
+  const tierPatterns = [
+    { name:'Pre-Launch Deposit', rx:/pre[\s\-]?launch|deposit|reservation/i, color:'#888888', icon:'🔖' },
+    { name:'Super Early Bird', rx:/super early bird/i, color:'var(--green)', icon:'⚡' },
+    { name:'Early Bird', rx:/(?<!super )early bird/i, color:'var(--accent)', icon:'🐦' },
+    { name:'Standard', rx:/^standard|regular[^:]|retail[^-]/im, color:'#6b9bd2', icon:'📦' },
+    { name:'Bundle', rx:/bundle|2[\s\-]pack|multi/i, color:'#9b7fd2', icon:'🎁' },
+    { name:'Premium', rx:/premium|limited edition|special/i, color:'#d2a17f', icon:'⭐' },
+  ];
+
+  let html = '';
+  let foundTiers = false;
+
+  // Try to extract individual tier blocks
+  const lines = src.split('\n');
+  let currentTier = null;
+  const tiers = [];
+
+  lines.forEach(line => {
+    const l = line.trim();
+    const tierMatch = tierPatterns.find(t => t.rx.test(l) && (l.includes('$') || l.includes('###') || /^[*#]/.test(l)));
+    if(tierMatch){
+      if(currentTier) tiers.push(currentTier);
+      currentTier = { name: tierMatch.name, color: tierMatch.color, icon: tierMatch.icon, lines: [l] };
+    } else if(currentTier && l) {
+      currentTier.lines.push(l);
+    }
+  });
+  if(currentTier) tiers.push(currentTier);
+
+  if(tiers.length >= 2){
+    foundTiers = true;
+    html += '<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px;">';
+    tiers.forEach(tier => {
+      const content = tier.lines.join('\n');
+      const priceMatch = content.match(/\$\s*([\d,]+)/);
+      const discMatch = content.match(/([\d]+)%\s*off/i);
+      const qtyMatch = content.match(/(\d[\d,]*)\s*units?/i) || content.match(/cap[^:]*:\s*(\d[\d,]*)/i);
+
+      html += '<div style="border:1px solid rgba(255,255,255,.08);border-left:3px solid '+tier.color+';padding:14px 18px;background:var(--card);">';
+      html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">';
+      html += '<span style="font-size:18px;">'+tier.icon+'</span>';
+      html += '<div style="font-family:var(--font-serif);font-size:16px;color:var(--text);">'+escHtml(tier.name)+'</div>';
+      if(priceMatch) html += '<div style="margin-left:auto;font-family:var(--font-serif);font-size:20px;color:'+tier.color+';">$'+escHtml(priceMatch[1])+'</div>';
+      html += '</div>';
+
+      if(discMatch || qtyMatch){
+        html += '<div style="display:flex;gap:16px;margin-bottom:8px;">';
+        if(discMatch) html += '<span style="font-family:var(--font-mono);font-size:10px;background:rgba(255,255,255,.06);padding:3px 8px;color:'+tier.color+';">-'+discMatch[1]+'% off MSRP</span>';
+        if(qtyMatch) html += '<span style="font-family:var(--font-mono);font-size:10px;background:rgba(255,255,255,.06);padding:3px 8px;color:var(--text-3);">'+escHtml(qtyMatch[1])+' units</span>';
+        html += '</div>';
+      }
+
+      // Render remaining content as clean text
+      const bodyLines = tier.lines.slice(1).filter(l=>!l.includes(tier.name)).join('\n');
+      if(bodyLines.trim()) html += '<div style="font-size:12px;color:var(--text-2);line-height:1.7;">'+markdownToHTML(bodyLines)+'</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  // Stretch goals section
+  const stretchIdx = src.search(/stretch goal/i);
+  if(stretchIdx >= 0){
+    const stretchSection = src.slice(stretchIdx);
+    html += '<div class="so-section"><div class="so-section-label">Stretch Goals</div>';
+    const stretchLines = stretchSection.split('\n').filter(l=>l.trim());
+    html += '<div style="display:flex;flex-direction:column;gap:6px;">';
+    stretchLines.slice(1).forEach(line => {
+      const l = line.trim();
+      if(!l) return;
+      const amtMatch = l.match(/\$\s*([\d,.]+[KkMm]?)/);
+      const unlockMatch = l.match(/unlock[:\s]+(.+)/i) || l.match(/—\s*(.+)/);
+      if(amtMatch){
+        html += '<div style="display:flex;align-items:center;gap:12px;padding:8px 14px;background:var(--card);border:1px solid rgba(255,255,255,.06);">';
+        html += '<div style="font-family:var(--font-mono);font-size:11px;color:var(--accent);min-width:80px;">$'+escHtml(amtMatch[1])+'</div>';
+        const desc = unlockMatch ? unlockMatch[1] : l.replace(amtMatch[0],'').replace(/^[\s\-—]+/,'').trim();
+        html += '<div style="font-size:12px;color:var(--text-2);">'+escHtml(desc)+'</div>';
+        html += '</div>';
+      }
+    });
+    html += '</div></div>';
+  }
+
+  // Fall back to full markdown if no structured tiers found
+  if(!foundTiers){
+    html += '<div class="so-view">'+markdownToHTML(src)+'</div>';
+  }
+
+  return html || '<div class="so-view"><p class="so-empty">No tier data yet.</p></div>';
+}
+
 
 function renderGenericView(def, data){
   let html = '';
@@ -3508,6 +4067,18 @@ function downloadStepResult(){
     }
     downloadAlignment('txt'); return;
   }
+  // M3 steps: download raw content as formatted document
+  if(stepNum >= 11){
+    const sm3 = getSession(activeId);
+    const d3 = sm3 && sm3.stepData && sm3.stepData[stepNum];
+    const rawM3 = d3 && (d3._raw || d3[STEP_DEFS[stepNum]?.fields[0]?.key] || '');
+    const def3 = STEP_DEFS[stepNum];
+    if(rawM3 && def3){
+      const hdr = ['KICKMAN — '+def3.title.toUpperCase(),'Project: '+(sm3?sm3.name||'Untitled':''),'Exported: '+new Date().toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric'}),'','═'.repeat(60),''].join('\n');
+      downloadBlob(hdr+'\n'+rawM3+'\n\n'+'─'.repeat(60)+'\nkickman.org','kickman-'+def3.title.toLowerCase().replace(/\s+/g,'-')+'-'+slugify(sm3.name)+'-'+TODAY()+'.txt');
+      return;
+    }
+  }
   const def=STEP_DEFS[stepNum];
   const session=getSession(activeId);
   const data=(session&&session.stepData&&session.stepData[stepNum])||{};
@@ -3627,13 +4198,11 @@ function autoExtractStepData(text, stepNum, sessionId){
     return;
   }
 
-  // Store the raw Kickman output for the step
   const clean = text.replace(/<!--[\s\S]*?-->/g,'').trim();
   if(!session.stepData[stepNum]) session.stepData[stepNum] = {};
-
-  // Only overwrite if this is clearly a step deliverable (not a mid-step question)
-  // Heuristic: response is long enough to be a deliverable
   if(clean.length < 200) return;
+  // M3 steps: always refresh (pricing discussions are iterative)
+  if(stepNum >= 11){ session.stepData[stepNum]._raw = clean; session.stepData[stepNum].updatedAt = Date.now(); scheduleSave(session); return; }
 
   // For step 1: extract founder answers
   if(stepNum === 1 && !session.stepData[1].whatItDoes){
