@@ -286,19 +286,7 @@
   .export-fmt-btn:last-child{border-radius:0 2px 2px 0;}
   .export-fmt-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);z-index:1;position:relative;}
 
-  /* Alignment download button */
-  #alignment-download-btn{
-    display:none;
-    align-items:center;gap:6px;
-    font-family:var(--font-mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
-    color:var(--green);background:var(--green-dim);
-    border:1px solid rgba(45,158,107,.3);
-    padding:6px 12px;cursor:pointer;transition:all .2s;
-    white-space:nowrap;
-  }
-  #alignment-download-btn:hover{background:rgba(45,158,107,.2);border-color:var(--green);}
-  #alignment-download-btn svg{width:13px;height:13px;flex-shrink:0;}
-  @media(max-width:680px){#alignment-download-btn{font-size:9px;padding:5px 10px;}}
+
 
   /* TIMELINE PANEL */
   .timeline-panel{width:240px;min-width:240px;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:var(--surface);}
@@ -542,12 +530,7 @@
       <div class="step-dot" id="dot-4"></div>
       <div class="step-dot" id="dot-5"></div>
     </div>
-    <button id="alignment-download-btn" onclick="downloadAlignment()" title="Download Product Alignment Document">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-      </svg>
-      Alignment
-    </button>
+
     <div style="position:relative;display:inline-block;">
       <button class="header-btn" onclick="toggleExportMenu()" id="export-menu-btn">Export ▾</button>
       <div id="export-menu" style="display:none;position:absolute;top:100%;right:0;margin-top:4px;background:var(--surface);border:1px solid var(--border);min-width:240px;z-index:200;">
@@ -2878,10 +2861,6 @@ function updateAlignmentBtn(session){
   const s = getSession((session && session.id) || activeId) || session;
   const hasAlignment = s && s.alignment && s.alignment.productName;
 
-  // Update the standalone header button
-  const btn = document.getElementById('alignment-download-btn');
-  if(btn) btn.style.display = hasAlignment ? 'flex' : 'none';
-
   // Export menu: alignment buttons are ALWAYS clickable
   // downloadAlignment() handles the "not ready" case gracefully
   const label = document.getElementById('export-alignment-item');
@@ -3123,6 +3102,8 @@ function openStepDrawer(stepNum){
   document.getElementById('so-edit-btn').textContent = '✎ Edit';
   document.getElementById('so-edit-btn').className = 'so-btn edit-mode';
 
+  // Auto-extract from history if step has no data yet
+  smartExtractStep(stepNum, session);
   renderStepView(stepNum, session);
   document.getElementById('step-overlay').classList.add('open');
 }
@@ -3160,12 +3141,21 @@ function renderStepView(stepNum, session){
   const hasData = def.fields.some(f => data[f.key] && String(data[f.key]).trim().length > 0);
 
   if(!hasData){
+    // Show generating state, then trigger Kickman to produce the content
     body.innerHTML = '<div class="so-empty-state">' +
-      '<span class="so-empty-icon">📋</span>' +
-      '<div class="so-empty-title">' + def.title + '</div>' +
-      '<div class="so-empty-body">Complete this step in the chat —<br>results will appear here automatically.<br><br>' +
-      '<span style="color:var(--accent);cursor:pointer;" onclick="closeStepDrawer()">← Back to chat</span></div>' +
+      '<span class="so-empty-icon" style="animation:spin 1.5s linear infinite;display:inline-block;">⟳</span>' +
+      '<div class="so-empty-title">Generating results...</div>' +
+      '<div class="so-empty-body">Kickman is extracting the output from your conversation.</div>' +
       '</div>';
+    // Add spin keyframe if not present
+    if(!document.getElementById('spin-style')){
+      const st = document.createElement('style');
+      st.id = 'spin-style';
+      st.textContent = '@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
+      document.head.appendChild(st);
+    }
+    // Trigger Kickman to regenerate this step's content
+    setTimeout(() => triggerStepGeneration(stepNum, session, body), 300);
     return;
   }
 
@@ -3368,6 +3358,227 @@ function downloadStepResult(){
   lines.push('─'.repeat(60)); lines.push('kickman.org');
   downloadBlob(lines.join('\n'), 'kickman-step'+def.num+'-'+def.title.toLowerCase().replace(/\s+/g,'-')+'-'+new Date().toISOString().slice(0,10)+'.txt');
 }
+// ── Trigger Kickman to generate missing step content ─────────────────────────
+async function triggerStepGeneration(stepNum, session, bodyEl){
+  const def = STEP_DEFS[stepNum];
+  if(!def) return;
+
+  const prompts = {
+    1: 'Based on our conversation so far, summarize the founder input: why they are building this, what the product does, cost and pricing, and timeline.',
+    2: 'Generate the complete Product Alignment Document now based on everything we have discussed. Use the exact template with all 7 sections.',
+    3: 'Summarize the three marketing approaches we discussed, including the chosen approach and reasoning.',
+    4: 'Output the Landing Page Briefs including both LP versions, the Validation Playbook, ad setup notes, and tracking dashboard.',
+    5: 'Output the Go/No-Go Report with validation results, verdict, winning angle, risks, and next steps.',
+    6: 'Summarize the Video Strategy from Module A including budget, timeline, chosen style, and key video rules.',
+    7: 'Summarize the Script and Scenes plan including core USP, scene order with timings, and recommended video length.',
+    8: 'Output the Video Brief including production approach, casting direction, and production timeline.',
+    9: 'Summarize the Campaign Page structure including the 12-section page outline, asset checklist, and trust signals.',
+    10: 'Output the Launch Ready checklist including community plan, content plan, IP checklist, and pre-launch checklist.',
+  };
+
+  const prompt = prompts[stepNum];
+  if(!prompt) return;
+
+  try {
+    const sysPrompt = getSystemPrompt(session.mission || 1) + buildMemoryContext(session);
+    const messages = buildMessageHistory(session);
+    // Add generation request
+    messages.push({role:'user', content: prompt + ' Output the full results now, do not ask questions.'});
+
+    const res = await fetch('/api/chat',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({messages, system: sysPrompt, password: currentPw})
+    });
+    if(!res.ok) throw new Error('API error');
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+
+    // Parse alignment update if step 2
+    const alUpdate = parseAlignmentUpdate(text);
+    if(alUpdate) applyAlignmentUpdate(alUpdate, session.id);
+
+    // Store as step data
+    const fresh = getSession(activeId);
+    if(!fresh.stepData) fresh.stepData = {};
+    if(!fresh.stepData[stepNum]) fresh.stepData[stepNum] = {};
+    const def2 = STEP_DEFS[stepNum];
+    if(def2 && def2.fields[0]){
+      fresh.stepData[stepNum][def2.fields[0].key] = text.replace(/<!--[\s\S]*?-->/g,'').trim();
+    }
+    fresh.stepData[stepNum].updatedAt = Date.now();
+    fresh.updatedAt = Date.now();
+    scheduleSave(fresh);
+
+    // Re-run smart extract now that we have the response
+    smartExtractStep(stepNum, fresh);
+
+    // Re-render view
+    if(currentStepDrawer === stepNum){
+      renderStepView(stepNum, fresh);
+      document.getElementById('step-drawer-meta').textContent = 'Just generated';
+    }
+  } catch(e) {
+    if(bodyEl && currentStepDrawer === stepNum){
+      bodyEl.innerHTML = '<div class="so-empty-state">' +
+        '<span class="so-empty-icon">⚠</span>' +
+        '<div class="so-empty-title">Could not generate results</div>' +
+        '<div class="so-empty-body">Complete this step in the chat first,<br>then come back to view results here.<br><br>' +
+        '<span style="color:var(--accent);cursor:pointer;" onclick="closeStepDrawer()">← Back to chat</span></div>' +
+        '</div>';
+    }
+  }
+}
+
+// ── Smart extract: scan history and populate stepData when opening ────────────
+// Called every time a step is opened — always uses latest history
+function smartExtractStep(stepNum, session){
+  if(!session || !session.history) return;
+
+  // Step 2 (Product Alignment) — use session.alignment if available
+  if(stepNum === 2){
+    if(session.alignment && session.alignment.productName){
+      // Already have alignment data — it's always up to date
+      return;
+    }
+    // Try to extract from history
+    extractAlignmentFromHistoryToSession(session);
+    return;
+  }
+
+  // For other steps: always re-scan history to find latest Kickman output
+  // This ensures the view reflects the most recent conversation output
+  const extracted = extractStepFromHistory(stepNum, session.history);
+  if(extracted){
+    if(!session.stepData) session.stepData = {};
+    // Merge extracted into existing (don't overwrite user edits of specific fields)
+    const existing = session.stepData[stepNum] || {};
+    const def = STEP_DEFS[stepNum];
+    const firstKey = def && def.fields[0] && def.fields[0].key;
+    // Only auto-fill first field if user hasn't manually edited other fields
+    const hasUserEdits = def && def.fields.slice(1).some(f => existing[f.key] && existing[f.key].trim());
+    if(!hasUserEdits){
+      session.stepData[stepNum] = Object.assign({}, extracted, existing.updatedAt ? {updatedAt: existing.updatedAt} : {});
+    } else if(!existing[firstKey]){
+      session.stepData[stepNum][firstKey] = extracted[firstKey];
+    }
+  }
+}
+
+// Extract alignment data from history and write to session.alignment
+function extractAlignmentFromHistoryToSession(session){
+  const msgs = (session.history || []).filter(m => m.role==='assistant'||m.role==='km');
+  for(let i = msgs.length - 1; i >= 0; i--){
+    const text = typeof msgs[i].content==='string' ? msgs[i].content : (msgs[i].content?.[0]?.text||'');
+    const clean = text.replace(/<!--[\s\S]*?-->/g,'').trim();
+    if(!clean.includes('PRODUCT NAME') && !clean.includes('产品名称') && !clean.includes('INTERNAL DESCRIPTION')) continue;
+
+    const alignment = {};
+
+    // Product name
+    const nameMatch = clean.match(/(?:PRODUCT NAME[^:\r\n]*:?|[^\r\n]*:?)[\s\S]{0,20}?([A-Z][^\r\n*]{2,60})/i);
+    if(nameMatch) alignment.productName = nameMatch[1].trim();
+
+    // Internal description
+    const descMatch = clean.match(/INTERNAL DESCRIPTION([\s\S]{1,600}?)(?:ALL FEATURES|BENEFITS|\n{3})/i);
+    if(descMatch) alignment.internalDescription = descMatch[1].replace(/\*+/g,'').trim();
+
+    // Features
+    const featStart = clean.search(/ALL FEATURES|所有功能/i);
+    const featEnd = clean.search(/BENEFITS|好处|优势/i);
+    if(featStart > -1){
+      const featSection = clean.slice(featStart, featEnd > featStart ? featEnd : featStart + 800);
+      alignment.features = featSection.split('\n')
+        .filter(l => /^[•\-\*]/.test(l.trim()))
+        .map(l => l.replace(/^[•\-\*]\s*/,'').replace(/\*+/g,'').trim())
+        .filter(Boolean);
+    }
+
+    // Benefits
+    const benStart = clean.search(/^#+\s*BENEFITS|^BENEFITS|^好处/im);
+    const benEnd = clean.search(/NEGATIVE|RESISTANCE|WHAT MIGHT|可能担心/i);
+    if(benStart > -1){
+      const benSection = clean.slice(benStart, benEnd > benStart ? benEnd : benStart + 800);
+      alignment.benefits = benSection.split('\n')
+        .filter(l => /^[•\-\*]/.test(l.trim()))
+        .map(l => l.replace(/^[•\-\*]\s*/,'').replace(/\*+/g,'').trim())
+        .filter(Boolean);
+    }
+
+    // Negative thoughts
+    const negStart = clean.search(/NEGATIVE THOUGHTS|RESISTANCE MAP|BACKER RESISTANCE|消费者可能/i);
+    const negEnd = clean.search(/EMOTIONAL DESTINATION|WHAT WE WANT|情感目标/i);
+    if(negStart > -1){
+      const negSection = clean.slice(negStart, negEnd > negStart ? negEnd : negStart + 1200);
+      alignment.negativeThoughts = negSection.split('\n')
+        .filter(l => /^[•\-\*"]/.test(l.trim()) || /^[""]/.test(l.trim()))
+        .map(l => l.replace(/^[•\-\*]\s*/,'').replace(/^[""“]/,'').replace(/[""”]$/,'').replace(/\*+/g,'').trim())
+        .filter(l => l.length > 5);
+    }
+
+    // Emotional destination
+    const posStart = clean.search(/EMOTIONAL DESTINATION|WHAT WE WANT|情感目标|我们希望/i);
+    const posEnd = clean.search(/READINESS SCORE|准备就绪|\/10/i);
+    if(posStart > -1){
+      const posSection = clean.slice(posStart, posEnd > posStart ? posEnd : posStart + 1200);
+      alignment.emotionalDestination = posSection.split('\n')
+        .filter(l => /^[•\-\*"]/.test(l.trim()) || /^[""]/.test(l.trim()))
+        .map(l => l.replace(/^[•\-\*]\s*/,'').replace(/^[""“]/,'').replace(/[""”]$/,'').replace(/\*+/g,'').trim())
+        .filter(l => l.length > 5);
+    }
+
+    // Readiness score
+    const scoreMatch = clean.match(/READINESS SCORE[^:\r\n]*:?[\s\S]{0,20}?(\d+)\s*\/\s*10/i);
+    if(scoreMatch) alignment.readinessScore = parseInt(scoreMatch[1]);
+
+    if(alignment.productName || (alignment.features && alignment.features.length > 0)){
+      if(!session.alignment) session.alignment = {};
+      Object.assign(session.alignment, alignment);
+      session.alignment.updatedAt = Date.now();
+      scheduleSave(session);
+      return;
+    }
+  }
+}
+
+// Extract content for any step from conversation history
+function extractStepFromHistory(stepNum, history){
+  if(!history) return null;
+  const def = STEP_DEFS[stepNum];
+  if(!def) return null;
+
+  // Get all assistant messages
+  const msgs = history.filter(m => m.role==='assistant'||m.role==='km').reverse(); // latest first
+
+  // Step-specific extraction patterns
+  const stepPatterns = {
+    3: /APPROACH [ABC]:|Marketing Approach|营销方向/i,
+    4: /LP VERSION|LANDING PAGE|VALIDATION PLAYBOOK|着陆页/i,
+    5: /VERDICT|GO\s*[\/|]|NO.GO|FINAL REPORT|最终报告/i,
+    6: /VIDEO STYLE|Video Strategy|MODULE A|视频风格/i,
+    7: /SCENE|SCRIPT|MODULE A[2-9]|场景/i,
+    8: /PRODUCTION|VIDEO BRIEF|MODULE A/i,
+    9: /CAMPAIGN PAGE|MODULE B|页面结构/i,
+    10: /LAUNCH READY|MODULE C|CHECKLIST|上线清单/i,
+  };
+
+  const pattern = stepPatterns[stepNum];
+  if(!pattern) return null;
+
+  for(const msg of msgs){
+    const text = typeof msg.content==='string' ? msg.content : (msg.content?.[0]?.text||'');
+    const clean = text.replace(/<!--[\s\S]*?-->/g,'').trim();
+    if(clean.length < 100) continue;
+    if(!pattern.test(clean)) continue;
+
+    // Store the full relevant output in the first field
+    const firstField = def.fields[0];
+    const result = {updatedAt: Date.now()};
+    result[firstField.key] = clean.slice(0, 4000); // cap at 4000 chars
+    return result;
+  }
+  return null;
+}
+
 // ── Auto-extract step data from Kickman response ──────────────────────────────
 // Called after each Kickman response to auto-populate step data
 function autoExtractStepData(text, stepNum, sessionId){
