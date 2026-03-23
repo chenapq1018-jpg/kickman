@@ -2962,6 +2962,11 @@ function detectStep(t,mission=1){
     if(t.includes('A5')||t.includes('A6')||t.includes('A7')||t.includes('SCENE')||t.includes('场景'))return 7;
     return 6;
   }
+  if(mission===3){
+    if(t.includes('PLEDGE TIER')||t.includes('SUPER EARLY BIRD')||t.includes('STRETCH GOAL')||t.includes('M3-E')||t.includes('M3-F')||t.includes('M3-G'))return 13;
+    if(t.includes('FINANCIAL FORECAST')||t.includes('BREAKEVEN')||t.includes('M3-D')||t.includes('Net profit'))return 12;
+    return 11;
+  }
   if(t.includes('FINAL REPORT')||t.includes('VERDICT:'))return 5;
   if(t.includes('LP VERSION')||t.includes('VALIDATION PLAYBOOK'))return 4;
   if(t.includes('APPROACH A')||t.includes('APPROACH B'))return 3;
@@ -2974,21 +2979,46 @@ function detectVerdict(t){
   if(t.includes('VERDICT: CONDITIONAL')||t.includes('CONDITIONAL ⚠️'))return 'conditional';
   return null;
 }
-function updateStepUI(step,mission=1){
-  if(mission===2){
-    for(let i=1;i<=5;i++){const el=document.getElementById('step-'+i);const dot=document.getElementById('dot-'+i);if(el)el.className='sidebar-step done';if(dot)dot.className='step-dot done';}
-    const sec=document.querySelector('.steps-section');
-    if(sec){let d=sec.querySelector('.m2-steps');if(!d){d=document.createElement('div');d.className='m2-steps';
-      [['06','Video Strategy'],['07','Script & Scenes'],['08','Video Brief'],['09','Campaign Page'],['10','Launch Ready']]
-      .forEach(([n,nm],i)=>{const s=document.createElement('div');s.id='sm2'+i;
-        s.innerHTML='<div class="step-num">'+n+'</div><div class="step-info"><div class="step-name">'+nm+'</div></div>';
-        d.appendChild(s);});sec.appendChild(d);}
-      d.querySelectorAll('[id^=sm2]').forEach((s,i)=>{
-        s.className='sidebar-step '+(step===i+6?'active':step>i+6?'done':'idle');
-        s.querySelector('.step-num').style.color=step===i+6?'var(--accent)':step>i+6?'var(--green)':'';});}
-    return;
+function updateStepUI(step, mission=1){
+  // step = the step number within its mission (M1: 1-5, M2: 6-10, M3: 11-13)
+  // mission = 1, 2, or 3
+
+  // M1 header dots (1-5)
+  for(let i=1;i<=5;i++){
+    const dot=document.getElementById('dot-'+i);
+    if(!dot) continue;
+    dot.className='step-dot';
+    if(mission===1){
+      if(i<step) dot.classList.add('done');
+      else if(i===step) dot.classList.add('active');
+      else dot.classList.add('idle');
+    } else {
+      dot.classList.add('done');
+    }
   }
-  for(let i=1;i<=5;i++){const el=document.getElementById(`step-${i}`);const dot=document.getElementById(`dot-${i}`);if(!el)continue;el.className='sidebar-step';dot.className='step-dot';if(i<step){el.classList.add('done');dot.classList.add('done');}else if(i===step){el.classList.add('active');dot.classList.add('active');}else el.classList.add('idle');}
+
+  // Steps 1-13 — classify each
+  for(let i=1;i<=13;i++){
+    const el=document.getElementById('step-'+i);
+    if(!el) continue;
+    el.className='sidebar-step';
+
+    // Which mission does step i belong to?
+    const iMission = i<=5?1:i<=10?2:3;
+
+    if(iMission < mission){
+      // Earlier mission → all done
+      el.classList.add('done');
+    } else if(iMission > mission){
+      // Future mission → idle
+      el.classList.add('idle');
+    } else {
+      // Same mission as current
+      if(i < step) el.classList.add('done');
+      else if(i === step) el.classList.add('active');
+      else el.classList.add('idle');
+    }
+  }
 }
 
 // ── SESSION LIST ───────────────────────────────────────────────────────────────
