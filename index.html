@@ -158,6 +158,20 @@
   .input-meta{display:flex;justify-content:flex-end;margin-top:6px;}
   .input-hint{font-family:var(--font-mono);font-size:10px;color:var(--text-3);}
 
+  /* Alignment download button */
+  #alignment-download-btn{
+    display:none;
+    align-items:center;gap:6px;
+    font-family:var(--font-mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--green);background:var(--green-dim);
+    border:1px solid rgba(45,158,107,.3);
+    padding:6px 12px;cursor:pointer;transition:all .2s;
+    white-space:nowrap;
+  }
+  #alignment-download-btn:hover{background:rgba(45,158,107,.2);border-color:var(--green);}
+  #alignment-download-btn svg{width:13px;height:13px;flex-shrink:0;}
+  @media(max-width:680px){#alignment-download-btn{font-size:9px;padding:5px 10px;}}
+
   /* TIMELINE PANEL */
   .timeline-panel{width:240px;min-width:240px;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:var(--surface);}
   .timeline-header{padding:12px 14px 10px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
@@ -400,6 +414,12 @@
       <div class="step-dot" id="dot-4"></div>
       <div class="step-dot" id="dot-5"></div>
     </div>
+    <button id="alignment-download-btn" onclick="downloadAlignment()" title="Download Product Alignment Document">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Alignment
+    </button>
     <button class="header-btn" onclick="exportChat()">Export</button>
     <button class="header-btn" onclick="doLogout()">Log out</button>
   </div>
@@ -1106,7 +1126,27 @@ function buildMemoryContext(session){
   if(!session) return '';
   const parts = [];
 
-  // If we have a saved summary, include it
+  // Always include the Product Alignment Document if it exists
+  if(session.alignment && session.alignment.productName){
+    const a = session.alignment;
+    const lines = ['\n\n# CURRENT PRODUCT ALIGNMENT DOCUMENT'];
+    lines.push('(This is the live alignment doc. Update it via <!--ALIGNMENT_UPDATE:{...}--> blocks.)');
+    if(a.productName) lines.push('Product: ' + a.productName);
+    if(a.definition) lines.push('Definition: ' + a.definition);
+    if(a.internalDescription) lines.push('Description: ' + a.internalDescription);
+    if(a.features && a.features.length) lines.push('Features: ' + a.features.join(' | '));
+    if(a.benefits && a.benefits.length) lines.push('Benefits: ' + a.benefits.join(' | '));
+    if(a.negativeThoughts && a.negativeThoughts.length){
+      lines.push('Key resistance points: ' + a.negativeThoughts.slice(0,5).join(' | '));
+    }
+    if(a.emotionalDestination && a.emotionalDestination.length){
+      lines.push('Emotional destination: ' + a.emotionalDestination.slice(0,4).join(' | '));
+    }
+    if(a.readinessScore) lines.push('Readiness score: ' + a.readinessScore + '/10');
+    parts.push(lines.join('\n'));
+  }
+
+  // If we have a saved summary, include it too
   if(session.projectMemory){
     parts.push('\n\n# PROJECT MEMORY (summarized from earlier conversation)\n' + session.projectMemory);
   }
@@ -1332,14 +1372,97 @@ If the user asks you to skip ahead or score immediately before you have this inf
 
 Only generate this AFTER confirming all 9 key information points above.
 
-Output:
+Output the following sections in order:
 
-**PRODUCT NAME & DEFINITION** — One crisp sentence.
-**INTERNAL DESCRIPTION** — 2–3 sentences. Functional, no spin.
-**ALL FEATURES** — Bullet list. Concrete and specific. No vague claims.
-**BENEFITS** — Reframe features as human outcomes.
-**WHAT MIGHT BACKERS FEAR OR DOUBT** — Top 4–6 real objections.
-**WHAT WE WANT PEOPLE TO THINK AND FEEL** — The emotional destination.
+**PRODUCT NAME & DEFINITION**
+One crisp sentence. What it is and who it's for.
+
+**INTERNAL DESCRIPTION**
+2–3 sentences. Functional, no spin. What it does and how.
+
+**ALL FEATURES**
+Bullet list. Concrete and specific. No vague claims like "powerful" or "smart."
+
+**BENEFITS**
+Reframe each feature as a human outcome. Not "10-hour battery" but "lasts your full workday without hunting for an outlet."
+
+---
+
+**NEGATIVE THOUGHTS & FEELINGS — BACKER RESISTANCE MAP**
+
+This is the most important section. Think like a skeptical stranger seeing this product for the first time on Kickstarter.
+
+Generate 10–15 specific negative thoughts, doubts, and gut reactions a potential backer might have. Be brutally honest. Cover all dimensions:
+
+*Category skepticism* — "Is this just another [X]?" "Haven't I seen this before?"
+*Comparison to existing solutions* — "I already have [Y], why do I need this?"
+*Cost resistance* — "Too expensive," "Another subscription I'll forget about"
+*Trust / privacy concerns* — "Who has access to my data?" "Is this watching me?"
+*Novelty fatigue* — "Fun for a week then collecting dust"
+*Complexity fears* — "Sounds like it'll need constant updates/setup/maintenance"
+*Target audience confusion* — "Is this for me or for someone else?"
+*Delivery skepticism* — "Will this actually ship?" "Kickstarter projects always run late"
+*Longevity concerns* — "What if the company folds?" "Will it be obsolete in a year?"
+*Appearance / form factor* — "Looks too [cheap/toyish/corporate/complicated]"
+
+Format as a bulleted list of real inner monologue quotes. Write them as the backer would actually think them, not as sanitized "objections."
+
+Example for an AI companion robot:
+- "This is just another cute toy that'll sit on my shelf"
+- "Why do I need this when I already have ChatGPT on my phone?"
+- "I don't want to pay another monthly subscription"
+- "Is this thing recording everything I say?"
+- "It'll be fun for a week and then I'll forget about it"
+- "Sounds complicated to set up"
+- "I don't want to train it or write any code"
+- "What if they shut down the servers in two years?"
+- "Is this for kids or adults? The design looks childish"
+- "Will it actually do useful things or just talk back at me?"
+- "I can't afford $300+ on something I'm not sure about"
+- "My partner will think I'm weird for buying a robot companion"
+
+After listing them, add this closing statement:
+
+"These are the thoughts we need to preempt — not react to. Every piece of content, every campaign page section, every video moment should be working to dissolve these doubts before they form. Keep this list visible throughout the campaign build."
+
+---
+
+**WHAT WE WANT PEOPLE TO THINK AND FEEL — EMOTIONAL DESTINATION MAP**
+
+This is the mirror of the resistance map — and just as important. These are the exact thoughts and feelings a converted backer has at the moment they click "Back this project."
+
+Generate 10–15 specific statements written as the backer's inner voice. Cover four layers:
+
+*Immediate emotional reaction* — the gut feeling in the first 3 seconds
+*Perceived identity fit* — "This is for someone like me"
+*Trust and transparency signals* — "I believe this company and this product"
+*Life integration* — "I can imagine this in my daily life"
+*Differentiation clarity* — "I understand why this is different from what I already have"
+
+Write them as real thoughts, not marketing copy.
+
+Example for a fluffy AI companion robot:
+- "This is genuinely cute — I want to pick it up"
+- "This feels like the next real step in AI, not just another gadget"
+- "It feels alive, not mechanical"
+- "It notices things I'd forget without being annoying about it"
+- "It helps me without making me manage it"
+- "This fits naturally into my day — it doesn't demand attention"
+- "I can see what it's doing — I actually trust it"
+- "It keeps learning and improving, I didn't just buy a static device"
+- "This is companionship and usefulness at the same time"
+- "It's not replacing me — it's working with me"
+- "I like the idea of having it around even when I'm not actively using it"
+- "This is the kind of AI I'm genuinely comfortable living with"
+- "I'd show this to my friends — it's a conversation starter"
+- "I backed this because nobody else has made something like this yet"
+
+After listing them, add:
+"These statements are the emotional brief for everything we build — the video, the campaign page copy, the ad creative. Every asset we create should make the backer feel at least 3–4 of these before they reach the pledge button."
+
+Then ask: "Does this emotional destination feel right for your product? Which of these statements feel most true — and which feel like a stretch we haven't earned yet? Tell me what to adjust before we move to marketing approaches."
+
+**Wait for confirmation before proceeding to Step 3.** The marketing approach must be built on top of a shared, agreed emotional destination — not a vague feeling.
 
 ---
 
@@ -1353,11 +1476,14 @@ Output:
 | Timeline Feasibility | /2 | |
 | Unit Economics | /2 | |
 
-2–3 sentences interpreting the score. Be honest about risks.
+2–3 sentences interpreting the score. Be honest about risks. If the resistance map revealed serious structural concerns (e.g. privacy fears for a surveillance-adjacent product, subscription fatigue for a SaaS-hardware hybrid), call them out here and explain how they affect the score.
 
-End with: "Does this feel accurate? Correct anything I've got wrong — then we move to marketing approaches."
+End with: "Does this feel accurate? Is there anything in the resistance map that surprised you, or any doubt I've missed? Once you're satisfied, we move to marketing approaches — which will be built specifically to counter these resistance points."
 
 # STEP 3 — THREE MARKETING APPROACHES
+
+Before presenting approaches, open with one sentence referencing the resistance map:
+"Based on your resistance map, the biggest psychological barriers are [top 2-3 from the list]. Each approach below attacks these differently."
 
 Present exactly 3 approaches, each meaningfully different — not tone variations.
 
@@ -1365,11 +1491,12 @@ For each:
 **APPROACH [A/B/C]: [Name]**
 - Core angle: one sentence
 - Why this works: reference 1–2 real $1M+ campaigns
+- Which resistance points from the map this directly counters
 - Who it resonates with
 - Sample headline
-- Risk
+- Risk: which resistance points it does NOT address (potential blind spot)
 
-End with: "Which approach feels most true to your product and story?"
+End with: "Which approach feels most true to your product and story? The one you choose determines which resistance points we tackle head-on in the video and page."
 
 # STEP 4 — LANDING PAGE BRIEFS
 
@@ -1558,6 +1685,51 @@ Output **KICKMAN MISSION 1 — FINAL REPORT** with:
 6. Call out structural problems clearly and early
 7. No filler, no cheerleading
 8. End every response with exactly one: deliverable, question, or decision point
+
+# PRODUCT ALIGNMENT SYSTEM
+
+You maintain a structured Product Alignment Document throughout the conversation. It is stored in the session and can be downloaded by the user at any time.
+
+## When to output an ALIGNMENT_UPDATE block
+
+Output a <!--ALIGNMENT_UPDATE:{...}--> block:
+- After completing Step 2 (the full alignment document is ready)
+- Whenever the user updates ANY product information: name, features, pricing, description, target audience, etc.
+- When the user says things like "actually the product name is X", "we're adding a feature", "change the price to Y", "update the description"
+- The alignment document must always reflect the current state of the product
+
+## Format
+
+Embed this block anywhere in your response (parsed and hidden from user):
+
+<!--ALIGNMENT_UPDATE:
+{
+  "productName": "Product Name Here",
+  "definition": "One crisp sentence — what it is and who it's for.",
+  "internalDescription": "2-3 sentences. Functional, no spin.",
+  "features": ["Feature 1", "Feature 2", "Feature 3"],
+  "benefits": ["Benefit 1", "Benefit 2", "Benefit 3"],
+  "negativeThoughts": [
+    "This is just another X",
+    "I already have Y, why do I need this?",
+    "Will it actually work?"
+  ],
+  "emotionalDestination": [
+    "This feels different from everything else out there",
+    "I trust this product and this team",
+    "I can imagine using this every day"
+  ],
+  "readinessScore": 7,
+  "readinessNotes": "Strong product differentiation but timeline is tight."
+}
+-->
+
+## Rules
+- Always output a full ALIGNMENT_UPDATE after Step 2 is confirmed
+- When user updates any field, output a partial update with only changed fields
+- Preserve all other fields that haven't changed
+- If user says "our product is now called X" mid-conversation, immediately update productName
+- The alignment document is a living document — keep it current throughout all 5 steps
 
 # TIMELINE SYSTEM
 
@@ -2019,6 +2191,7 @@ function loadSession(id){
   }
   renderList();
   renderTimeline();
+  updateAlignmentBtn(session);
 }
 
 async function startCurrentSession(){
@@ -2104,8 +2277,10 @@ async function callKickman(trigger){
     addMessageDOM('km',text); updateStepUI(fresh.step,fresh.mission||1);
     // Parse and apply any timeline updates from Kickman
     const tlUpdate=parseTimelineUpdate(text); if(tlUpdate)applyTimelineUpdate(tlUpdate);
+    const alUpdate=parseAlignmentUpdate(text); if(alUpdate)applyAlignmentUpdate(alUpdate,fresh.id);
     syncTimelineToStep(fresh.step,fresh.mission||1);
     renderTimeline();
+    updateAlignmentBtn(fresh);
     // Background summarization — fires after long conversations to build project memory
     if(fresh.history.length >= SUMMARIZE_THRESHOLD){
       setTimeout(()=>summarizeEarlyHistory(fresh.id), 2000);
@@ -2400,6 +2575,124 @@ function confirmDeleteMob(id){
   renderMobProjectList();
   renderList();
   closeMobProjects();
+}
+
+// ── PRODUCT ALIGNMENT ─────────────────────────────────────────────────────────
+
+function parseAlignmentUpdate(text){
+  const match = text.match(/<!--ALIGNMENT_UPDATE:([\s\S]*?)-->/);
+  if(!match) return null;
+  try { return JSON.parse(match[1].trim()); } catch(e){ return null; }
+}
+
+function applyAlignmentUpdate(update, sessionId){
+  if(!update) return;
+  const session = getSession(sessionId || activeId);
+  if(!session) return;
+  if(!session.alignment) session.alignment = {};
+  // Merge update into existing alignment (partial updates supported)
+  Object.keys(update).forEach(k => {
+    if(update[k] !== undefined) session.alignment[k] = update[k];
+  });
+  session.alignment.updatedAt = Date.now();
+  session.updatedAt = Date.now();
+  scheduleSave(session);
+  // Update the alignment download button visibility
+  updateAlignmentBtn(session);
+}
+
+function updateAlignmentBtn(session){
+  const btn = document.getElementById('alignment-download-btn');
+  if(!btn) return;
+  const hasAlignment = session && session.alignment && session.alignment.productName;
+  btn.style.display = hasAlignment ? 'flex' : 'none';
+}
+
+function downloadAlignment(){
+  const session = getSession(activeId);
+  if(!session || !session.alignment) return;
+  const a = session.alignment;
+  const now = new Date().toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric'});
+
+  const lines = [];
+  lines.push('KICKMAN — PRODUCT ALIGNMENT DOCUMENT');
+  lines.push('Generated by Kickman.org');
+  lines.push('Last updated: ' + now);
+  lines.push('Project: ' + (session.name || 'Untitled'));
+  lines.push('');
+  lines.push('═'.repeat(60));
+  lines.push('');
+
+  if(a.productName){
+    lines.push('PRODUCT NAME & DEFINITION');
+    lines.push('─'.repeat(40));
+    lines.push(a.productName);
+    if(a.definition) lines.push(a.definition);
+    lines.push('');
+  }
+
+  if(a.internalDescription){
+    lines.push('INTERNAL DESCRIPTION');
+    lines.push('─'.repeat(40));
+    lines.push(a.internalDescription);
+    lines.push('');
+  }
+
+  if(a.features && a.features.length){
+    lines.push('ALL FEATURES');
+    lines.push('─'.repeat(40));
+    a.features.forEach(f => lines.push('• ' + f));
+    lines.push('');
+  }
+
+  if(a.benefits && a.benefits.length){
+    lines.push('BENEFITS');
+    lines.push('─'.repeat(40));
+    a.benefits.forEach(b => lines.push('• ' + b));
+    lines.push('');
+  }
+
+  if(a.negativeThoughts && a.negativeThoughts.length){
+    lines.push('WHAT MIGHT BACKERS THINK OR FEEL (Resistance Map)');
+    lines.push('─'.repeat(40));
+    lines.push('These are the doubts and fears we need to preempt throughout the campaign:');
+    lines.push('');
+    a.negativeThoughts.forEach(t => lines.push('• "' + t + '"'));
+    lines.push('');
+  }
+
+  if(a.emotionalDestination && a.emotionalDestination.length){
+    lines.push('WHAT WE WANT PEOPLE TO THINK AND FEEL (Emotional Destination)');
+    lines.push('─'.repeat(40));
+    lines.push('These are the feelings a converted backer has when they click Back:');
+    lines.push('');
+    a.emotionalDestination.forEach(t => lines.push('• "' + t + '"'));
+    lines.push('');
+  }
+
+  if(a.readinessScore){
+    lines.push('READINESS SCORE');
+    lines.push('─'.repeat(40));
+    lines.push('Score: ' + a.readinessScore + ' / 10');
+    if(a.readinessNotes) lines.push(a.readinessNotes);
+    lines.push('');
+  }
+
+  lines.push('═'.repeat(60));
+  lines.push('');
+  lines.push('This document was generated by Kickman — your crowdfunding coach.');
+  lines.push('Update it anytime by telling Kickman about changes to your product.');
+  lines.push('kickman.org');
+
+  const text = lines.join('\n');
+  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+  const el = document.createElement('a');
+  el.href = URL.createObjectURL(blob);
+  const filename = (a.productName || session.name || 'product')
+    .slice(0,30).replace(/[^a-z0-9]/gi,'-').toLowerCase();
+  el.download = 'kickman-alignment-' + filename + '-' + new Date().toISOString().slice(0,10) + '.txt';
+  el.click();
+  URL.revokeObjectURL(el.href);
 }
 
 function exportChat(){
