@@ -1197,6 +1197,11 @@ function buildMemoryContext(session){
     parts.push('\n\n# PROJECT MEMORY (summarized from earlier conversation)\n' + session.projectMemory);
   }
 
+  // Always remind about alignment template rule when alignment exists
+  if(session.alignment && session.alignment.productName){
+    parts.push('\n\n# ALIGNMENT TEMPLATE REMINDER\nIf asked to output the Product Alignment Document, use ONLY these 7 sections in this exact order: (1) PRODUCT NAME & DEFINITION, (2) INTERNAL DESCRIPTION, (3) ALL FEATURES, (4) BENEFITS, (5) NEGATIVE THOUGHTS & FEELINGS — BACKER RESISTANCE MAP, (6) WHAT WE WANT PEOPLE TO THINK AND FEEL — EMOTIONAL DESTINATION MAP, (7) READINESS SCORE. No extra sections. No reordering. Always follow with <!--ALIGNMENT_UPDATE:{...}--> and ask for feedback.');
+  }
+
   return parts.join('');
 }
 
@@ -1731,15 +1736,31 @@ Output **KICKMAN MISSION 1 — FINAL REPORT** with:
 6. Call out structural problems clearly and early
 7. No filler, no cheerleading
 8. End every response with exactly one: deliverable, question, or decision point
-9. PRODUCT ALIGNMENT TEMPLATE IS FIXED — whenever you output the Product Alignment Document (at Step 2, or any time the user asks to see/update/regenerate it), you MUST follow this exact structure and order, nothing more, nothing less:
-   - PRODUCT NAME & DEFINITION
-   - INTERNAL DESCRIPTION
-   - ALL FEATURES
-   - BENEFITS
-   - NEGATIVE THOUGHTS & FEELINGS — BACKER RESISTANCE MAP
-   - WHAT WE WANT PEOPLE TO THINK AND FEEL — EMOTIONAL DESTINATION MAP
-   - READINESS SCORE
-   Do NOT add extra sections, rename sections, reorder sections, or summarize sections unless the user explicitly asks you to add something new. The template is the template. If the user says "show me the alignment" or "output the product alignment", reproduce the current stored alignment in full using this exact structure.
+9. PRODUCT ALIGNMENT TEMPLATE IS STRICTLY FIXED.
+
+This rule overrides everything else when it comes to alignment output.
+
+WHENEVER you output a Product Alignment Document — at Step 2, when the user asks at any point, in Mission 2, in response to "show me the alignment", "generate the alignment", "update the alignment", or any similar request — you MUST output ONLY these 7 sections in this EXACT order:
+
+   1. PRODUCT NAME & DEFINITION
+   2. INTERNAL DESCRIPTION
+   3. ALL FEATURES
+   4. BENEFITS
+   5. NEGATIVE THOUGHTS & FEELINGS — BACKER RESISTANCE MAP
+   6. WHAT WE WANT PEOPLE TO THINK AND FEEL — EMOTIONAL DESTINATION MAP
+   7. READINESS SCORE
+
+FORBIDDEN:
+   - Adding any section not listed above
+   - Renaming any section
+   - Reordering any section
+   - Summarizing any section
+   - Skipping any section
+   - Adding headers like "Summary", "Overview", "Additional Notes", etc.
+
+After outputting the full alignment document in template format, ALWAYS output the <!--ALIGNMENT_UPDATE:{...}--> block so it gets saved, then ask: "Does this look accurate? What would you like to add or change?"
+
+If the user says "add a section about X", you may append it AFTER the 7 standard sections, but never replace or reorder them.
 
 # PRODUCT ALIGNMENT SYSTEM
 
@@ -2162,7 +2183,8 @@ Type "Mission 3" when ready.
 4. Honest about budget tiers — never oversell
 5. Never suggest fabricating reviews, coverage, or quotes
 6. End every response with exactly one: deliverable, question, or decision point
-7. If user tries to skip, explain why and offer faster version`;
+7. If user tries to skip, explain why and offer faster version
+8. PRODUCT ALIGNMENT TEMPLATE IS STRICTLY FIXED — if user asks to see, generate, or update the Product Alignment Document at any point in Mission 2, output ONLY these 7 sections in this exact order: (1) PRODUCT NAME & DEFINITION, (2) INTERNAL DESCRIPTION, (3) ALL FEATURES, (4) BENEFITS, (5) NEGATIVE THOUGHTS & FEELINGS — BACKER RESISTANCE MAP, (6) WHAT WE WANT PEOPLE TO THINK AND FEEL — EMOTIONAL DESTINATION MAP, (7) READINESS SCORE. No extra sections, no reordering. Always follow with <!--ALIGNMENT_UPDATE:{...}--> and ask if the user wants to add or change anything.`;
 
 function getSystemPrompt(mission){
   return mission===2 ? SYSTEM_M2 : SYSTEM_M1;
@@ -2312,7 +2334,14 @@ async function callKickman(trigger){
     if(hasAnyDate || hasActiveMs) tlContext = buildTimelineContext();
   }
   const sysPrompt = baseSysPrompt + memoryContext + tlContext;
-  const apiMessages=trigger==='m2start'?[{role:'user',content:'Begin Mission 2.'}]:messages;
+  let apiMessages;
+  if(trigger==='m2start'){
+    apiMessages=[{role:'user',content:'Begin Mission 2.'}];
+  } else if(trigger==='gen_alignment'){
+    apiMessages=[{role:'user',content:'Please generate the complete Product Alignment Document now, based on everything we have discussed. Use the exact template: 1) PRODUCT NAME & DEFINITION, 2) INTERNAL DESCRIPTION, 3) ALL FEATURES, 4) BENEFITS, 5) NEGATIVE THOUGHTS & FEELINGS — BACKER RESISTANCE MAP, 6) WHAT WE WANT PEOPLE TO THINK AND FEEL — EMOTIONAL DESTINATION MAP, 7) READINESS SCORE. Follow the template exactly — no extra sections, no reordering. After outputting it, ask the user if there is anything they want to add or change.'}];
+  } else {
+    apiMessages=messages;
+  }
   showTyping();
   try{
     const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:apiMessages,system:sysPrompt,password:currentPw})});
@@ -2328,6 +2357,18 @@ async function callKickman(trigger){
     if(fresh.name==='New Project'){const fu=fresh.history.find(m=>m.role==='user'&&m.content!=='Begin.');if(fu){const c=typeof fu.content==='string'?fu.content:(fu.content[0]?.text||'');fresh.name=c.slice(0,40).replace(/\n/g,' ').trim()+(c.length>40?'…':'');}}
     const ns=detectStep(text,fresh.mission||1); if(ns>fresh.step)fresh.step=ns;
     const v=detectVerdict(text); if(v){fresh.verdict=v;if(v==='go'&&(fresh.mission||1)===1){setTimeout(()=>triggerMission2(fresh.id),1200);}}
+    // After gen_alignment, re-check and if alignment is now complete, proceed to M2
+    if(trigger==='gen_alignment'){
+      const nowHasAlignment = fresh.alignment && fresh.alignment.productName && fresh.alignment.negativeThoughts && fresh.alignment.negativeThoughts.length > 0;
+      if(nowHasAlignment){
+        // Show the alignment download button
+        updateAlignmentBtn(fresh);
+        // After user confirms, they can proceed — show a prompt
+        setTimeout(()=>{
+          addMessageDOM('km', '**Product Alignment is now locked. ✓**\n\nYou can download it anytime using the Export button at the top.\n\nWhenever you\'re ready — type "proceed to Mission 2" and we\'ll start building your video and campaign page.');
+        }, 800);
+      }
+    }
     fresh.updatedAt=Date.now(); scheduleSave(fresh);
     addMessageDOM('km',text); updateStepUI(fresh.step,fresh.mission||1);
     // Parse and apply any timeline updates from Kickman
@@ -2350,10 +2391,37 @@ async function callKickman(trigger){
 // -- MISSION 2 TRIGGER --------------------------------------------------
 async function triggerMission2(sessionId){
   const session=getSession(sessionId); if(!session)return;
+
+  // Check if Product Alignment is complete before entering Mission 2
+  const hasAlignment = session.alignment && session.alignment.productName
+    && session.alignment.features && session.alignment.features.length > 0
+    && session.alignment.negativeThoughts && session.alignment.negativeThoughts.length > 0;
+
+  if(!hasAlignment){
+    // Show alignment gate banner
+    showAlignmentGateBanner();
+    // Inject a Kickman message asking to complete alignment first
+    setTimeout(()=>{
+      addMessageDOM('km', '**Before we move to Mission 2, we need to lock the Product Alignment Document.**\n\nI noticed we haven\'t fully captured it yet — or some sections are missing. This document is the foundation for everything in Mission 2: the video brief, the campaign page, the content strategy.\n\nLet me generate the complete Product Alignment now based on everything we\'ve discussed. Once you confirm it looks right, we\'ll move straight into Mission 2.\n\nGenerating alignment now...');
+      // Trigger alignment generation via special prompt
+      setTimeout(()=>callKickman('gen_alignment'), 800);
+    }, 600);
+    return;
+  }
+
+  // Alignment is complete — proceed to Mission 2
   session.mission=2; session.step=6; session.updatedAt=Date.now();
   scheduleSave(session); updateStepUI(6,2); renderList();
   showMissionBanner();
   await callKickman('m2start');
+}
+
+function showAlignmentGateBanner(){
+  const container=document.getElementById('messages');
+  const b=document.createElement('div');
+  b.style.cssText='display:flex;align-items:center;gap:12px;padding:14px 20px;background:rgba(212,160,23,0.08);border:1px solid rgba(212,160,23,0.3);margin:8px 0;animation:msgIn .3s ease forwards;opacity:0;';
+  b.innerHTML='<span style="font-size:20px">&#x1F4CB;</span><div><div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:#d4a017;text-transform:uppercase;margin-bottom:3px">Alignment Check</div><div style="font-size:13px;color:var(--text-2)">Completing Product Alignment before Mission 2</div></div>';
+  container.appendChild(b); container.scrollTop=container.scrollHeight;
 }
 function showMissionBanner(){
   const c=document.getElementById('messages');
