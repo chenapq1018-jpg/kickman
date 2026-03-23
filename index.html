@@ -158,6 +158,12 @@
   .input-meta{display:flex;justify-content:flex-end;margin-top:6px;}
   .input-hint{font-family:var(--font-mono);font-size:10px;color:var(--text-3);}
 
+  /* Export dropdown */
+  .export-menu-item{display:block;width:100%;padding:11px 16px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text-2);font-family:var(--font-mono);font-size:10px;letter-spacing:1px;text-align:left;cursor:pointer;white-space:nowrap;transition:background .15s;}
+  .export-menu-item:last-child{border-bottom:none;}
+  .export-menu-item:hover{background:rgba(255,255,255,.04);color:var(--text);}
+  .export-all-item{color:var(--accent)!important;border-top:1px solid var(--border)!important;}
+
   /* Alignment download button */
   #alignment-download-btn{
     display:none;
@@ -420,7 +426,15 @@
       </svg>
       Alignment
     </button>
-    <button class="header-btn" onclick="exportChat()">Export</button>
+    <div style="position:relative;display:inline-block;">
+      <button class="header-btn" onclick="toggleExportMenu()" id="export-menu-btn">Export ▾</button>
+      <div id="export-menu" style="display:none;position:absolute;top:100%;right:0;margin-top:4px;background:var(--surface);border:1px solid var(--border);min-width:200px;z-index:200;">
+        <button onclick="exportChat();closeExportMenu()" class="export-menu-item">&#x1F4AC; Chat History</button>
+        <button onclick="downloadAlignment();closeExportMenu()" class="export-menu-item" id="export-alignment-item">&#x1F4C4; Product Alignment</button>
+        <button onclick="exportTimeline();closeExportMenu()" class="export-menu-item">&#x1F4C5; Timeline Plan</button>
+        <button onclick="exportAll();closeExportMenu()" class="export-menu-item export-all-item">&#x2B07; Download All (ZIP)</button>
+      </div>
+    </div>
     <button class="header-btn" onclick="doLogout()">Log out</button>
   </div>
 </header>
@@ -459,7 +473,12 @@
 
 <!-- MOBILE MENU POPUP -->
 <div id="mob-menu-popup" style="display:none;position:fixed;bottom:64px;right:12px;background:var(--surface);border:1px solid var(--border);z-index:100;min-width:140px;">
-  <button onclick="exportChat();toggleMobMenu()" style="display:block;width:100%;padding:14px 18px;background:none;border:none;color:var(--text-2);font-family:var(--font-mono);font-size:11px;letter-spacing:1px;text-align:left;cursor:pointer;">Export</button>
+  <div style="border-bottom:1px solid var(--border);padding:4px 0;">
+    <div style="padding:6px 18px;font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--text-3);text-transform:uppercase;">Export</div>
+    <button onclick="exportChat();toggleMobMenu()" style="display:block;width:100%;padding:10px 18px 10px 28px;background:none;border:none;color:var(--text-2);font-family:var(--font-mono);font-size:11px;text-align:left;cursor:pointer;">&#x1F4AC; Chat History</button>
+    <button onclick="downloadAlignment();toggleMobMenu()" style="display:block;width:100%;padding:10px 18px 10px 28px;background:none;border:none;color:var(--text-2);font-family:var(--font-mono);font-size:11px;text-align:left;cursor:pointer;">&#x1F4C4; Product Alignment</button>
+    <button onclick="exportTimeline();toggleMobMenu()" style="display:block;width:100%;padding:10px 18px 10px 28px;background:none;border:none;color:var(--text-2);font-family:var(--font-mono);font-size:11px;text-align:left;cursor:pointer;">&#x1F4C5; Timeline Plan</button>
+  </div>
   <button onclick="doLogout();toggleMobMenu()" style="display:block;width:100%;padding:14px 18px;background:none;border:none;color:var(--red);font-family:var(--font-mono);font-size:11px;letter-spacing:1px;text-align:left;cursor:pointer;">Log out</button>
 </div>
 
@@ -2695,11 +2714,158 @@ function downloadAlignment(){
   URL.revokeObjectURL(el.href);
 }
 
+// ── EXPORT ────────────────────────────────────────────────────────────────────
+
+function toggleExportMenu(){
+  const menu = document.getElementById('export-menu');
+  if(!menu) return;
+  const open = menu.style.display !== 'none';
+  menu.style.display = open ? 'none' : 'block';
+  if(!open){
+    // Dim alignment item if no alignment yet
+    const s = getSession(activeId);
+    const alignItem = document.getElementById('export-alignment-item');
+    if(alignItem) alignItem.style.opacity = (s && s.alignment && s.alignment.productName) ? '1' : '0.4';
+    setTimeout(()=>document.addEventListener('click', closeExportMenu, {once:true}), 10);
+  }
+}
+function closeExportMenu(){
+  const menu = document.getElementById('export-menu');
+  if(menu) menu.style.display = 'none';
+}
+
+function slugify(str){ return (str||'').slice(0,30).replace(/[^a-z0-9]/gi,'-').toLowerCase(); }
+function downloadBlob(text, filename){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));
+  a.download = filename; a.click(); URL.revokeObjectURL(a.href);
+}
+
+// ── Chat history ──────────────────────────────────────────────────────────────
 function exportChat(){
-  const s=getSession(activeId);if(!s)return;
-  const text=s.history.filter(m=>m.content!=='Begin.').map(m=>{const c=typeof m.content==='string'?m.content:(m.content[0]?.text||'');return `[${m.role.toUpperCase()}]\n${c}`;}).join('\n\n---\n\n');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'}));
-  a.download=`kickman-${s.name.slice(0,30).replace(/[^a-z0-9]/gi,'-')}-${new Date().toISOString().slice(0,10)}.txt`;a.click();
+  const s = getSession(activeId); if(!s) return;
+  const now = new Date().toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric'});
+  const lines = [
+    'KICKMAN — CONVERSATION HISTORY',
+    'Project: ' + (s.name||'Untitled'),
+    'Exported: ' + now,
+    '',
+    '═'.repeat(60),
+    ''
+  ];
+  s.history
+    .filter(m => m.content !== 'Begin.')
+    .forEach(m => {
+      const role = m.role === 'km' ? 'KICKMAN' : 'YOU';
+      const text = typeof m.content==='string' ? m.content : (m.content[0]?.text||'');
+      // Strip hidden blocks
+      const clean = text.replace(/<!--[\s\S]*?-->/g,'').trim();
+      lines.push('[' + role + ']');
+      lines.push(clean);
+      lines.push('');
+      lines.push('─'.repeat(40));
+      lines.push('');
+    });
+  downloadBlob(lines.join('\n'), 'kickman-chat-' + slugify(s.name) + '-' + new Date().toISOString().slice(0,10) + '.txt');
+}
+
+// ── Timeline ──────────────────────────────────────────────────────────────────
+function exportTimeline(){
+  const s = getSession(activeId); if(!s) return;
+  const tl = s.timeline || DEFAULT_TIMELINE;
+  const now = new Date().toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric'});
+  const lines = [
+    'KICKMAN — CAMPAIGN TIMELINE',
+    'Project: ' + (s.name||'Untitled'),
+    'Exported: ' + now,
+    '',
+    '═'.repeat(60),
+    ''
+  ];
+
+  const riskLabel = {low:'✓ Low Risk', medium:'● Watch', high:'⚠ High Risk'};
+  const statusLabel = {done:'[DONE]', active:'[ACTIVE]', pending:'[PENDING]'};
+
+  tl.forEach((ms, i) => {
+    const status = statusLabel[ms.status] || '[PENDING]';
+    const risk = riskLabel[ms.risk] || '';
+    const date = ms.date ? ms.date : 'TBD';
+    lines.push((i+1) + '. ' + ms.name);
+    lines.push('   Status: ' + status + '  |  Date: ' + date + '  |  ' + risk);
+    if(ms.hint) lines.push('   Note: ' + ms.hint);
+    ms.subtasks.forEach(st => {
+      const stDate = st.date ? st.date : 'TBD';
+      const stStatus = st.status==='done'?'✓':st.status==='active'?'→':'○';
+      lines.push('   ' + stStatus + ' ' + st.name + ' — ' + stDate);
+    });
+    lines.push('');
+  });
+
+  lines.push('─'.repeat(60));
+  lines.push('Generated by Kickman.org');
+  downloadBlob(lines.join('\n'), 'kickman-timeline-' + slugify(s.name) + '-' + new Date().toISOString().slice(0,10) + '.txt');
+}
+
+// ── Export All ────────────────────────────────────────────────────────────────
+async function exportAll(){
+  const s = getSession(activeId); if(!s) return;
+  const now = new Date().toISOString().slice(0,10);
+  const slug = slugify(s.name);
+
+  // Build combined document
+  const sections = [];
+
+  // Header
+  sections.push(
+    'KICKMAN — COMPLETE PROJECT EXPORT\n' +
+    'Project: ' + (s.name||'Untitled') + '\n' +
+    'Exported: ' + new Date().toLocaleDateString('en',{year:'numeric',month:'long',day:'numeric'}) + '\n' +
+    'kickman.org\n\n' +
+    '╔' + '═'.repeat(58) + '╗\n' +
+    '║  This file contains: Product Alignment + Timeline + Chat  ║\n' +
+    '╚' + '═'.repeat(58) + '╝'
+  );
+
+  // Product Alignment
+  if(s.alignment && s.alignment.productName){
+    const a = s.alignment;
+    const al = ['\n\n' + '═'.repeat(60), 'SECTION 1 — PRODUCT ALIGNMENT DOCUMENT', '═'.repeat(60)];
+    if(a.productName){ al.push('\nPRODUCT NAME & DEFINITION\n' + '─'.repeat(40)); al.push(a.productName); if(a.definition) al.push(a.definition); }
+    if(a.internalDescription){ al.push('\nINTERNAL DESCRIPTION\n' + '─'.repeat(40)); al.push(a.internalDescription); }
+    if(a.features && a.features.length){ al.push('\nALL FEATURES\n' + '─'.repeat(40)); a.features.forEach(f=>al.push('• '+f)); }
+    if(a.benefits && a.benefits.length){ al.push('\nBENEFITS\n' + '─'.repeat(40)); a.benefits.forEach(b=>al.push('• '+b)); }
+    if(a.negativeThoughts && a.negativeThoughts.length){ al.push('\nRESISTANCE MAP — What Backers Might Think/Feel\n' + '─'.repeat(40)); a.negativeThoughts.forEach(t=>al.push('• "'+t+'"')); }
+    if(a.emotionalDestination && a.emotionalDestination.length){ al.push('\nEMOTIONAL DESTINATION — What We Want Them to Feel\n' + '─'.repeat(40)); a.emotionalDestination.forEach(t=>al.push('• "'+t+'"')); }
+    if(a.readinessScore){ al.push('\nREADINESS SCORE: ' + a.readinessScore + '/10'); if(a.readinessNotes) al.push(a.readinessNotes); }
+    sections.push(al.join('\n'));
+  }
+
+  // Timeline
+  const tl = s.timeline || DEFAULT_TIMELINE;
+  const tlLines = ['\n\n' + '═'.repeat(60), 'SECTION 2 — CAMPAIGN TIMELINE', '═'.repeat(60)];
+  const riskLabel = {low:'✓ Low Risk', medium:'● Watch', high:'⚠ High Risk'};
+  tl.forEach((ms,i) => {
+    const date = ms.date||'TBD';
+    const risk = riskLabel[ms.risk]||'';
+    tlLines.push('\n'+(i+1)+'. '+ms.name+' — '+date+'  '+risk);
+    ms.subtasks.forEach(st => {
+      const st2 = st.status==='done'?'✓':st.status==='active'?'→':'○';
+      tlLines.push('   '+st2+' '+st.name+' — '+(st.date||'TBD'));
+    });
+  });
+  sections.push(tlLines.join('\n'));
+
+  // Chat history
+  const chatLines = ['\n\n' + '═'.repeat(60), 'SECTION 3 — CONVERSATION HISTORY', '═'.repeat(60)];
+  s.history.filter(m=>m.content!=='Begin.').forEach(m => {
+    const role = m.role==='km'?'KICKMAN':'YOU';
+    const text = typeof m.content==='string'?m.content:(m.content[0]?.text||'');
+    const clean = text.replace(/<!--[\s\S]*?-->/g,'').trim();
+    chatLines.push('\n['+role+']\n'+clean+'\n'+'─'.repeat(40));
+  });
+  sections.push(chatLines.join('\n'));
+
+  downloadBlob(sections.join('\n'), 'kickman-full-export-' + slug + '-' + now + '.txt');
 }
 </script>
 </body>
