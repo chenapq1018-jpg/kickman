@@ -3065,16 +3065,12 @@ function openStepDrawer(stepNum){
   // Render fields
   renderStepFields(stepNum, session);
 
-  // Open drawer
-  document.getElementById('step-drawer-overlay').classList.add('open');
-  document.getElementById('step-drawer').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  // Show overlay inside chat container
+  document.getElementById('step-overlay').classList.add('open');
 }
 
 function closeStepDrawer(){
-  document.getElementById('step-drawer-overlay').classList.remove('open');
-  document.getElementById('step-drawer').classList.remove('open');
-  document.body.style.overflow = '';
+  document.getElementById('step-overlay').classList.remove('open');
   currentStepDrawer = null;
 }
 
