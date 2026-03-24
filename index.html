@@ -210,6 +210,10 @@
   .img-btn:hover{border-color:var(--border-hover);color:var(--text-2);}
   .img-btn svg{width:16px;height:16px;}
   #file-input{display:none;}
+  .drag-overlay{display:none;position:absolute;inset:0;background:rgba(232,98,42,.08);border:2px dashed rgba(232,98,42,.5);z-index:20;border-radius:2px;pointer-events:none;justify-content:center;align-items:center;}
+  .drag-overlay.active{display:flex;}
+  .drag-overlay-inner{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--accent);font-family:var(--font-mono);font-size:11px;letter-spacing:1px;opacity:.8;}
+  .input-area{position:relative;}
   #user-input{flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:var(--font-sans);font-size:14px;line-height:1.6;padding:12px 16px;resize:none;min-height:46px;max-height:200px;outline:none;transition:border-color .2s;}
   #user-input:focus{border-color:rgba(232,98,42,.4);}
   #user-input::placeholder{color:var(--text-3);}
@@ -624,10 +628,17 @@
       <div class="welcome-note">14 days &middot; Go / No-Go decision &middot; Kickstarter-ready</div>
     </div>
     <div class="messages" id="messages" style="display:none"></div>
-    <div class="input-area" id="input-area" style="display:none">
+    <div class="input-area" id="input-area" style="display:none"
+         ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+      <div class="drag-overlay" id="drag-overlay">
+        <div class="drag-overlay-inner">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span>Drop image to analyze</span>
+        </div>
+      </div>
       <div class="image-preview-strip" id="image-preview-strip"></div>
       <div class="input-row">
-        <textarea id="user-input" placeholder="Type your message&#x2026;" rows="1" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+        <textarea id="user-input" placeholder="Type a message or drop an image..." rows="1" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
         <div class="input-actions">
           <button class="img-btn" onclick="document.getElementById('file-input').click()" title="Upload image">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -644,7 +655,7 @@
       </div>
       <input type="file" id="file-input" accept="image/*" multiple onchange="handleImageUpload(event)">
       <div class="input-meta">
-        <span class="input-hint">Enter &#x21B5; newline &middot; Shift+Enter send</span>
+        <span class="input-hint">Enter &#x21B5; newline &middot; Shift+Enter send &middot; Drop or paste image</span>
       </div>
     </div>
   </div>
@@ -1766,6 +1777,71 @@ For now, the Google Sheet above is all you need. Keep it simple."
 
 End with: "Set up your ads this week, run for 7–10 days, then bring me the numbers. I'll tell you what they mean."
 
+
+End with: \"Set up your ads this week, run for 7–10 days, then bring me the numbers. I'll tell you what they mean.\"
+
+# STEP 4C — VALIDATION DATA ANALYSIS
+
+This step activates automatically whenever the founder shares performance data. Do NOT wait to be asked. If data is pasted, analyze immediately.
+
+## TRIGGER PHRASES (activate instantly):
+- Any table or numbers about ads/landing page performance
+- "conversion rate is low", "CPL went up", "signups are slow"
+- Daily data pasted (Date | UV | Signups | CVR)
+- "what do these numbers mean"
+
+## ANALYSIS FRAMEWORK
+
+### Layer 1 — Triage: which layer is broken?
+
+| Metric | 🔴 Broken | 🟡 Weak | 🟢 Good |
+|---|---|---|---|
+| Ad CTR | <0.5% | 0.5–1.5% | >1.5% |
+| LP CVR (visits→signup) | <8% | 8–15% | >15% |
+| CPL | >$15 | $5–15 | <$5 |
+| Daily signups | <3/day | 3–10/day | >10/day |
+
+- CTR broken → ad creative or targeting problem
+- CTR ok but CVR low → landing page doesn't match ad promise
+- Both broken → fix both before reading results
+
+### Layer 2 — Day-by-day patterns
+- Day of week drop → audience profile signal
+- Spend increase but no proportional signups → demand ceiling or wrong targeting
+- CVR improving → social proof building; CVR declining → creative fatigue
+
+### Layer 3 — Creative vs Audience vs Page diagnosis
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| High CTR, low CVR | LP promise ≠ ad | Mirror ad headline on LP hero |
+| One creative >> others | Weak hook in others | Kill losers, scale winner |
+| Good CVR in one segment, low in another | Wrong audience for this LP | Target only winning segment |
+| Good Day 1-3, drops | Ad fatigue | Refresh creative, exclude converters |
+| Bounce <15s | Page too slow OR visual mismatch | Check load speed, match ad image |
+
+### Layer 4 — LP Version comparison
+If A/B testing: if one version CVR >3% higher → winner confirmed. Note what's different and why.
+
+Output:
+~~~
+LP VERSION VERDICT
+Version A: [CVR]% — [diagnosis]
+Version B: [CVR]% — [diagnosis]
+Winner: [A/B] — [key reason]
+~~~
+
+### Layer 5 — Three action outputs (ALWAYS end analysis with exactly these three)
+1. **STOP:** [specific thing clearly not working]
+2. **DOUBLE DOWN:** [specific winner — name the audience and creative]
+3. **TEST NEXT:** [one new hypothesis based on what data suggests is blocking]
+
+## PROACTIVE DATA REQUEST
+If founder has been running ads 5+ days without sharing data:
+"You've had ads running for a while. Let's look at the numbers.
+
+Share: Date | Landing page visits | Email signups | Conversion rate — and your CPL per creative if you have it. Paste as a table or raw numbers."
+
 # STEP 5 — GO / NO-GO REPORT
 
 Ask for: clicks, leads/reservations, CPL per version, qualitative signals.
@@ -2253,6 +2329,152 @@ Type "Mission 3" when ready.
 
 ---
 
+
+---
+
+# MODULE D: PARTNER RESOURCES & OUTREACH
+
+Available at any point in Mission 2 or 3. Activate when founder asks about agencies, KOLs, media, or referral partners.
+
+---
+
+## D1 — AD AGENCIES & LAUNCH PARTNERS
+
+**When to use an agency vs. DIY:**
+- DIY: Budget <$5K, founder has ads experience, simple product
+- Agency: Budget >$10K, first launch, complex product, wants to maximize Day 1
+
+**JELLOP** — Most KS-specialized paid acquisition agency.
+- Best for: Tech hardware, gadgets, consumer electronics
+- Minimum: ~$10K/month ad spend (% of managed spend)
+- Known for: Aggressive Day 1 push, warm audience retargeting
+- Contact: jellop.com
+
+**FUNDED TODAY** — Full-service KS marketing (PR + ads + email).
+- Contact: fundedtoday.com
+
+**ENVENTYS PARTNERS** — Strong for hardware + outdoor/lifestyle.
+- Best for: Outdoor gear, lifestyle hardware, $100–$500 price range
+- Contact: enventyspartners.com
+
+**LAUNCHBOOM** — Specializes in pre-launch reservation funnel.
+- Contact: launchboom.com
+
+**BACKERKIT ADS / KROWDSTER** — Email campaigns to existing KS backers.
+- Cost: $200–$800 per campaign blast
+- Best timing: 2 weeks before launch and during campaign
+
+**Budget matching:**
+- <$5K: BackerKit Ads + 2–3 micro-KOL units + Krowdster blast
+- $5K–$20K: Add Jellop or LaunchBoom, 5–8 KOL units, 1–2 media pitches
+- $20K+: Full agency + 10+ KOL seeding + PR
+
+**Offer to draft inquiry emails** when founder is ready to reach out.
+
+---
+
+## D2 — KOL STRATEGY
+
+### The honest truth about KOL in crowdfunding
+
+KOL ROI has collapsed. Big names (1M+ followers) are expensive and their audiences are passive. Mega-influencer paid deals almost never ROI on KS.
+
+**What KOL actually does for KS:** It is NOT a traffic channel. It is a CREDIBILITY SIGNAL.
+The real job: sit on your campaign page as social proof. The skeptical backer who doesn't know the brand sees "a real person I trust used this and said X" — hesitation turns to pledge.
+
+**ROI reality:**
+- $50K paid mega-influencer → ~200 direct KS clicks. Almost never worth it.
+- $0 unit-for-review to mid-tier creator with 50K–300K subscribers who genuinely loves it → 10x more valuable. Video lives forever on YouTube.
+
+**Target profile: 30K–500K subscribers, category-specific, authenticity-driven**
+This range: still cares about their reputation, won't fake enthusiasm, large enough to matter, will respond to unit-for-review offers.
+
+**What makes a good KOL for KS:**
+1. Has reviewed similar products — knows how to explain value
+2. Long-form videos (8min+) — they actually use the product
+3. Engaged comments section — real audience
+4. Asks good questions before agreeing — they care
+5. **US-only recommendations unless founder specifically requests otherwise**
+
+**What to avoid:** Anyone >1M subscribers (too expensive), unboxing-only channels, anyone requiring a script, "collab agencies" bundling 10 micro-influencers.
+
+### US MID-TIER RECOMMENDATIONS BY CATEGORY
+
+**TECH HARDWARE / AI / SMART HOME:**
+- Lon.TV — extremely thorough long-form, niche but trusted
+- Simply Austin — relatable everyday tech, strong trust
+- The Tech Chap — detailed honest reviews
+- Look for: "living with [product] for 30 days" style channels
+
+**ROBOTICS / HOME AUTOMATION:**
+- Stuff Made Here — engineering explanation, highly credible
+- DIY Perks — maker audience, trusts product quality claims
+- Modern Dad — smart home + family life, authentic context
+
+**PET TECH:** Target veterinary-adjacent creators and dog trainers (50K–200K)
+
+**HEALTH & FITNESS DEVICES:**
+- DC Rainmaker (dcrainmaker.com) — gold standard for fitness wearables. Getting a positive mention here is extremely credible.
+- GPSKevin — running/cycling gadgets, technical depth
+
+**HOME / KITCHEN:**
+- Ethan Chlebowski — food science approach, audience trusts his analysis
+
+**MEDIA / PRESS:**
+- Wirecutter (NYT) — extremely valuable, needs finished product
+- Yanko Design — industrial design community
+- Product Hunt — launch day before KS, captures tech early adopters
+- Engadget / The Verge — only if there's genuine news
+
+### HOW TO APPROACH A MID-TIER KOL
+
+1. Watch 2–3 recent videos first. Reference something specific.
+2. Lead with the product's single most impressive feature.
+3. Offer a unit with zero strings. Let them decide to review or not.
+4. If they ask for payment: $500–$2,000 is reasonable for this tier.
+5. Send the unit with a one-page brief (not a script).
+
+**The one-page brief format:**
+~~~
+PRODUCT: [Name]
+WHAT IT DOES IN ONE SENTENCE: [...]
+THE MOMENT MOST PEOPLE ARE SURPRISED BY: [specific feature]
+WHO IT'S FOR: [specific person]
+WHAT TO ACTUALLY TEST: [2-3 use cases]
+KS LAUNCH DATE: [date] — coverage in 2 weeks before or during campaign is ideal
+~~~
+
+Never ask them to hide negatives. Authentic negatives + genuine positives = trust.
+
+**Timing:** Seed units 6–8 weeks before launch. Ask for embargo until 1 week before.
+
+**Offer to draft the outreach email and product brief** when founder names a specific creator.
+
+---
+
+## D3 — REFERRAL & CROSS-PROMOTION
+
+**KickBooster** (kickbooster.me) — Purpose-built KS affiliate tool, ~5% commission to affiliates.
+
+**BackerKit Ads** — Reaches people who backed similar campaigns.
+
+**Campaign cross-promos:** Find non-competing adjacent campaigns launching in same window.
+- Go to Kickstarter → Technology → Sort by Recently Launched
+- Reach out with a backer email swap proposal
+
+**Deposit holders as referral base:** Give early supporters a unique referral link. "Refer 3 backers, get a free accessory."
+
+---
+
+## D4 — RESOURCE MATCHING LOGIC
+
+When founder asks about partnerships, always:
+1. Ask budget first — many resources have minimums
+2. Ask timeline — agencies need 4–6 weeks lead time
+3. Ask primary market — US-only vs global changes everything
+4. Offer to draft the outreach — don't just give names, write the actual email
+
+
 # MISSION 2 RULES
 1. Always reference Mission 1 Alignment Doc — never re-ask product information
 2. Language: match user (ZH or EN) automatically
@@ -2366,7 +2588,7 @@ function setSyncStatus(state){const el=document.getElementById('sync-status');el
 
 // ── LOAD SESSION ───────────────────────────────────────────────────────────────
 function loadSession(id){
-  activeId=id; pendingImages=[]; renderPreviewStrip();
+  activeId=id; pendingImages=[]; renderPreviewStrip(); kbLoaded=false; kbCache={};
   const session=getSession(id); if(!session)return;
   document.getElementById('messages').innerHTML=''; updateStepUI(session.step);
   if(!session.started||session.history.length===0){
@@ -2400,7 +2622,12 @@ async function startCurrentSession(){
 // ── IMAGE UPLOAD ───────────────────────────────────────────────────────────────
 function handleImageUpload(event){
   const files=Array.from(event.target.files);
-  files.forEach(file=>{
+  addImageFiles(files);
+  event.target.value='';
+}
+
+function addImageFiles(files){
+  files.filter(f=>f.type.startsWith('image/')).forEach(file=>{
     const reader=new FileReader();
     reader.onload=e=>{
       const b64=e.target.result.split(',')[1];
@@ -2410,8 +2637,32 @@ function handleImageUpload(event){
     };
     reader.readAsDataURL(file);
   });
-  event.target.value=''; // reset so same file can be re-uploaded
 }
+
+let dragCounter=0;
+function handleDragOver(e){e.preventDefault();e.stopPropagation();e.dataTransfer.dropEffect='copy';}
+function handleDragLeave(e){e.preventDefault();dragCounter--;if(dragCounter<=0){dragCounter=0;document.getElementById('drag-overlay').classList.remove('active');}}
+function handleDrop(e){
+  e.preventDefault();e.stopPropagation();dragCounter=0;
+  document.getElementById('drag-overlay').classList.remove('active');
+  const files=Array.from(e.dataTransfer.files);
+  if(files.length>0) addImageFiles(files);
+}
+document.addEventListener('dragenter',function(e){
+  const area=document.getElementById('input-area');
+  if(!area||area.style.display==='none') return;
+  if(e.dataTransfer&&Array.from(e.dataTransfer.types).includes('Files')){dragCounter++;document.getElementById('drag-overlay').classList.add('active');}
+});
+document.addEventListener('paste',function(e){
+  const area=document.getElementById('input-area');
+  if(!area||area.style.display==='none') return;
+  const items=Array.from(e.clipboardData.items).filter(i=>i.type.startsWith('image/'));
+  if(!items.length) return;
+  e.preventDefault();
+  items.forEach(item=>{const f=item.getAsFile();if(f) addImageFiles([f]);});
+});
+
+
 
 function renderPreviewStrip(){
   const strip=document.getElementById('image-preview-strip');
@@ -2450,7 +2701,9 @@ async function callKickman(trigger){
     const hasActiveMs = tl && tl.some(m => m.status !== 'pending');
     if(hasAnyDate || hasActiveMs) tlContext = buildTimelineContext();
   }
-  const sysPrompt = baseSysPrompt + memoryContext + tlContext;
+  let kbContext='';
+  try{const insights=await loadKBInsights(curSess);kbContext=buildKBContext(insights);}catch(e){}
+  const sysPrompt = baseSysPrompt + memoryContext + tlContext + kbContext;
   let apiMessages;
   if(trigger==='m2start'){
     apiMessages=[{role:'user',content:'Begin Mission 2.'}];
@@ -3698,6 +3951,128 @@ function buildStepMemoryContext(session){
   return parts.join('\\n');
 }
 
+
+
+// ── KNOWLEDGE BASE ────────────────────────────────────────────────────────────
+let kbCache = {};
+let kbLoaded = false;
+
+function inferProductCategory(session){
+  const combined = (((session.alignment&&session.alignment.productName)||session.name||'') + ' ' + ((session.alignment&&session.alignment.internalDescription)||'')).toLowerCase();
+  if(/robot|robo/i.test(combined)) return 'robotics';
+  if(/ai|智能/i.test(combined)) return 'ai-hardware';
+  if(/pet|猫|狗|dog|cat/i.test(combined)) return 'pet-tech';
+  if(/fitness|health|健康/i.test(combined)) return 'health-fitness';
+  if(/home|家居|smart home/i.test(combined)) return 'smart-home';
+  if(/camera|photo|摄影/i.test(combined)) return 'camera';
+  if(/game|gaming|游戏/i.test(combined)) return 'gaming';
+  if(/audio|speaker|headphone/i.test(combined)) return 'audio';
+  if(/kitchen|food|厨/i.test(combined)) return 'kitchen';
+  return 'general';
+}
+
+async function loadKBInsights(session){
+  if(kbLoaded && kbCache) return kbCache;
+  kbLoaded = true;
+  try{
+    const cat = inferProductCategory(session);
+    const res = await fetch('/api/insights?type=both&category='+encodeURIComponent(cat)+'&limit=3');
+    if(!res.ok){ kbCache={}; return {}; }
+    kbCache = await res.json();
+    return kbCache;
+  }catch(e){ kbCache={}; return {}; }
+}
+
+function buildKBContext(data){
+  if(!data) return '';
+  const {insights, benchmarks} = data.insights!==undefined ? data : {insights:data, benchmarks:null};
+  let ctx = '';
+  if(benchmarks && benchmarks.categoryStats){
+    const stats = benchmarks.categoryStats;
+    const label = benchmarks.label || benchmarks.category || 'this category';
+    const lines = [];
+    const fmt = (stat, unit, label) => {
+      if(!stat||stat.n<2) return null;
+      const conf = stat.confidence==='high'?'':` (${stat.confidence} confidence, n=${stat.n})`;
+      return `${label}: avg ${stat.mean}${unit}${conf}`;
+    };
+    if(stats.cpl) lines.push(fmt(stats.cpl,'','CPL (cost per lead)'));
+    if(stats.cvr) lines.push(fmt(stats.cvr,'%','Landing page CVR'));
+    if(stats.ctr) lines.push(fmt(stats.ctr,'%','Ad CTR'));
+    if(stats.ksFunding) lines.push(fmt(stats.ksFunding,'','KS funding raised'));
+    if(stats.ksBackers) lines.push(fmt(stats.ksBackers,' backers','KS backers'));
+    const valid = lines.filter(Boolean);
+    if(valid.length>0){
+      ctx += '\n\n# CATEGORY BENCHMARKS — '+label.toUpperCase()+'\n';
+      ctx += 'Aggregated averages from real projects in this category (raw data never stored). Use to tell founders whether their metrics are strong or weak vs similar products.\n';
+      ctx += 'IMPORTANT: Frame as "similar projects in this category" — never attribute to any specific project.\n\n';
+      ctx += valid.join('\n');
+    }
+  }
+  const insightList = Array.isArray(insights) ? insights : [];
+  if(insightList.length>0){
+    const items = insightList.map(ins=>{
+      const parts=[];
+      if(ins.headline) parts.push('Insight: '+ins.headline);
+      if(ins.whatWorked) parts.push('What worked: '+ins.whatWorked);
+      if(ins.keyTakeaway) parts.push('Takeaway: '+ins.keyTakeaway);
+      return parts.join(' | ');
+    }).filter(Boolean);
+    if(items.length>0){
+      ctx += '\n\n# LEARNINGS FROM SIMILAR PROJECTS\n';
+      ctx += items.map((item,i)=>(i+1)+'. '+item).join('\n');
+    }
+  }
+  return ctx;
+}
+
+async function extractAndStoreInsight(session, trigger){
+  if(!session||!session.alignment||!session.alignment.productName) return;
+  if((session.history||[]).length<10) return;
+  const category = inferProductCategory(session);
+  const alignSummary = [
+    'Product type: '+(session.alignment.productName||''),
+    'Category: '+category,
+    'Trigger: '+trigger,
+    'Verdict: '+(session.verdict||'none'),
+    'Mission reached: '+(session.mission||1),
+  ].join('\n');
+  const approach = session.stepData&&session.stepData[3]&&session.stepData[3]._raw ? session.stepData[3]._raw.slice(0,400) : '';
+  const prompt = `Extract an anonymized learning insight from this Kickstarter coaching session.\n\nContext:\n${alignSummary}\n${approach?'Marketing approach:\n'+approach:''}\n\nSTRICT RULES:\n- NO numbers (costs, CPL, email counts, budgets)\n- NO company names or identifying information\n- DO include: what positioning worked, what objections came up, winning narrative\n- Max 3 sentences\n\nRespond in JSON only:\n{"headline":"...","whatWorked":"...","whatFailed":"...","keyTakeaway":"..."}`;
+  try{
+    const res = await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompt}],system:'Extract anonymized product insights. Respond with valid JSON only. Never include numbers, costs, or identifying information.',password:currentPw,max_tokens:300})});
+    if(!res.ok) return;
+    const data = await res.json();
+    const text = data.content?.[0]?.text||'';
+    const m = text.match(/\{[\s\S]+\}/);
+    if(!m) return;
+    const insight = JSON.parse(m[0]);
+    await fetch('/api/insights',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:currentPw,type:'insight',category,insight:{...insight,priceRange:'',verdict:session.verdict||'',mission:session.mission||1}})});
+  }catch(e){}
+}
+
+function extractValidationMetrics(session){
+  if(!session||!session.history) return null;
+  const allText = session.history.filter(m=>m.role==='user').map(m=>typeof m.content==='string'?m.content:(m.content?.[0]?.text||'')).join(' ');
+  const metrics = {};
+  const cpl = allText.match(/(?:CPL|cost per (?:lead|email|signup))[\s:$]*([\d.]+)/i); if(cpl) metrics.cpl=parseFloat(cpl[1]);
+  const cvr = allText.match(/(?:CVR|conversion rate)[\s:%]*([\d.]+)%/i); if(cvr) metrics.cvr=parseFloat(cvr[1]);
+  const ctr = allText.match(/(?:CTR|click.through)[\s:%]*([\d.]+)%/i); if(ctr) metrics.ctr=parseFloat(ctr[1]);
+  const emails = allText.match(/([\d,]+)\s*(?:emails?|signups?|leads?)/i); if(emails) metrics.emailCount=parseFloat(emails[1].replace(/,/g,''));
+  return Object.keys(metrics).length>0 ? metrics : null;
+}
+
+async function submitBenchmark(session, metricsObj){
+  if(!metricsObj||Object.keys(metricsObj).filter(k=>metricsObj[k]!=null).length===0) return;
+  const category = inferProductCategory(session);
+  try{
+    await fetch('/api/insights',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:currentPw,type:'benchmark',category,metrics:metricsObj})});
+  }catch(e){}
+}
+
+function maybeExtractInsight(session, trigger){
+  setTimeout(()=>extractAndStoreInsight(session,trigger),2000);
+}
 
 // ── EXPORT ────────────────────────────────────────────────────────────────────
 
