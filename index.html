@@ -88,15 +88,17 @@
   .sidebar-step.idle .step-icon{background:rgba(255,255,255,.05);color:var(--text-3);}
   .sidebar-step.has-data .step-icon{background:rgba(45,158,107,.12);color:#4ecb8d;}
   .step-view-hint{display:none;}
-  .step-num{font-family:var(--font-mono);font-size:10px;color:var(--text-3);min-width:20px;flex-shrink:0;}
+  .sidebar-step.done{cursor:pointer;}
+  .sidebar-step.done:hover{background:rgba(255,255,255,.04);}
+  .sidebar-step.done:hover .step-view-hint{opacity:1;}
+  .step-view-hint{font-family:var(--font-mono);font-size:8px;color:var(--accent);opacity:0;transition:opacity .15s;margin-left:auto;padding-top:2px;}
+  .step-num{font-family:var(--font-mono);font-size:11px;color:var(--text-3);min-width:18px;padding-top:1px;}
   .sidebar-step.done .step-num{color:var(--green);}
   .sidebar-step.active .step-num{color:var(--accent);}
-  .sidebar-step.has-data .step-num{color:#4ecb8d;}
-  .step-info{flex:1;min-width:0;}
-  .step-name{font-size:11px;font-weight:500;color:var(--text-3);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .sidebar-step.active .step-name{color:var(--text);font-weight:600;}
+  .step-info{flex:1;}
+  .step-name{font-size:11px;font-weight:500;color:var(--text-3);line-height:1.3;}
+  .sidebar-step.active .step-name{color:var(--text);}
   .sidebar-step.done .step-name{color:var(--text-2);}
-  .sidebar-step.has-data .step-name{color:var(--text-2);}
 
   /* Step results overlay — covers chat area */
   .step-overlay{display:none;position:absolute;inset:0;background:var(--bg);z-index:30;flex-direction:column;animation:msgIn .2s ease forwards;}
@@ -140,53 +142,6 @@
   .step-empty-state{padding:48px 0;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--text-3);line-height:1.8;}
   .step-empty-icon{font-size:32px;display:block;margin-bottom:14px;opacity:.4;}
   .step-saved-badge{font-family:var(--font-mono);font-size:9px;color:var(--green);opacity:0;transition:opacity .3s;}
-  .step-saved-badge.show{opacity:1;}
-
-  /* Step overlay */
-  .step-overlay{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:30;flex-direction:column;}
-  .step-overlay.open{display:flex;animation:msgIn .2s ease forwards;}
-  .step-overlay-head{height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;background:var(--surface);}
-  .step-overlay-back{font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:5px;transition:color .15s;padding:0;flex-shrink:0;}
-  .step-overlay-back:hover{color:var(--accent);}
-  .so-divider{width:1px;height:18px;background:var(--border);flex-shrink:0;}
-  .step-overlay-title{font-family:var(--font-serif);font-size:17px;color:var(--text);flex:1;}
-  .step-overlay-meta{font-family:var(--font-mono);font-size:9px;color:var(--text-3);flex-shrink:0;}
-  .step-overlay-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;}
-  .so-btn{font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:6px 12px;border:1px solid var(--border);background:none;color:var(--text-2);cursor:pointer;transition:all .15s;white-space:nowrap;}
-  .so-btn:hover{border-color:var(--accent);color:var(--accent);}
-  .so-btn.edit-mode{border-color:rgba(232,98,42,.35);color:var(--accent);background:var(--accent-dim2);}
-  .so-btn.save{background:var(--accent);color:#fff;border-color:var(--accent);}
-  .so-btn.save:hover{opacity:.85;}
-  .step-overlay-body{flex:1;overflow-y:auto;background:var(--bg);}
-  .step-overlay-body::-webkit-scrollbar{width:3px;}
-  .step-overlay-body::-webkit-scrollbar-thumb{background:var(--border);}
-
-  /* Document layout */
-  .so-doc{max-width:720px;margin:0 auto;padding:40px 32px 80px;}
-  .so-doc-header{margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid var(--border);}
-  .so-doc-step-num{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:6px;}
-  .so-doc-title{font-family:var(--font-serif);font-size:26px;font-weight:400;color:var(--text);margin:0 0 4px;}
-  .so-doc-subtitle{font-family:var(--font-mono);font-size:10px;color:var(--text-3);}
-  .so-section{margin-bottom:28px;}
-  .so-section-label{font-family:var(--font-mono);font-size:8px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
-  .so-section-label::after{content:'';flex:1;height:1px;background:rgba(232,98,42,.12);}
-  .so-view{font-size:13px;line-height:1.8;color:var(--text-2);}
-  .so-view ul{padding-left:0;margin:4px 0;list-style:none;}
-  .so-view li{padding:4px 0 4px 18px;position:relative;font-size:13px;border-bottom:1px solid rgba(255,255,255,.03);}
-  .so-view li::before{content:'\B7';position:absolute;left:0;color:var(--accent);font-size:16px;line-height:1.3;}
-  .so-view li:last-child{border-bottom:none;}
-  .so-view.quote-style li{padding:6px 0 6px 14px;border-left:2px solid rgba(232,98,42,.2);border-bottom:none;margin-bottom:5px;font-style:italic;}
-  .so-view.quote-style li::before{display:none;}
-  .so-empty{color:var(--text-3);font-style:italic;font-size:12px;}
-  .so-empty-state{padding:60px 20px;text-align:center;}
-  .so-empty-icon{font-size:28px;display:block;margin-bottom:12px;opacity:.4;}
-  .so-empty-title{font-family:var(--font-serif);font-size:20px;color:var(--text-3);margin-bottom:6px;}
-  .so-empty-body{font-family:var(--font-mono);font-size:10px;color:var(--text-3);line-height:1.8;}
-  .so-editor{width:100%;background:var(--card);border:1px solid rgba(232,98,42,.3);color:var(--text);font-family:var(--font-mono);font-size:12px;line-height:1.7;padding:12px 14px;resize:vertical;outline:none;min-height:80px;box-sizing:border-box;transition:border-color .15s;}
-  .so-editor:focus{border-color:var(--accent);}
-  .so-editor.short{min-height:44px;resize:none;}
-  .so-edit-hint{font-family:var(--font-mono);font-size:9px;color:var(--text-3);margin-top:4px;}
-  @media(max-width:680px){.so-doc{padding:20px 16px 60px;}.step-overlay-head{padding:0 14px;}.so-btn.dl-btn{display:none;}}
   .step-saved-badge.show{opacity:1;}
 
   @media(max-width:680px){
@@ -255,10 +210,6 @@
   .img-btn:hover{border-color:var(--border-hover);color:var(--text-2);}
   .img-btn svg{width:16px;height:16px;}
   #file-input{display:none;}
-  .drag-overlay{display:none;position:absolute;inset:0;background:rgba(232,98,42,.08);border:2px dashed rgba(232,98,42,.5);z-index:20;border-radius:2px;pointer-events:none;justify-content:center;align-items:center;}
-  .drag-overlay.active{display:flex;}
-  .drag-overlay-inner{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--accent);font-family:var(--font-mono);font-size:11px;letter-spacing:1px;opacity:.8;}
-  .input-area{position:relative;}
   #user-input{flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:var(--font-sans);font-size:14px;line-height:1.6;padding:12px 16px;resize:none;min-height:46px;max-height:200px;outline:none;transition:border-color .2s;}
   #user-input:focus{border-color:rgba(232,98,42,.4);}
   #user-input::placeholder{color:var(--text-3);}
@@ -637,12 +588,10 @@
       <div class="sidebar-step idle" id="step-5" onclick="openStepDrawer(5)"><div class="step-icon">○</div><div class="step-num" id="snum-5">05</div><div class="step-info"><div class="step-name" id="stepname-5">Go / No-Go Report</div></div></div>
       <div class="sidebar-step idle" id="step-6" onclick="openStepDrawer(6)"><div class="step-icon">○</div><div class="step-num" id="snum-6">06</div><div class="step-info"><div class="step-name" id="stepname-6">Video Strategy</div></div></div>
       <div class="sidebar-step idle" id="step-7" onclick="openStepDrawer(7)"><div class="step-icon">○</div><div class="step-num" id="snum-7">07</div><div class="step-info"><div class="step-name" id="stepname-7">Script &amp; Scenes</div></div></div>
-      <div class="sidebar-step idle" id="step-8" onclick="openStepDrawer(8)"><div class="step-icon">○</div><div class="step-num" id="snum-8">08</div><div class="step-info"><div class="step-name" id="stepname-8">Video Brief</div></div></div>
-      <div class="sidebar-step idle" id="step-9" onclick="openStepDrawer(9)"><div class="step-icon">○</div><div class="step-num" id="snum-9">09</div><div class="step-info"><div class="step-name" id="stepname-9">Campaign Page</div></div></div>
-      <div class="sidebar-step idle" id="step-10" onclick="openStepDrawer(10)"><div class="step-icon">○</div><div class="step-num" id="snum-10">10</div><div class="step-info"><div class="step-name" id="stepname-10">Launch Ready</div></div></div>
-      <div class="sidebar-step idle" id="step-11" onclick="openStepDrawer(11)"><div class="step-icon">○</div><div class="step-num" id="snum-11">11</div><div class="step-info"><div class="step-name" id="stepname-11">Pricing Strategy</div></div></div>
-      <div class="sidebar-step idle" id="step-12" onclick="openStepDrawer(12)"><div class="step-icon">○</div><div class="step-num" id="snum-12">12</div><div class="step-info"><div class="step-name" id="stepname-12">Financial Forecast</div></div></div>
-      <div class="sidebar-step idle" id="step-13" onclick="openStepDrawer(13)"><div class="step-icon">○</div><div class="step-num" id="snum-13">13</div><div class="step-info"><div class="step-name" id="stepname-13">Pledge Tiers</div></div></div>
+      <div class="sidebar-step idle" id="step-8" onclick="openStepDrawer(8)"><div class="step-icon">○</div><div class="step-num" id="snum-8">08</div><div class="step-info"><div class="step-name" id="stepname-8">Campaign Page</div></div></div>
+      <div class="sidebar-step idle" id="step-9" onclick="openStepDrawer(9)"><div class="step-icon">○</div><div class="step-num" id="snum-9">09</div><div class="step-info"><div class="step-name" id="stepname-9">Pre-Campaign Warmup</div></div></div>
+      <div class="sidebar-step idle" id="step-10" onclick="openStepDrawer(10)"><div class="step-icon">○</div><div class="step-num" id="snum-10">10</div><div class="step-info"><div class="step-name" id="stepname-10">Pricing Strategy</div></div></div>
+      <div class="sidebar-step idle" id="step-11" onclick="openStepDrawer(11)"><div class="step-icon">○</div><div class="step-num" id="snum-11">11</div><div class="step-info"><div class="step-name" id="stepname-11">Go Live Ready</div></div></div>
     </div>
   </aside>
 
@@ -675,17 +624,10 @@
       <div class="welcome-note">14 days &middot; Go / No-Go decision &middot; Kickstarter-ready</div>
     </div>
     <div class="messages" id="messages" style="display:none"></div>
-    <div class="input-area" id="input-area" style="display:none"
-         ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-      <div class="drag-overlay" id="drag-overlay">
-        <div class="drag-overlay-inner">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          <span>Drop image to analyze</span>
-        </div>
-      </div>
+    <div class="input-area" id="input-area" style="display:none">
       <div class="image-preview-strip" id="image-preview-strip"></div>
       <div class="input-row">
-        <textarea id="user-input" placeholder="Type a message or drop an image…" rows="1" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+        <textarea id="user-input" placeholder="Type your message&#x2026;" rows="1" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
         <div class="input-actions">
           <button class="img-btn" onclick="document.getElementById('file-input').click()" title="Upload image">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -702,7 +644,7 @@
       </div>
       <input type="file" id="file-input" accept="image/*" multiple onchange="handleImageUpload(event)">
       <div class="input-meta">
-        <span class="input-hint">Enter &#x21B5; newline &middot; Shift+Enter send &middot; Drop or paste image</span>
+        <span class="input-hint">Enter &#x21B5; newline &middot; Shift+Enter send</span>
       </div>
     </div>
   </div>
@@ -1282,26 +1224,17 @@ function buildMessageHistory(session){
 function convertHistoryToAPI(hist){
   return hist.map(msg => {
     if(msg.role==='user' && msg.images && msg.images.length>0){
-      const content=[];
-      const textContent = (msg.content||'').trim();
-      if(textContent){
-        content.push({type:'text', text:textContent});
-      } else {
-        // Image-only: add an implicit analysis prompt so API always gets non-empty text
-        content.push({type:'text', text:'Please analyze this image and tell me what you see. Apply your expertise as a crowdfunding coach — what does this tell you about the product, ad creative, data, or campaign material?'});
-      }
+      const content=[{type:'text',text:msg.content||''}];
       msg.images.forEach(img=>{
         content.push({type:'image',source:{type:'base64',media_type:img.mediaType,data:img.base64}});
       });
       return {role:'user',content};
     }
     // Strip TIMELINE_UPDATE blocks from assistant messages to save tokens
-    const rawText = typeof msg.content==='string'
+    const text = typeof msg.content==='string'
       ? msg.content.replace(/<!--TIMELINE_UPDATE:[\s\S]*?-->/g,'').trim()
-      : (typeof msg.content==='string' ? msg.content : '');
-    // Never send empty content blocks
-    const safeText = rawText || '[...]';
-    return {role:msg.role==='km'?'assistant':msg.role, content:safeText};
+      : msg.content;
+    return {role:msg.role, content:text};
   });
 }
 
@@ -1510,28 +1443,12 @@ Your mission: In 14 days, give this founder a clear Go / No-Go decision — is t
 
 # HOW YOU WORK
 
-You guide the founder through 5 sequential steps. Default flow is sequential, but you adapt — see NAVIGATION & FLEXIBILITY.
+You guide the founder through 5 sequential steps. Never skip. Never proceed without confirmation.
 
 At the end of every response, output exactly one of:
 - A structured deliverable
 - A sharp question
 - A decision point with options
-
-# NAVIGATION & FLEXIBILITY
-
-You are a guide, not a gatekeeper. Handle non-linear conversations gracefully:
-
-**Jumping ahead:** Briefly note what's being skipped ("Skipping to [X] — we can fill in [Y] later"), then dive in fully. Never refuse to proceed because prerequisites aren't met.
-
-**Going back:** Switch immediately. Treat it as an update: "Updated. Here's how this changes things: ..." If the change affects downstream decisions, note it. Then offer to continue forward.
-
-**Tangent questions:** Answer directly and completely. Then return naturally to the main thread.
-
-**Updating decisions:** Acknowledge clearly ("Got it — MSRP is now $279"). Output an ALIGNMENT_UPDATE or TIMELINE_UPDATE block. Note downstream impact. Don't re-do the whole step unless asked.
-
-**Cross-mission questions:** Boundaries between Missions are guides, not walls. If you're in Mission 1 and the user asks about pricing, answer it. If in Mission 2 and they ask about tiers, help them.
-
-**Tone when switching:** Clean and direct. "Going back to [X]." / "Skipping to [X]." / "Updated. [summary]." Never be robotic about transitions.
 
 Speak like a sharp, direct advisor. No filler. No cheerleading. Name real campaigns when referencing strategies.
 
@@ -1849,150 +1766,12 @@ For now, the Google Sheet above is all you need. Keep it simple."
 
 End with: "Set up your ads this week, run for 7–10 days, then bring me the numbers. I'll tell you what they mean."
 
-# STEP 4C — VALIDATION DATA ANALYSIS
-
-This step activates automatically whenever the founder shares any performance data — UV numbers, signups, CTR, CPL, conversion rates, or any variation in results. You do not need to be "in Step 4C" to run this analysis. If the founder pastes data, analyze it immediately.
-
-## TRIGGER PHRASES (activate this analysis immediately):
-- Shares a table, spreadsheet, or any numbers about ad performance
-- Mentions "conversion rate dropped", "CPL went up", "signups are low", "some days are better"
-- Pastes daily data (Date | UV | Signups | CVR)
-- Says "here are my results" or "what do these numbers mean"
-
-## ANALYSIS FRAMEWORK
-
-When receiving data, run through these layers in order:
-
-### Layer 1 — Triage: Is performance good, OK, or broken?
-
-Use these benchmarks:
-| Metric | 🔴 Broken | 🟡 Weak | 🟢 Good |
-|---|---|---|---|
-| CTR (ad click-through rate) | <0.5% | 0.5–1.5% | >1.5% |
-| Landing page CVR (visits→signup) | <8% | 8–15% | >15% |
-| CPL (cost per lead) | >$15 | $5–15 | <$5 |
-| Daily signup volume | <3/day | 3–10/day | >10/day |
-
-Immediately tell the founder which layer the problem is in:
-- **Ad layer problem** (CTR <1%): The ad creative or targeting is not compelling enough — people scroll past it
-- **Landing page problem** (CTR ok, CVR low): The ad promise is not matching what people find on the LP
-- **Both broken**: Need to fix both before reading results
-- **Working but slow**: Economics are fine, just need more budget or time
-
-### Layer 2 — Day-by-Day Pattern Analysis
-
-If they share daily data, look for:
-
-**Day-of-week patterns:**
-- Lower performance on weekends? → Audience is likely working professionals
-- Lower performance Mon/Tue? → Impulse category, better on Thu–Sun
-- Sudden drop mid-campaign? → Ad fatigue, audience saturation, or budget delivery issue
-
-**Spend vs results correlation:**
-- Did higher spend days produce proportionally more signups? → Scaling is viable
-- Did higher spend NOT produce more signups? → Demand is limited, or targeting is hitting the wrong people
-
-**Trend over time:**
-- Improving CVR over 7 days → Landing page is gaining social proof momentum (early signups)
-- Declining CVR over 7 days → Ad creative burning out, need fresh hook
-- Flat but low → Structural problem with the LP or targeting
-
-### Layer 3 — Creative vs Audience vs Page Diagnosis
-
-Ask the founder for this data if not already provided:
-1. Did you run multiple ad creatives? Which performed best/worst?
-2. Did you use different audience segments? Which segment had the best CVR?
-3. Are the low-CVR visitors spending time on the page (time on site >1 min) or bouncing immediately (<15 sec)?
-
-**Diagnosis matrix:**
-
-| Symptom | Likely Cause | Fix |
-|---|---|---|
-| High CTR, low LP CVR | LP headline doesn't match ad promise | Rewrite LP hero to mirror ad message exactly |
-| Low CTR on one creative, high on another | Weak visual hook or headline | Kill the losing creative, scale the winner |
-| Good CVR in one audience, low in another | Wrong audience for this LP | Target only the winning audience segment |
-| Good Day 1–3, then drops | Ad fatigue / audience exhaustion | Refresh creative, expand audience or exclude converters |
-| High bounce rate (<15s on page) | Page loads too slow OR visual doesn't match ad | Check load speed; make hero image match ad creative |
-| Signups but no opens of confirmation email | Wrong email addresses / spam trap | Check email deliverability; add double opt-in |
-| Great LP CVR, high CPL | Targeting too narrow or CPC too high | Broaden audience OR test different platform |
-
-### Layer 4 — LP Version Comparison
-
-If they ran two LP versions (A and B):
-- If Version A CVR > Version B by >3%: Version A wins. Ask: what's different about A?
-- If similar CVR but different audiences respond: Segment-specific LP performance
-- If one version gets more shares/comments: That's your viral hook — build on it
-
-Output a clear winner recommendation:
-~~~
-LP VERSION VERDICT
-Version A: [CVR]% CVR — [diagnosis]
-Version B: [CVR]% CVR — [diagnosis]
-Winner: [A/B] — recommended for scaling
-Key reason: [one sentence]
-What to keep from loser: [if anything]
-~~~
-
-### Layer 5 — Specific Recommendations
-
-Always end data analysis with exactly 3 things:
-
-1. **STOP doing:** [Specific thing that's clearly not working — be specific, e.g. "Stop running the carousel ad to the 25-34 female interest segment — CVR is 4%, well below breakeven"]
-
-2. **DOUBLE DOWN on:** [Specific winner — e.g. "Scale the video ad to the 'tech gadgets' interest audience — 23% CVR at $3.20 CPL, 6x more efficient than other segments"]
-
-3. **TEST next:** [One new thing to try based on what the data suggests is blocking performance — e.g. "Create a new LP hero section that leads with the AI identification feature, not the companion angle — 60% of your organic shares are about the identification feature"]
-
-## PROACTIVE DATA REQUEST
-
-If the founder has been running ads for 5+ days but hasn't shared data, proactively ask:
-
-"You've had ads running for a while now. Let's look at the numbers.
-
-Can you share:
-- Daily breakdown: Date | Landing page visits | Email signups | Conversion rate
-- Ad performance: CTR on each creative, CPL
-- Any differences between audience segments if you tested multiple
-
-Paste it as a table or just the raw numbers — I'll analyze it and tell you exactly what's working and what to change."
-
-
 # STEP 5 — GO / NO-GO REPORT
 
-## What this verdict means
-
-This is a ONE-TIME strategic feasibility judgment: is this product worth taking to Kickstarter?
-
-**CRITICAL: This is NOT an operational checklist.**
-- Do NOT factor in production status, prototype readiness, or manufacturing stage
-- Do NOT give NO-GO because "the product isn't manufactured yet" — that's the point of crowdfunding
-- Do NOT give NO-GO because "more market research is needed" — that's circular
-
-**The only question is: does the evidence suggest this product can succeed on Kickstarter?**
-
-GO criteria (any strong combination):
-- Clear demand signal from validation (clicks, emails, reservations)
-- Differentiated product with a believable story
-- Founder has the ability to execute or has a team
-- Price point is defensible relative to value
-- Market exists and is reachable
-
-NO-GO criteria (genuine dealbreakers):
-- Unit economics are fundamentally broken (can't be profitable at any realistic volume)
-- No meaningful differentiation — identical to existing products with no angle
-- The founder has acknowledged they cannot fulfill the product
-- Regulatory/legal barrier that cannot be resolved
-
-CONDITIONAL criteria:
-- Strong product but one fixable issue blocking launch readiness (e.g., pricing needs adjustment, one key feature not ready)
-- Give a specific condition: "GO if X is resolved"
-
-**Once GO is given, it stays GO.** Subsequent conversation about manufacturing, timelines, or challenges does not retroactively change the verdict. The verdict is locked at the time it is issued.
-
-Ask for: validation data (clicks, leads/reservations, CPL per version), qualitative signals, any concerns from testing.
+Ask for: clicks, leads/reservations, CPL per version, qualitative signals.
 
 Output **KICKMAN MISSION 1 — FINAL REPORT** with:
-- Validation summary with benchmarks
+- Validation summary table with benchmarks
 - **VERDICT: GO ✅ / NO-GO ❌ / CONDITIONAL ⚠️**
 - WINNING ANGLE, WHAT THE DATA TELLS US, RISKS TO WATCH, RECOMMENDED NEXT STEP
 
@@ -2025,7 +1804,7 @@ Output **KICKMAN MISSION 1 — FINAL REPORT** with:
 - Zendure SuperBase V 2023: $5M home battery. Category follower with better specs.
 
 # RULES
-1. Guide sequentially by default, but adapt — if the user jumps ahead or goes back, follow their lead (see NAVIGATION & FLEXIBILITY)
+1. Never move to next step without explicit user confirmation
 2. Never generate the Readiness Score until all 9 key information points are confirmed
 3. If user asks to skip scoring, explain why you can't and ask the missing questions
 4. Never invent campaign data — only reference campaigns listed above
@@ -2033,6 +1812,7 @@ Output **KICKMAN MISSION 1 — FINAL REPORT** with:
 6. Call out structural problems clearly and early
 7. No filler, no cheerleading
 8. End every response with exactly one: deliverable, question, or decision point
+9. When a key result for a step is fully produced and needs confirmation, end with: "This is a key result — please confirm to proceed." Then output <!--CONFIRM_STEP:N--> where N is the step number (1=Founder Input, 2=Product Alignment, 3=Marketing Approaches, 4=Landing Page Briefs, 5=Go/No-Go)
 9. PRODUCT ALIGNMENT TEMPLATE IS STRICTLY FIXED.
 
 This rule overrides everything else when it comes to alignment output.
@@ -2238,7 +2018,7 @@ Output cutdown plan: 15s / 30s / 60s — which scenes, which platform. Remind: p
 ## A7 — PRODUCTION RESOURCES
 First ask: want to explore AI video tools?
 If yes: Sora, Runway Gen-3, Kling AI, HeyGen, CapCut AI. Honest: AI good for validation ads, real footage converts better for main KS video.
-Production companies: see Module D (D1) for full agency list with budget tiers. Eval questions: KS experience / 3 case studies / cutdowns / category experience. Always offer to draft the inquiry email.
+Production companies: [制作公司资源库 — 待更新]. Eval questions: KS experience / 3 case studies / cutdowns / category experience.
 Casting: based on Mission 1 target audience. Platforms: Backstage.com, Casting Networks, Model Mayhem.
 
 ## A8 — BUDGET-ADJUSTED PLAN
@@ -2473,339 +2253,53 @@ Type "Mission 3" when ready.
 
 ---
 
-
----
-
-# MODULE D: PARTNER RESOURCES & OUTREACH
-
-This module is available at any point in Mission 2 or 3. Activate it when the founder asks about:
-- Ad agencies / launch partners
-- KOL / media / press outreach
-- Referral and cross-promotion partners
-- Any question about "who should I work with"
-
----
-
-## D1 — AD AGENCIES & LAUNCH PARTNERS
-
-### When to use an agency vs. DIY
-- DIY (self-managed): Budget <$5K total, founder has some ad experience, product is simple
-- Agency recommended: Budget >$10K, first launch, complex product, wants to maximize Day 1
-- Always worth a consultation call even if you DIY — most agencies offer free strategy calls
-
-### JELLOP
-The most KS-specialized paid acquisition agency. Strong on Facebook/Instagram performance.
-- Best for: Tech hardware, gadgets, consumer electronics
-- Minimum budget: ~$10K/month ad spend (they take % of managed spend)
-- Known for: Aggressive Day 1 push strategy, warm audience retargeting
-- Contact: jellop.com — direct inquiry form
-- Note: They are selective; apply early and get on their radar before launch
-
-### FUNDED TODAY
-Full-service KS marketing. PR + ads + email outreach combined.
-- Best for: Products needing media coverage + paid acquisition together
-- Services: PR outreach, backer club email campaigns, ad management
-- Contact: fundedtoday.com
-
-### ENVENTYS PARTNERS
-Strong for hardware + outdoor/lifestyle products. Full campaign management option.
-- Best for: Outdoor gear, lifestyle hardware, mid-range tech ($100–$500 price range)
-- Services: Campaign page, video, ads, fulfillment coordination
-- Contact: enventyspartners.com
-
-### KROWDSTER / BACKERKIT ADS
-Email-list based promotion to existing Kickstarter backers.
-- Best for: Any category — reaches repeat KS backers directly
-- Cost: CPC or flat fee per campaign
-- Best timing: 2 weeks before launch and during campaign
-- Contact: krowdster.co / backerkit.com/ads
-
-### LAUNCH BOOM
-Specializes in pre-launch reservation funnel building.
-- Best for: Products that need a strong pre-launch email list
-- Process: They build your landing page + run ads to build pre-launch list
-- Contact: launchboom.com
-
-### HOW TO APPROACH AN AGENCY
-When the founder is ready to reach out, offer to draft the inquiry email. Template:
-
-Subject: [Product Name] — Kickstarter Launch [Month] — Agency Partnership Inquiry
-
-Hi [Agency],
-
-I'm launching [Product Name] on Kickstarter in [Month]. [One sentence about what it is and what makes it different].
-
-Our validation data shows [brief signal — e.g. "strong initial interest, $X CPL in early testing"].
-Target raise: $[X]. Launch date: [date].
-
-Would love a 20-min intro call to explore if we're a good fit.
-
-[Name]
-
----
-
-## D2 — KOL STRATEGY & RECOMMENDATIONS
-
-### The honest truth about KOL in 2024–2025
-
-KOL ROI has collapsed. Mega-influencers (1M+) are extremely expensive, their audiences are passive, and most followers scroll past sponsored content. Big names do NOT reliably drive Kickstarter conversions.
-
-**What KOL actually does for a KS campaign:**
-It is NOT a traffic channel. It is a credibility signal.
-
-The real job of a KOL review is to sit on your campaign page as social proof — the skeptical backer who is on the fence reads "I've never heard of this brand" and then sees a real person they trust saying "I actually used this, here's what it does." That hesitation turns into a pledge.
-
-Think of it as: reviewers = trust infrastructure, not traffic source.
-
-**ROI reality check:**
-- A $50K paid mega-influencer deal might generate 200 direct clicks to KS. Almost never worth it.
-- A $0 unit-for-review to a mid-tier creator with 50K–300K subscribers who genuinely loves the product and makes a thorough 8–12 minute video is worth 10x more.
-- The review lives forever on YouTube. A paid post disappears in 48 hours.
-
-**The profile you want: Mid-tier, category-specific, authenticity-driven**
-
-Target range: **30K–500K subscribers / followers** on YouTube or Instagram.
-Why this range:
-- Small enough that they still personally care about their reputation — they won't fake enthusiasm
-- Large enough to have real reach and credibility
-- More likely to respond to unit-for-review offers without demanding cash upfront
-- Their audience trusts them because they're not obviously "sponsored all the time"
-
-**What makes a good KOL for KS:**
-1. They have reviewed similar products before — they know how to explain a product
-2. Their videos are long (8min+) and thorough — they actually use the product
-3. Comments section is engaged — real audience, not bot-inflated
-4. They disclose sponsorships clearly — trust signal, not a red flag
-5. They ask good questions before agreeing to review — means they care
-
-**What to avoid:**
-- Anyone with >1M subscribers (too expensive, too passive audience)
-- Unboxing-only channels — they don't explain value, just open boxes
-- Anyone who requires a script — authenticity destroyed
-- "Collab agencies" that bundle 10 micro-influencers for a flat fee — almost always low quality
-- Anyone promising "guaranteed views" — red flag
-
-### US-FOCUSED RECOMMENDATIONS BY CATEGORY
-
-These are mid-tier creators known for thorough, authentic reviews. US audience primary.
-Only recommend non-US creators if the founder specifically asks.
-
-**TECH HARDWARE / AI / SMART HOME (50K–400K range):**
-- Mrwhosetheboss (UK-based but US-skewing audience, 500K–1M range — borderline but authentic)
-- Tech With Tim — software/hardware crossover, developer audience
-- Lon.TV — extremely thorough long-form reviews, niche but trusted
-- The Tech Chap — detailed, honest, good for comparison-shopping audience
-- Simply Austin — relatable everyday tech user, strong trust factor
-- Look for: channels that do "living with [product] for 30 days" style videos
-
-**ROBOTICS / HOME AUTOMATION:**
-- Stuff Made Here — engineering explanation style, highly credible
-- DIY Perks — project-oriented, maker audience trusts product quality claims
-- Modern Dad — smart home + family life crossover, authentic lifestyle context
-- Shane Craig — home tech, thorough walkthrough style
-
-**PET TECH:**
-- Avoid mega pet influencers — they treat products as props
-- Target: veterinary-adjacent creators, dog trainers on YouTube/Instagram
-- Look for channels with "product actually helped my pet" type content
-- 50K–200K follower range is sweet spot for pet tech
-
-**HEALTH & FITNESS DEVICES:**
-- DC Rainmaker (dcrainmaker.com) — the gold standard for fitness wearables/tech. Blog + YouTube. Known for brutally honest reviews. Getting a positive mention here is extremely credible.
-- Ray Maker — same person as DC Rainmaker, worth a dedicated outreach
-- GPSKevin — running/cycling gadgets, technical depth
-- Kaleido Art — wellness tech, female audience, authentic lifestyle
-
-**OUTDOOR / SURVIVAL / TOOLS:**
-- Thunderhead nine — EDC and survival gear, very detailed
-- Sharkwheels / similar gear channels — product-focused, not personality-focused
-- ITS Tactical — serious outdoor audience, credibility-oriented
-
-**HOME / KITCHEN GADGETS:**
-- Ethan Chlebowski — food science approach, audience trusts his analysis process
-- Pro Home Cooks — practical, not flashy, strong trust with cooking audience
-- NOT Joshua Weissman — his audience is cooking-focused, not gadget-focused
-
-**MEDIA THAT ACTUALLY DRIVES TRAFFIC:**
-These are editorial outlets, not KOL — different mechanism (SEO + authority, not trust):
-- Wirecutter (NYT) — a mention here is extremely valuable, but you need a finished product
-- Yanko Design — industrial design community, strong for visually distinctive products
-- Product Hunt — launch here the day before or day of KS, captures tech early adopters
-- Cool Hunting — curated lifestyle products, editorial credibility
-- Engadget / The Verge — only if there's genuine news (record funding, breakthrough feature)
-
-### HOW TO APPROACH A MID-TIER KOL
-
-Most mid-tier creators respond to genuine, personal outreach. They are tired of copy-paste pitches.
-
-**What works:**
-1. Watch 2–3 of their recent videos first. Reference something specific.
-2. Lead with the product's most impressive single feature — not a spec sheet
-3. Offer a unit with zero strings. Let them decide to review or not.
-4. If they ask for payment, have a number ready: $500–$2,000 is reasonable for dedicated coverage in this tier
-5. Send the unit with a one-page brief: what it does, what's impressive, what to focus on
-
-**What to ask them to cover:**
-Give them direction, not a script. Tell them:
-- "The moment most people are surprised by is [X feature]. We'd love you to get to that."
-- "The main thing skeptics worry about is [Y]. If you can address that authentically, it helps."
-- Never ask them to not mention negatives. Authentic negatives + genuine positives = trust.
-
-**The brief format (1 page, max):**
-~~~
-PRODUCT: [Name]
-WHAT IT DOES IN ONE SENTENCE: [...]
-THE FEATURE MOST PEOPLE ARE SURPRISED BY: [...]
-WHO IT'S FOR: [specific person, not "everyone"]
-WHAT TO ACTUALLY TEST: [2–3 specific use cases, not "just explore it"]
-KS LAUNCH DATE: [date] — any coverage in the 2 weeks before or during campaign is ideal
-~~~
-
-When the founder is ready to reach out, offer to draft the full outreach email and product brief. Always personalize to the specific creator.
-
-**Timing:**
-- Seed units 6–8 weeks before launch — gives time for review production
-- Follow up once at 3 weeks if no response
-- Ask for embargo until 1 week before launch date
-
----
-
-## D3 — REFERRAL & CROSS-PROMOTION PARTNERS
-
-### What is KS referral marketing?
-Partner with other Kickstarter campaigns or complementary brands to cross-promote to each other's backer lists. This is one of the most cost-efficient channels — these are people who have already backed something on Kickstarter.
-
-### BACKER CLUB NETWORKS
-These are email lists of repeat KS backers who opted in to hear about new campaigns:
-
-**Jellop Backer Club** — part of Jellop's service, reaches warm KS audience
-**Krowdster** — krowdster.co — self-serve backer email campaigns, ~$200–$800 per blast
-**BackerKit Ads** — backerkit.com/ads — reaches people who backed similar campaigns
-**Indiegogo Partner Network** — if running on IGG or cross-listing
-
-### COMPLEMENTARY CAMPAIGN CROSS-PROMOTIONS
-Find campaigns launching in the same window with a non-competing but adjacent audience.
-
-How to find them:
-1. Go to Kickstarter → Technology/Design → Sort by "Recently Launched"
-2. Find campaigns in adjacent categories (not direct competitors)
-3. Reach out directly to the campaign creator with a swap proposal
-
-Swap proposal template (offer to draft):
-"Hi [Name], I'm launching [Product] on [Date] — targeting [audience]. 
-I noticed your campaign targets a similar demographic but different product.
-Would you be open to a backer email cross-promo swap? I promote you to my list, you promote me to yours.
-My list size: [X]. Happy to discuss terms."
-
-### AFFILIATE / REFERRAL PARTNERS
-Set up a referral link program before launch:
-- Give early supporters a unique referral link
-- Offer reward: "Refer 3 backers, get a free accessory"
-- Tools: BackerKit referral, KickBooster (kickbooster.me), own coupon codes
-- KickBooster: purpose-built KS affiliate tool, ~5% commission to affiliates
-
-### CHINESE MARKET CROSS-BORDER PARTNERS
-If the product has China market relevance:
-- 众筹网 (zhongchou.cn) — Chinese crowdfunding platform, cross-listing option
-- 摩点 (modian.com) — strong for tech gadgets in China
-- Taobao presale — run pre-order simultaneously on Taobao
-- Reach out to 小红书 (RED) KOLs for pre-launch buzz in China market
-
----
-
-## D4 — RESOURCE MATCHING LOGIC
-
-When the founder asks about partnerships or outreach, always:
-
-1. **Ask their budget first** — many resources have minimums
-2. **Ask their timeline** — agencies need 4–6 weeks lead time minimum
-3. **Ask their primary market** — US-only vs global vs China-specific changes recommendations dramatically
-4. **Offer to draft the outreach** — don't just give names, write the actual email/DM
-
-Match by product category + budget tier:
-- <$5K total marketing: BackerKit Ads + 2–3 micro-KOL units + Krowdster email blast
-- $5K–$20K: Add Jellop or LaunchBoom, 5–8 KOL units, 1–2 media pitches
-- $20K+: Full agency (Jellop or Funded Today), 10+ KOL seeding, PR firm or Enventys
-
 # MISSION 2 RULES
 1. Always reference Mission 1 Alignment Doc — never re-ask product information
 2. Language: match user (ZH or EN) automatically
-3. Production companies and partner resources: use Module D — always match to founder's budget, timeline, and category
+3. Production companies: use [占位符] until resource list provided
 4. Honest about budget tiers — never oversell
 5. Never suggest fabricating reviews, coverage, or quotes
 6. End every response with exactly one: deliverable, question, or decision point
-7. If user skips ahead, follow their lead and note what was skipped
-8. If user goes back to Mission 1 content, handle it and note downstream impact
-9. Cross-mission questions are fine — answer them directly, don't redirect
-10. Mission boundaries are guides, not walls
+7-extra. When a key result is complete and confirmed, output <!--CONFIRM_STEP:N--> (6=Video Strategy, 7=Script & Scenes, 8=Campaign Page, 9=Pre-Campaign Warmup)
+7. If user tries to skip, explain why and offer faster version
 8. PRODUCT ALIGNMENT TEMPLATE IS STRICTLY FIXED — if user asks to see, generate, or update the Product Alignment Document at any point in Mission 2, output ONLY these 7 sections in this exact order: (1) PRODUCT NAME & DEFINITION, (2) INTERNAL DESCRIPTION, (3) ALL FEATURES, (4) BENEFITS, (5) NEGATIVE THOUGHTS & FEELINGS — BACKER RESISTANCE MAP, (6) WHAT WE WANT PEOPLE TO THINK AND FEEL — EMOTIONAL DESTINATION MAP, (7) READINESS SCORE. No extra sections, no reordering. Always follow with <!--ALIGNMENT_UPDATE:{...}--> and ask if the user wants to add or change anything.`;
 
 const SYSTEM_M3 = `# IDENTITY
-You are Kickman, a world-class crowdfunding strategist. The founder has completed validation (Mission 1) and campaign production (Mission 2). You are now in Mission 3: Pricing Strategy & Financial Forecasting.
+You are Kickman, a world-class crowdfunding strategist. Mission 3: Pricing Strategy & Go Live.
 
 # NAVIGATION & FLEXIBILITY
-Same rules as always — adapt to the founder's flow. If they jump between pricing, tiers, and forecast, follow them. All three are part of the same model.
-
-# MISSION 3 MODULES
+Adapt to the founder's flow. All missions are one continuous project — boundaries are guides, not walls.
 
 ## M3-A — PRICING STRATEGY
-Confirm: COGS, target MSRP, expected KS backer price. Then: minimum viable price, competitive positioning, psychological price points, Early Bird depth.
-
-Research 3-5 comparable KS campaigns before anchoring MSRP. MSRP must be real — KS backers research. Typical KS discount off MSRP: 20-35%. Beyond 40% signals the MSRP was fictional.
+Confirm COGS and target MSRP. Research 3-5 comparable KS campaigns. MSRP must be real — backers research. Typical KS discount off MSRP: 20-35%.
 
 ## M3-B — FEE STRUCTURE
-- Kickstarter platform fee: 5.0%
-- Payment processing: 3.0% + $0.20 per pledge (US)
-- Blended effective rate: ~8.5%
-- Net revenue per unit = Pledge × (1 - 0.085) - $0.20
+Platform fee: 5%. Payment processing: 3% + $0.20/pledge. Blended: ~8.5%. Net = Pledge × 0.915 - $0.20.
 
-## M3-C — COST STRUCTURE
-Per-unit cost stack: COGS + fulfillment ($8-35 by size/region) + platform fees (8.5%) + import duty (0-25% of COGS for US delivery) + backers gift if applicable.
+## M3-C — TIER DESIGN
+1. Pre-Launch Deposit ($1-20, refundable) — locks best tier, target 200-500 deposits before launch
+2. Super Early Bird (30-40% off, hard cap 100-300 units, 48h only)
+3. Early Bird (20-25% off, soft cap — restock in batches of 500)
+4. Standard (10-15% off, unlimited)
+5. Multi-unit bundle (2-pack, extra 10% off)
+6. Accessory bundle
+7. Premium/Limited Edition (50-200 units, VIP identity)
 
-Shipping by weight: Small <0.5kg: sea $8-12, air $18-28. Medium 0.5-2kg: sea $12-20, air $28-45. Large 2-5kg: sea $18-30, air $45-80.
+## M3-D — STRETCH GOALS
+First goal at ~150% of funding target. Space goals every 3-5 days. Must be producible at margin.
 
-US-primary model: 65% US, 25% EU, 10% RoW.
-
-## M3-D — FINANCIAL FORECAST
-Build 2 pricing scenarios × 3 volume scenarios (conservative/base/optimistic). Show: net revenue per unit, contribution margin, fixed cost breakeven quantity, net profit at each volume.
-
-Kickstarter hardware benchmarks: median successful campaign 400-800 backers, top 10%: 2,000-5,000, top 1%: 10,000+.
-
-## M3-E — KICKSTARTER REFERENCE PRICING
-Pull 3-5 comparable campaigns from knowledge. Show: product, MSRP, KS price, discount%, funded amount, backers, strategy notes.
-
-## M3-F — COMPLETE TIER STRUCTURE
-1. **Pre-Launch Deposit** (1 month before): $1-20 refundable, locks best tier access. Target 200-500 deposits. Gives launchpad Day 1 number.
-2. **Super Early Bird** (0-48h): 30-40% off MSRP, hard cap 100-300 units. Must still be profitable.
-3. **Early Bird** (main volume): 20-25% off, soft cap — restock in batches of 500 ("just unlocked more due to demand"). Fulfills 60-70% of total orders.
-4. **Standard**: 10-15% off MSRP, unlimited.
-5. **Multi-unit bundle**: 2-pack at ~10% extra off.
-6. **Accessory bundle**: product + key accessory, slight discount.
-7. **Premium/Limited Edition**: special color/version, 50-200 units, VIP identity.
-
-For each tier: pledge price, discount vs MSRP, unit economics (net after fees+COGS+fulfillment), quantity cap, copy hook.
-
-## M3-G — STRETCH GOALS
-First goal at ~150% of funding target. Space goals every 3-5 days. Must be producible at margin — accessories, colors, extended warranty, not custom tooling. Ask founder what backers would most want.
-
-## M3-H — MISSION 3 SUMMARY
-Output: MSRP rationale + benchmarks, full pledge tier table, pre-launch deposit plan, stretch goal ladder, financial model, break-even target, key risks.
-
-End: "Mission 3 complete. Type 'Mission 4' when ready for launch day execution."
+## M3-E — GO LIVE READY
+Launch checklist. Community plan (email sequence, Day 1 push). PR and KOL seeding (mid-tier creators only, see Module D). Contingency plan.
 
 # M3 RULES
-1. Always research comparable KS campaigns before anchoring MSRP
-2. Always confirm COGS before building financial model
+1. Research comparable KS campaigns before anchoring MSRP
+2. Confirm COGS before building any tier model
 3. Show your math — every number must be traceable
-4. Be honest about margin — if economics are bad at a price, say so
-5. Model downside first
-6. Early Bird is a soft cap — restock strategically
-7. Stretch goals must be producible at margin
-8. Language: match user (ZH or EN)
-9. End every response with one deliverable, question, or decision point
-10. Resource recommendations: when founder asks about agencies, KOLs, or partners, use Module D from Mission 2 — these resources apply across all missions
-11. Always offer to draft outreach emails/messages when recommending a specific partner or KOL
-10. If user revisits M1/M2 content, handle it and note if it changes the financial model
+4. Early Bird is a soft cap — restock strategically
+5. Stretch goals must be producible at margin
+6. Language: match user (ZH or EN)
+7. End every response with one deliverable, question, or decision point
+8. When a key result is complete and confirmed, output <!--CONFIRM_STEP:N--> where N is the step number
 `;
 
 function getSystemPrompt(mission){
@@ -2872,7 +2366,7 @@ function setSyncStatus(state){const el=document.getElementById('sync-status');el
 
 // ── LOAD SESSION ───────────────────────────────────────────────────────────────
 function loadSession(id){
-  activeId=id; pendingImages=[]; renderPreviewStrip(); kbLoaded=false; kbCache=[];
+  activeId=id; pendingImages=[]; renderPreviewStrip();
   const session=getSession(id); if(!session)return;
   document.getElementById('messages').innerHTML=''; updateStepUI(session.step);
   if(!session.started||session.history.length===0){
@@ -2906,13 +2400,7 @@ async function startCurrentSession(){
 // ── IMAGE UPLOAD ───────────────────────────────────────────────────────────────
 function handleImageUpload(event){
   const files=Array.from(event.target.files);
-  addImageFiles(files);
-  event.target.value='';
-}
-
-// Shared image ingestion — used by file picker, drag/drop, and paste
-function addImageFiles(files){
-  files.filter(f=>f.type.startsWith('image/')).forEach(file=>{
+  files.forEach(file=>{
     const reader=new FileReader();
     reader.onload=e=>{
       const b64=e.target.result.split(',')[1];
@@ -2922,76 +2410,7 @@ function addImageFiles(files){
     };
     reader.readAsDataURL(file);
   });
-}
-
-// ── Drag & Drop ───────────────────────────────────────────────────────────────
-let dragCounter = 0;
-
-function handleDragOver(e){
-  e.preventDefault();
-  e.stopPropagation();
-  e.dataTransfer.dropEffect = 'copy';
-}
-
-function handleDragLeave(e){
-  e.preventDefault();
-  dragCounter--;
-  if(dragCounter <= 0){
-    dragCounter = 0;
-    document.getElementById('drag-overlay').classList.remove('active');
-  }
-}
-
-function handleDrop(e){
-  e.preventDefault();
-  e.stopPropagation();
-  dragCounter = 0;
-  document.getElementById('drag-overlay').classList.remove('active');
-  const files = Array.from(e.dataTransfer.files);
-  if(files.length > 0){
-    addImageFiles(files);
-  }
-  // Also handle dragged image URLs (e.g. dragging from browser)
-  const imgSrc = e.dataTransfer.getData('text/html');
-  if(!files.length && imgSrc){
-    const match = imgSrc.match(/src="([^"]+)"/);
-    if(match) fetchImageFromUrl(match[1]);
-  }
-}
-
-// Show drag overlay when dragging into input area
-document.addEventListener('dragenter', function(e){
-  const area = document.getElementById('input-area');
-  if(!area || area.style.display === 'none') return;
-  if(e.dataTransfer && Array.from(e.dataTransfer.types).includes('Files')){
-    dragCounter++;
-    document.getElementById('drag-overlay').classList.add('active');
-  }
-});
-
-// ── Paste image support ───────────────────────────────────────────────────────
-document.addEventListener('paste', function(e){
-  const area = document.getElementById('input-area');
-  if(!area || area.style.display === 'none') return;
-  const items = Array.from(e.clipboardData.items);
-  const imageItems = items.filter(item => item.type.startsWith('image/'));
-  if(imageItems.length === 0) return;
-  e.preventDefault();
-  imageItems.forEach(item => {
-    const file = item.getAsFile();
-    if(file) addImageFiles([file]);
-  });
-});
-
-// Fetch image from URL (for dragged browser images)
-function fetchImageFromUrl(url){
-  fetch(url)
-    .then(r => r.blob())
-    .then(blob => {
-      const file = new File([blob], 'image.jpg', {type: blob.type||'image/jpeg'});
-      addImageFiles([file]);
-    })
-    .catch(()=>{});
+  event.target.value=''; // reset so same file can be re-uploaded
 }
 
 function renderPreviewStrip(){
@@ -3031,18 +2450,12 @@ async function callKickman(trigger){
     const hasActiveMs = tl && tl.some(m => m.status !== 'pending');
     if(hasAnyDate || hasActiveMs) tlContext = buildTimelineContext();
   }
-  // Load KB insights (cached after first load per session)
-  let kbContext = '';
-  try {
-    const insights = await loadKBInsights(curSess);
-    kbContext = buildKBContext(insights);
-  } catch(e) {}
-  const sysPrompt = baseSysPrompt + memoryContext + tlContext + kbContext;
+  const sysPrompt = baseSysPrompt + memoryContext + tlContext;
   let apiMessages;
   if(trigger==='m2start'){
     apiMessages=[{role:'user',content:'Begin Mission 2.'}];
   } else if(trigger==='m3start'){
-    apiMessages=[{role:'user',content:'Begin Mission 3. Start with M3-A: confirm our COGS and anchor the pricing strategy.'}];
+    apiMessages=[{role:'user',content:'Begin Mission 3. Start with pricing strategy: confirm COGS and anchor the MSRP.'}];
   } else if(trigger==='gen_alignment'){
     apiMessages=[{role:'user',content:'Please generate the complete Product Alignment Document now, based on everything we have discussed. Use the exact template: 1) PRODUCT NAME & DEFINITION, 2) INTERNAL DESCRIPTION, 3) ALL FEATURES, 4) BENEFITS, 5) NEGATIVE THOUGHTS & FEELINGS — BACKER RESISTANCE MAP, 6) WHAT WE WANT PEOPLE TO THINK AND FEEL — EMOTIONAL DESTINATION MAP, 7) READINESS SCORE. Follow the template exactly — no extra sections, no reordering. After outputting it, ask the user if there is anything they want to add or change.'}];
   } else {
@@ -3062,27 +2475,14 @@ async function callKickman(trigger){
     else{fresh.history.push({role:'assistant',content:text});}
     if(fresh.name==='New Project'){const fu=fresh.history.find(m=>m.role==='user'&&m.content!=='Begin.');if(fu){const c=typeof fu.content==='string'?fu.content:(fu.content[0]?.text||'');fresh.name=c.slice(0,40).replace(/\n/g,' ').trim()+(c.length>40?'…':'');}}
     const ns=detectStep(text,fresh.mission||1); if(ns>fresh.step)fresh.step=ns;
-    const v=detectVerdict(text);
-    if(v){
-      // Verdict is locked once set — never downgrade from GO
-      const prev=fresh.verdict;
-      if(!prev || prev==='conditional' || v==='go'){
-        fresh.verdict=v;
-      }
-      if(v==='go'&&(fresh.mission||1)===1){
-        setTimeout(()=>triggerMission2(fresh.id),1200);
-        maybeExtractInsight(fresh, 'go_verdict'); // Learn from this GO decision
-        // Also submit numerical benchmarks (aggregated, raw values never stored)
-        setTimeout(() => {
-          const metrics = extractValidationMetrics(fresh);
-          if(metrics) submitBenchmark(fresh, metrics);
-        }, 3000);
-      }
-    }
-    if((fresh.mission||1)===2 && /mission\s*3|开始.*定价|pricing.*strategy/i.test(typeof userMsg==='string'?userMsg:'')){
+    // Check for step confirmation signals from Kickman
+    const confirmNum = parseStepConfirmSignal(text);
+    if(confirmNum && fresh) confirmStep(confirmNum);
+    if(typeof parseStepConfirmSignal==='function'){const cn=parseStepConfirmSignal(text);if(cn&&fresh) confirmStep(cn);}
+    if((fresh.mission||1)===2 && /mission.{0,2}3|开始.*定价|pricing.*strategy/i.test(typeof userMsg==='string'?userMsg:'')){
       setTimeout(()=>triggerMission3(fresh.id),800);
-      maybeExtractInsight(fresh, 'mission2_complete'); // Learn from M2 strategy choices
     }
+    const v=detectVerdict(text); if(v){fresh.verdict=v;if(v==='go'&&(fresh.mission||1)===1){setTimeout(()=>triggerMission2(fresh.id),1200);}}
     // After gen_alignment, re-check and if alignment is now complete, proceed to M2
     if(trigger==='gen_alignment'){
       const nowHasAlignment = fresh.alignment && fresh.alignment.productName && fresh.alignment.negativeThoughts && fresh.alignment.negativeThoughts.length > 0;
@@ -3120,15 +2520,10 @@ async function callKickman(trigger){
 async function triggerMission3(sessionId){
   const session=getSession(sessionId); if(!session) return;
   if((session.mission||1)>=3) return;
-  session.mission=3; session.step=11; session.updatedAt=Date.now();
-  scheduleSave(session); updateStepUI(11,3); renderList();
+  session.mission=3; session.step=10; session.updatedAt=Date.now();
+  scheduleSave(session); updateStepUI(10,3); renderList();
   const cont=document.getElementById('messages');
-  if(cont){
-    const b=document.createElement('div');
-    b.style.cssText='display:flex;align-items:center;gap:12px;padding:14px 20px;background:rgba(232,98,42,.08);border:1px solid rgba(232,98,42,.25);margin:8px 0;opacity:0;animation:msgIn .3s ease forwards;';
-    b.innerHTML='<span style="font-size:18px">&#x1F4B0;</span><div><div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:2px;">Mission 2 Complete</div><div style="font-size:13px;color:var(--text-2);">Starting Mission 3 &mdash; Pricing Strategy &amp; Financial Forecast</div></div>';
-    cont.appendChild(b); cont.scrollTop=cont.scrollHeight;
-  }
+  if(cont){const b=document.createElement('div');b.style.cssText='display:flex;align-items:center;gap:12px;padding:14px 20px;background:rgba(232,98,42,.08);border:1px solid rgba(232,98,42,.25);margin:8px 0;opacity:0;animation:msgIn .3s ease forwards;';b.innerHTML='<span style="font-size:18px">&#x1F4B0;</span><div><div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:2px;">Mission 2 Complete</div><div style="font-size:13px;color:var(--text-2);">Starting Mission 3 &mdash; Pricing Strategy &amp; Go Live</div></div>';cont.appendChild(b);cont.scrollTop=cont.scrollHeight;}
   await callKickman('m3start');
 }
 
@@ -3189,9 +2584,8 @@ async function sendMessage(){
   const msgImages=pendingImages.map(img=>({base64:img.base64,mediaType:img.mediaType}));
   pendingImages=[]; renderPreviewStrip();
 
-  // Add to history — image-only messages get an implicit analysis prompt
-  const safeContent = text.trim() || (msgImages.length > 0 ? '' : '[empty]');
-  const userMsg={role:'user',content:safeContent,images:msgImages.length>0?msgImages:undefined};
+  // Add to history
+  const userMsg={role:'user',content:text,images:msgImages.length>0?msgImages:undefined};
   session.history.push(userMsg);
   session.updatedAt=Date.now(); scheduleSave(session);
 
@@ -3266,15 +2660,14 @@ function renderMd(text){
 // ── STEP/VERDICT ───────────────────────────────────────────────────────────────
 function detectStep(t,mission=1){
   if(mission===2){
-    if(t.includes('MODULE B')||t.includes('B1')||t.includes('英雄区')||t.includes('Campaign Page'))return 9;
-    if(t.includes('A10')||t.includes('Module A Summary')||t.includes('视频简报'))return 8;
-    if(t.includes('A5')||t.includes('A6')||t.includes('A7')||t.includes('SCENE')||t.includes('场景'))return 7;
+    if(t.includes('PRE-CAMPAIGN')||t.includes('WARMUP')||t.includes('预热计划'))return 9;
+    if(t.includes('MODULE B')||t.includes('CAMPAIGN PAGE')||t.includes('众筹页面'))return 8;
+    if(t.includes('SCENE ORDER')||t.includes('SCRIPT')||t.includes('场景'))return 7;
     return 6;
   }
   if(mission===3){
-    if(t.includes('PLEDGE TIER')||t.includes('SUPER EARLY BIRD')||t.includes('STRETCH GOAL')||t.includes('M3-F')||t.includes('M3-G'))return 13;
-    if(t.includes('FINANCIAL FORECAST')||t.includes('BREAKEVEN')||t.includes('Net profit')||t.includes('M3-D'))return 12;
-    return 11;
+    if(t.includes('GO LIVE')||t.includes('LAUNCH CHECKLIST'))return 11;
+    return 10;
   }
   if(t.includes('FINAL REPORT')||t.includes('VERDICT:'))return 5;
   if(t.includes('LP VERSION')||t.includes('VALIDATION PLAYBOOK'))return 4;
@@ -3283,25 +2676,59 @@ function detectStep(t,mission=1){
   return 1;
 }
 function detectVerdict(t){
-  // Only detect from explicit VERDICT lines to avoid false positives
-  var lines = t.split('\n');
-  for(var i=0;i<lines.length;i++){
-    var l = lines[i];
-    if(/\*\*VERDICT/i.test(l)||/^VERDICT[:\s]/i.test(l)){
-      if(/NO.GO/i.test(l)) return 'no-go';
-      if(/CONDITIONAL/i.test(l)) return 'conditional';
-      if(/\bGO\b/i.test(l)) return 'go';
-    }
-  }
-  // Fallback patterns
-  if(t.includes('VERDICT: GO')) return 'go';
-  if(t.includes('GO ✅') && !t.includes('NO-GO')) return 'go';
-  if(t.includes('VERDICT: NO-GO') || t.includes('NO-GO ❌')) return 'no-go';
-  if(t.includes('VERDICT: CONDITIONAL') || t.includes('CONDITIONAL ⚠️')) return 'conditional';
+  if(t.includes('VERDICT: GO')||t.includes('GO ✅'))return 'go';
+  if(t.includes('VERDICT: NO-GO')||t.includes('NO-GO ❌'))return 'no-go';
+  if(t.includes('VERDICT: CONDITIONAL')||t.includes('CONDITIONAL ⚠️'))return 'conditional';
   return null;
 }
+// ── STEP REQUIREMENTS & CONFIRMATION SYSTEM ──────────────────────────────────
+
+const STEP_REQUIREMENTS = {
+  1: { label:'Founder Input', needs:[], hint:'Tell Kickman about your product: what it is, who it\'s for, your cost and timeline.', key_info:['What the product does and why you built it','Target user','Estimated COGS and target price','Development stage and launch target'] },
+  2: { label:'Product Alignment', needs:[ {check:s=>hasConfirmed(s,1)||hasStepData(s,1), label:'Founder Input confirmed (Step 01)'} ], hint:'Confirm your Founder Input first, then Kickman generates the full Product Alignment.', key_info:['Product name','Feature list','Resistance map','Emotional destination','Readiness score'] },
+  3: { label:'Marketing Approaches', needs:[ {check:s=>hasConfirmed(s,1)||hasStepData(s,1), label:'Founder Input confirmed'}, {check:s=>hasConfirmed(s,2)||hasStepData(s,2), label:'Product Alignment confirmed (Step 02)'} ], hint:'Complete Steps 01 and 02 first. Kickman will present three marketing angles to choose from.', key_info:['Three approaches presented','One selected (or testing all)'] },
+  4: { label:'Landing Page Briefs', needs:[ {check:s=>hasConfirmed(s,3)||hasStepData(s,3), label:'Marketing Approach selected (Step 03)'} ], hint:'Select a marketing approach in Step 03 first. The landing page is built around your chosen angle.', key_info:['LP Version 1 brief','LP Version 2 brief','Validation playbook'] },
+  5: { label:'Go / No-Go Report', needs:[ {check:s=>hasConfirmed(s,4)||hasStepData(s,4)||!!s.verdict, label:'Landing pages tested (Step 04)'} ], hint:'Run your validation campaign and share your data (CPL, CVR, signups) with Kickman.', verdictLocked:true, key_info:['Daily UV and signups','CPL per LP version','At least 7 days of data'] },
+  6: { label:'Video Strategy', needs:[ {check:s=>hasConfirmed(s,3)||hasStepData(s,3), label:'Marketing Approach confirmed (Step 03)'}, {check:s=>(s.mission||1)>=2||hasStepData(s,6), label:'Entered Mission 2'} ], hint:'Requires marketing approach confirmed. Share landing page data if available — it informs video direction.', key_info:['Landing page performance data','Video production budget','Launch date'] },
+  7: { label:'Script & Scenes', needs:[ {check:s=>hasConfirmed(s,6)||hasStepData(s,6), label:'Video Strategy confirmed (Step 06)'} ], hint:'Complete Video Strategy (Step 06) first.', key_info:['USP statement','Scene order','Casting direction'] },
+  8: { label:'Campaign Page', needs:[ {check:s=>hasConfirmed(s,3)||hasStepData(s,3), label:'Marketing Approach confirmed'}, {check:s=>(s.mission||1)>=2||hasStepData(s,8), label:'In Mission 2'} ], hint:'Campaign page is built around your marketing angle. Complete Step 03 and enter Mission 2 first.', key_info:['12-section page structure','Asset checklist','Key copy blocks'] },
+  9: { label:'Pre-Campaign Warmup', needs:[ {check:s=>hasConfirmed(s,4)||hasStepData(s,4), label:'Landing Page Briefs ready (Step 04)'}, {check:s=>(s.mission||1)>=2||hasStepData(s,9), label:'In Mission 2'} ], hint:'Needs landing page and campaign page ready. Complete Steps 04 and 08 first.', key_info:['Warmup page chosen','Ad creatives direction','CPL and CVR targets','Deposit strategy'] },
+  10: { label:'Pricing Strategy', needs:[ {check:s=>(s.mission||1)>=2||hasStepData(s,10), label:'Completed Mission 1'}, {check:s=>s.alignment&&!!s.alignment.productName, label:'Product Alignment confirmed'}, {check:s=>hasStepData(s,10), label:'Pricing discussed with Kickman'} ], hint:'Tell Kickman your COGS and target MSRP to unlock the full tier structure.', key_info:['COGS per unit','Target MSRP','KS pledge price range','Inventory constraints'] },
+  11: { label:'Go Live Ready', needs:[ {check:s=>hasConfirmed(s,10)||hasStepData(s,10), label:'Pricing Strategy confirmed (Step 10)'}, {check:s=>hasStepData(s,8), label:'Campaign Page ready (Step 08)'} ], hint:'Complete Pricing Strategy and Campaign Page before finalizing launch readiness.', key_info:['All assets and page ready','Community plan','PR and KOL plan','Contingency plan'] },
+};
+
+function hasConfirmed(session, stepNum){
+  const def = STEP_DEFS[stepNum];
+  if(!def || !def.confirmKey) return false;
+  return !!(session && session.confirmations && session.confirmations[def.confirmKey]);
+}
+
+function checkStepRequirements(stepNum, session){
+  const req = STEP_REQUIREMENTS[stepNum];
+  if(!req || !req.needs || req.needs.length===0) return {met:true, missing:[]};
+  if(req.verdictLocked && session.verdict) return {met:true, missing:[]};
+  const missing = req.needs.filter(n => !n.check(session));
+  return {met: missing.length===0, missing};
+}
+
+function confirmStep(stepNum){
+  const session = getSession(activeId); if(!session) return;
+  const def = STEP_DEFS[stepNum]; if(!def||!def.confirmKey) return;
+  if(!session.confirmations) session.confirmations = {};
+  session.confirmations[def.confirmKey] = Date.now();
+  session.updatedAt = Date.now(); scheduleSave(session);
+  updateStepUI(session.step||1, session.mission||1);
+  const badge = document.getElementById('step-saved-badge');
+  if(badge){ badge.textContent='✓ Confirmed'; badge.classList.add('show'); setTimeout(()=>{ badge.textContent='Saved ✓'; badge.classList.remove('show'); }, 2500); }
+}
+
+function parseStepConfirmSignal(text){
+  const m = text.match(/<!--CONFIRM_STEP:(\d+)-->/);
+  return m ? parseInt(m[1]) : null;
+}
+
 function updateStepUI(step, mission=1){
-  // Update M1 header dots
+  // Header dots (M1 only)
   for(let i=1;i<=5;i++){
     const dot=document.getElementById('dot-'+i);
     if(!dot) continue;
@@ -3309,22 +2736,24 @@ function updateStepUI(step, mission=1){
     if(mission===1){ if(i<step) dot.classList.add('done'); else if(i===step) dot.classList.add('active'); else dot.classList.add('idle'); }
     else dot.classList.add('done');
   }
-  const session = getSession(activeId);
-  for(let i=1;i<=13;i++){
+  // Steps 1-11 — data-aware state
+  const session=getSession(activeId);
+  for(let i=1;i<=11;i++){
     const el=document.getElementById('step-'+i);
     if(!el) continue;
-    const iMission=i<=5?1:i<=10?2:3;
+    // Mission boundary: 1-5=M1, 6-9=M2, 10-11=M3
+    const iMission=i<=5?1:i<=9?2:3;
     let state;
     if(iMission<mission) state='done';
     else if(iMission>mission) state='idle';
     else if(i<step) state='done';
     else if(i===step) state='active';
     else state='idle';
-    // Override idle with has-data if step has content
+    // Override idle with has-data if step has real content
     if(state==='idle' && session && hasStepData(session,i)) state='has-data';
     el.className='sidebar-step '+state;
     const icon=el.querySelector('.step-icon');
-    if(icon) icon.textContent = state==='done'?'✓':state==='active'?'◉':state==='has-data'?'·':'○';
+    if(icon) icon.textContent=state==='done'?'✓':state==='active'?'◉':state==='has-data'?'·':'○';
   }
 }
 
@@ -3335,6 +2764,7 @@ function hasStepData(session, stepNum){
   const d=session.stepData[stepNum];
   return !!(d._raw||d._rawText||Object.keys(d).some(k=>k!=='updatedAt'&&d[k]&&String(d[k]).length>20));
 }
+
 
 // ── SESSION LIST ───────────────────────────────────────────────────────────────
 function renderList(){
@@ -3604,281 +3034,88 @@ function buildAlignmentText(session){
 
 // Step definitions — schema for each step's editable fields
 const STEP_DEFS = {
-  1: {
-    title: 'Founder Input',
-    num: '01',
-    mission: 1,
-    fields: [
-      {key:'whyBuilding',     label:'Why Are You Building This?',        hint:'Personal story or frustration behind the product'},
-      {key:'whatItDoes',      label:'What Does the Product Do?',         hint:'Plain language, no jargon'},
-      {key:'costsAndPricing', label:'Cost & Pricing',                    hint:'COGS estimate and target retail price'},
-      {key:'timeline',        label:'Timeline',                          hint:'Sample ready / launch date / ship to backers'},
-    ]
-  },
-  2: {
-    title: 'Product Alignment',
-    num: '02',
-    mission: 1,
-    fields: [
-      {key:'productName',          label:'Product Name & Definition',    hint:'One crisp sentence — what it is and who it is for'},
-      {key:'internalDescription',  label:'Internal Description',         hint:'2-3 sentences, functional, no spin'},
-      {key:'features',             label:'All Features',                 hint:'One per line'},
-      {key:'benefits',             label:'Benefits',                     hint:'One per line — reframe features as human outcomes'},
-      {key:'negativeThoughts',     label:'Resistance Map — What Backers Might Think/Feel', hint:'One per line — doubts and fears to preempt'},
-      {key:'emotionalDestination', label:'Emotional Destination — What We Want Them to Feel', hint:'One per line — inner voice of a converted backer'},
-      {key:'readinessScore',       label:'Readiness Score',              hint:'X / 10 with brief reasoning', short:true},
-    ]
-  },
-  3: {
-    title: 'Marketing Approaches',
-    num: '03',
-    mission: 1,
-    fields: [
-      {key:'approachA', label:'Approach A', hint:'Name, core angle, sample headline, risk'},
-      {key:'approachB', label:'Approach B', hint:'Name, core angle, sample headline, risk'},
-      {key:'approachC', label:'Approach C', hint:'Name, core angle, sample headline, risk'},
-      {key:'chosen',    label:'Chosen Approach & Reason', hint:'Which angle you chose and why', short:true},
-    ]
-  },
-  4: {
-    title: 'Landing Page Briefs',
-    num: '04',
-    mission: 1,
-    fields: [
-      {key:'lpVersion1',        label:'LP Version 1',           hint:'Headline, subheadline, hero visual, 3 sections, CTA, what it tests'},
-      {key:'lpVersion2',        label:'LP Version 2',           hint:'Headline, subheadline, hero visual, 3 sections, CTA, what it tests'},
-      {key:'validationPlaybook',label:'Validation Playbook',    hint:'Budget, platform, ad ideas, metrics, duration'},
-      {key:'adSetupNotes',      label:'Ad Setup Notes',         hint:'Facebook/Google setup steps, pixel status'},
-      {key:'dashboard',         label:'Tracking Dashboard',     hint:'Key metrics to watch: CPL, CVR, CTR'},
-    ]
-  },
-  5: {
-    title: 'Go / No-Go Report',
-    num: '05',
-    mission: 1,
-    fields: [
-      {key:'validationResults', label:'Validation Results',     hint:'Clicks, leads, CPL per version, qualitative signals'},
-      {key:'verdict',           label:'Verdict',                hint:'GO / NO-GO / CONDITIONAL with reasoning', short:true},
-      {key:'winningAngle',      label:'Winning Angle',          hint:'Which LP version won and why'},
-      {key:'risksToWatch',      label:'Risks to Watch',         hint:'Key risks before launch'},
-      {key:'nextStep',          label:'Recommended Next Step',  hint:''},
-    ]
-  },
-  6: {
-    title: 'Video Strategy',
-    num: '06',
-    mission: 2,
-    fields: [
-      {key:'budget',        label:'Production Budget & Timeline', hint:'Budget tier, target launch date, prototype status', short:true},
-      {key:'styleChoice',   label:'Chosen Video Style',           hint:'Style A/B/C and why it fits', short:true},
-      {key:'videoRules',    label:'Key Video Rules',              hint:'What works / what kills on Kickstarter'},
-    ]
-  },
-  7: {
-    title: 'Script & Scenes',
-    num: '07',
-    mission: 2,
-    fields: [
-      {key:'coreUSP',       label:'Core Video USP',               hint:'The one thing the video makes undeniable', short:true},
-      {key:'scenes',        label:'Scene Order',                  hint:'Ranked scenes with timings and cutdown flags'},
-      {key:'videoLength',   label:'Recommended Length',           hint:'Main video + cutdown plan (15s/30s/60s)', short:true},
-    ]
-  },
-  8: {
-    title: 'Video Brief',
-    num: '08',
-    mission: 2,
-    fields: [
-      {key:'productionApproach', label:'Production Approach',    hint:'Company / team recommendation based on budget'},
-      {key:'castingDirection',   label:'Casting Direction',      hint:'Talent profile and where to find them'},
-      {key:'videoTimeline',      label:'Production Timeline',    hint:'Week-by-week from now to launch'},
-    ]
-  },
-  9: {
-    title: 'Campaign Page',
-    num: '09',
-    mission: 2,
-    fields: [
-      {key:'pageStructure',  label:'Page Structure',             hint:'12 sections with copy options A/B'},
-      {key:'assetChecklist', label:'Asset Checklist',            hint:'Photos, GIFs, graphics, video needed'},
-      {key:'trustSignals',   label:'Trust Signals',              hint:'Have / develop / skip'},
-    ]
-  },
-  10: {
-    title: 'Launch Ready',
-    num: '10',
-    mission: 2,
-    fields: [
-      {key:'communityPlan',  label:'Community Plan',             hint:'Facebook Group, WhatsApp beta group, social accounts'},
-      {key:'contentPlan',    label:'Content Plan',               hint:'Weekly rhythm, hook testing, platform priority'},
-      {key:'ipChecklist',    label:'IP & Domain Checklist',      hint:'Domain, trademark, patent status'},
-      {key:'launchChecklist',label:'Launch Checklist',           hint:'Everything confirmed before going live'},
-    ]
-  },
-  11: {
-    title: 'Pricing Strategy',
-    num: '11',
-    mission: 3,
-    fields: [
-      {key:'cogs',          label:'COGS & Cost Stack',           hint:'Fully-loaded cost per unit'},
-      {key:'msrp',          label:'MSRP & KS Price',             hint:'Retail price and Kickstarter backer price', short:true},
-      {key:'benchmarks',    label:'Competitive Benchmarks',      hint:'3-5 comparable KS campaigns'},
-      {key:'feeModel',      label:'Fee Structure',               hint:'Platform 5% + payment 3.5% + fulfillment'},
-    ]
-  },
-  12: {
-    title: 'Financial Forecast',
-    num: '12',
-    mission: 3,
-    fields: [
-      {key:'assumptions',   label:'Model Assumptions',           hint:'Fees, fulfillment, fixed costs'},
-      {key:'scenario1',     label:'Pricing Scenario 1',          hint:'Conservative / Base / Optimistic'},
-      {key:'scenario2',     label:'Pricing Scenario 2',          hint:'Conservative / Base / Optimistic'},
-      {key:'breakeven',     label:'Break-even Analysis',         hint:'Units to cover all fixed costs', short:true},
-    ]
-  },
-  13: {
-    title: 'Pledge Tiers',
-    num: '13',
-    mission: 3,
-    fields: [
-      {key:'deposit',       label:'Pre-Launch Deposit',          hint:'$1-20 refundable, locks best tier'},
-      {key:'superEB',       label:'Super Early Bird',            hint:'30-40% off, hard cap 100-300 units'},
-      {key:'earlyBird',     label:'Early Bird',                  hint:'20-25% off, soft cap, restock strategy'},
-      {key:'standard',      label:'Standard + Bundles',          hint:'Regular price + multi-unit + accessory'},
-      {key:'stretchGoals',  label:'Stretch Goals',               hint:'Milestone ladder with unlockables'},
-    ]
-  },
+  1: { title:'Founder Input', num:'01', mission:1, confirmKey:'founderInputConfirmed',
+    fields:[
+      {key:'whyBuilding',    label:'Why Building This',     hint:'Founder motivation and background'},
+      {key:'whatItDoes',     label:'What The Product Does', hint:'Core function and mechanism'},
+      {key:'targetUser',     label:'Target User',           hint:'Who specifically needs this'},
+      {key:'costAndPricing', label:'Cost & Pricing',        hint:'COGS estimate and target price'},
+      {key:'timeline',       label:'Timeline',              hint:'Current stage and launch target'},
+    ]},
+  2: { title:'Product Alignment', num:'02', mission:1, confirmKey:'productAlignmentConfirmed',
+    fields:[
+      {key:'productName',         label:'Product Name & Definition', hint:'One crisp sentence'},
+      {key:'internalDescription', label:'Internal Description',      hint:'2-3 sentences, functional'},
+      {key:'features',            label:'All Features',              hint:'One per line'},
+      {key:'benefits',            label:'Benefits',                  hint:'Reframe as human outcomes'},
+      {key:'negativeThoughts',    label:'Resistance Map',            hint:'What backers might fear'},
+      {key:'emotionalDestination',label:'Emotional Destination',     hint:'What we want them to feel'},
+      {key:'readinessScore',      label:'Readiness Score',           hint:'/10 with reasoning', short:true},
+    ]},
+  3: { title:'Marketing Approaches', num:'03', mission:1, confirmKey:'marketingApproachConfirmed',
+    fields:[
+      {key:'approachA',     label:'Approach A',       hint:'Angle, target, core message'},
+      {key:'approachB',     label:'Approach B',       hint:'Angle, target, core message'},
+      {key:'approachC',     label:'Approach C',       hint:'Angle, target, core message'},
+      {key:'chosenApproach',label:'Chosen Approach',  hint:'Which one and why', short:true},
+    ]},
+  4: { title:'Landing Page Briefs', num:'04', mission:1, confirmKey:'landingPageConfirmed',
+    fields:[
+      {key:'lpVersion1',       label:'LP Version 1',        hint:'Headline, subheadline, hero, CTA'},
+      {key:'lpVersion2',       label:'LP Version 2',        hint:'Headline, subheadline, hero, CTA'},
+      {key:'validationPlaybook',label:'Validation Playbook',hint:'Budget, platform, metrics, duration'},
+    ]},
+  5: { title:'Go / No-Go Report', num:'05', mission:1, confirmKey:'verdictConfirmed', verdictLocked:true,
+    fields:[
+      {key:'verdict',          label:'Verdict',          hint:'GO / NO-GO / CONDITIONAL', short:true},
+      {key:'validationResults',label:'Validation Results',hint:'What the data showed'},
+      {key:'winningAngle',     label:'Winning Angle',    hint:'Which LP and why'},
+      {key:'risksToWatch',     label:'Risks to Watch',   hint:'Key concerns'},
+      {key:'nextStep',         label:'Next Step',        hint:'Recommended action', short:true},
+    ]},
+  6: { title:'Video Strategy', num:'06', mission:2, confirmKey:'videoStrategyConfirmed',
+    fields:[
+      {key:'videoImportance',label:'Why Video Wins KS',  hint:'Context for this campaign'},
+      {key:'theme',          label:'Core Theme & Hook',  hint:'Central story and opening moment'},
+      {key:'style',          label:'Visual Style',       hint:'Tone, aesthetic, pacing'},
+      {key:'duration',       label:'Length & Cutdowns',  hint:'Main + 15s/30s/60s plan'},
+    ]},
+  7: { title:'Script & Scenes', num:'07', mission:2, confirmKey:'scriptConfirmed',
+    fields:[
+      {key:'coreUSP',    label:'Core USP Statement',  hint:'The one thing the video must land'},
+      {key:'sceneOrder', label:'Scene Order & Timings',hint:'Each scene with duration'},
+      {key:'castingNotes',label:'Casting Direction',  hint:'Who appears, tone, demographics'},
+    ]},
+  8: { title:'Campaign Page', num:'08', mission:2, confirmKey:'campaignPageConfirmed',
+    fields:[
+      {key:'pageStructure', label:'Page Structure',    hint:'12 sections with copy direction'},
+      {key:'assetChecklist',label:'Asset Checklist',   hint:'Photos, GIFs, graphics needed'},
+      {key:'trustSignals',  label:'Trust Signals',     hint:'Reviews, press, certifications'},
+      {key:'copyHighlights',label:'Key Copy Blocks',   hint:'Hero headline and section hooks'},
+    ]},
+  9: { title:'Pre-Campaign Warmup', num:'09', mission:2, confirmKey:'warmupConfirmed',
+    fields:[
+      {key:'warmupPlan',     label:'Warmup Plan',            hint:'Which page, creatives, timeline'},
+      {key:'adCreatives',    label:'Ad Creative Directions', hint:'3-5 specific ad hooks to test'},
+      {key:'kpiTargets',     label:'KPI Targets',            hint:'CPL, CVR, deposit conversion'},
+      {key:'depositStrategy',label:'Deposit Strategy',       hint:'$1-20 deposit flow if using', short:true},
+    ]},
+  10: { title:'Pricing Strategy', num:'10', mission:3, confirmKey:'pricingConfirmed',
+    fields:[
+      {key:'msrp',        label:'MSRP & KS Price',     hint:'Retail price and KS backer price', short:true},
+      {key:'tierDesign',  label:'Pledge Tier Design',  hint:'All tiers: price, discount, quantity, copy hook'},
+      {key:'earlyBirdPlan',label:'Early Bird Strategy',hint:'Super EB, EB, Standard, Bundle, Premium'},
+      {key:'stretchGoals',label:'Stretch Goals',       hint:'Milestone ladder with unlockables'},
+      {key:'benchmarks',  label:'Competitive Benchmarks',hint:'3-5 comparable KS campaigns'},
+    ]},
+  11: { title:'Go Live Ready', num:'11', mission:3, confirmKey:'goLiveConfirmed',
+    fields:[
+      {key:'launchChecklist',label:'Launch Checklist',  hint:'Everything confirmed before going live'},
+      {key:'communityPlan', label:'Community Plan',     hint:'Facebook Group, email sequence, Day 1 push'},
+      {key:'prPlan',        label:'PR & KOL Plan',      hint:'Media outreach and creator seeding'},
+      {key:'contingency',   label:'Contingency Plan',   hint:'What if Day 1 is slow'},
+    ]},
 };
-
-
-// ── STEP REQUIREMENTS — gate what each step needs before showing results ──────
-// Each step defines: required fields in session.alignment + session data checks
-// If requirements not met, show a "what's missing" screen instead of generating
-
-const STEP_REQUIREMENTS = {
-  1: {
-    label: 'Founder Input',
-    needs: [], // Step 1 is always accessible — it IS the input
-    missing_msg: '',
-  },
-  2: {
-    label: 'Product Alignment',
-    needs: [
-      { check: s => s.alignment && s.alignment.productName, label: 'Product name confirmed' },
-      { check: s => s.alignment && s.alignment.features && s.alignment.features.length > 0, label: 'Feature list discussed' },
-      { check: s => s.alignment && s.alignment.negativeThoughts && s.alignment.negativeThoughts.length > 0, label: 'Backer resistance map created' },
-      { check: s => s.alignment && s.alignment.readinessScore, label: 'Readiness score assigned' },
-    ],
-    hint: 'Complete the Product Alignment conversation with Kickman first.',
-  },
-  3: {
-    label: 'Marketing Approaches',
-    needs: [
-      { check: s => s.alignment && s.alignment.productName, label: 'Product alignment complete (Step 02)' },
-      { check: s => s.step >= 3 || hasStepData(s, 3), label: 'Marketing approaches discussed with Kickman' },
-    ],
-    hint: 'Finish Step 02 (Product Alignment) first, then ask Kickman to present marketing angles.',
-  },
-  4: {
-    label: 'Landing Page Briefs',
-    needs: [
-      { check: s => hasStepData(s, 3), label: 'Marketing approach selected (Step 03)' },
-      { check: s => s.step >= 4 || hasStepData(s, 4), label: 'Landing page briefs and ad setup discussed with Kickman' },
-    ],
-    hint: 'Complete Step 03 first, then work through the landing page briefs and ad setup with Kickman. Once ads are live, share your daily UV/signup/CVR data for Kickman to analyze.',
-    key_info: ['Two LP versions designed and built', 'Ads running on Meta and/or Google', 'Daily tracking: UV, signups, conversion rate, CPL', 'At least 7 days of data before reading results'],
-  },
-  5: {
-    label: 'Go / No-Go Report',
-    needs: [
-      { check: s => hasStepData(s, 4) || s.step >= 5 || !!s.verdict, label: 'Landing page briefs discussed (Step 04)' },
-      { check: s => s.step >= 5 || hasStepData(s, 5) || !!s.verdict, label: 'Go/No-Go discussed with Kickman' },
-    ],
-    hint: 'Share your validation data with Kickman: daily UV, signups, CVR, CPL per LP version. Kickman will analyze performance, diagnose what worked, and issue a Go/No-Go verdict.',
-    // Special: if verdict is already set (GO/NO-GO/CONDITIONAL), always show results — never re-gate
-    verdictLocked: true,
-  },
-  6: {
-    label: 'Video Strategy',
-    needs: [
-      { check: s => (s.mission || 1) >= 2, label: 'Validated and entered Mission 2 (must have GO verdict)' },
-      { check: s => s.step >= 6 || hasStepData(s, 6), label: 'Video strategy discussed with Kickman' },
-    ],
-    hint: 'You need a GO verdict from Step 05 to enter Mission 2.',
-  },
-  7: {
-    label: 'Script & Scenes',
-    needs: [
-      { check: s => (s.mission || 1) >= 2, label: 'In Mission 2' },
-      { check: s => s.step >= 7 || hasStepData(s, 7), label: 'Script and scenes discussed with Kickman' },
-    ],
-    hint: 'Complete Step 06 (Video Strategy) first.',
-  },
-  8: {
-    label: 'Video Brief',
-    needs: [
-      { check: s => (s.mission || 1) >= 2, label: 'In Mission 2' },
-      { check: s => s.step >= 8 || hasStepData(s, 8), label: 'Video brief discussed with Kickman' },
-    ],
-    hint: 'Complete Steps 06-07 first.',
-  },
-  9: {
-    label: 'Campaign Page',
-    needs: [
-      { check: s => (s.mission || 1) >= 2, label: 'In Mission 2' },
-      { check: s => s.step >= 9 || hasStepData(s, 9), label: 'Campaign page structure discussed with Kickman' },
-    ],
-    hint: 'Complete the video modules (Steps 06-08) first.',
-  },
-  10: {
-    label: 'Launch Ready',
-    needs: [
-      { check: s => (s.mission || 1) >= 2, label: 'In Mission 2' },
-      { check: s => s.step >= 10 || hasStepData(s, 10), label: 'Launch checklist reviewed with Kickman' },
-    ],
-    hint: 'Complete Step 09 (Campaign Page) first.',
-  },
-  11: {
-    label: 'Pricing Strategy',
-    needs: [
-      { check: s => (s.mission || 1) >= 2, label: 'Completed Mission 1 validation' },
-      { check: s => s.alignment && s.alignment.productName, label: 'Product name and definition confirmed' },
-      { check: s => s.stepData && s.stepData[11] && (s.stepData[11]._raw || s.stepData[11].cogs), label: 'COGS and pricing discussed with Kickman' },
-    ],
-    hint: 'Tell Kickman your product cost (COGS) and target retail price. Kickman will then build the pricing strategy.',
-    key_info: ['Product COGS (fully-loaded cost per unit)', 'Target MSRP (retail price)', 'Expected Kickstarter discount level'],
-  },
-  12: {
-    label: 'Financial Forecast',
-    needs: [
-      { check: s => s.stepData && s.stepData[11] && (s.stepData[11]._raw || s.stepData[11].cogs), label: 'Pricing strategy complete (Step 11)' },
-      { check: s => s.alignment && s.alignment.productName, label: 'Product alignment confirmed' },
-      { check: s => s.stepData && s.stepData[12] && (s.stepData[12]._raw || s.stepData[12].scenario1), label: 'Financial model built with Kickman' },
-    ],
-    hint: 'Complete Step 11 (Pricing Strategy) first. Kickman needs your COGS and pricing before building the financial model.',
-    key_info: ['COGS confirmed', 'MSRP and KS price agreed', 'Fixed costs estimated (video, design, pre-launch)', 'Target volume scenarios discussed'],
-  },
-  13: {
-    label: 'Pledge Tiers',
-    needs: [
-      { check: s => s.stepData && s.stepData[12] && (s.stepData[12]._raw || s.stepData[12].scenario1), label: 'Financial forecast complete (Step 12)' },
-      { check: s => s.stepData && s.stepData[13] && (s.stepData[13]._raw || s.stepData[13].superEB), label: 'Pledge tiers designed with Kickman' },
-    ],
-    hint: 'Complete Step 12 (Financial Forecast) first. The tier economics need to be grounded in the financial model.',
-    key_info: ['Financial model complete', 'MSRP and margins confirmed', 'Inventory constraints discussed', 'Stretch goal ideas identified'],
-  },
-};
-
-// Check if a step's requirements are met — returns {met: bool, missing: []}
-function checkStepRequirements(stepNum, session) {
-  const req = STEP_REQUIREMENTS[stepNum];
-  if(!req || !req.needs || req.needs.length === 0) return { met: true, missing: [] };
-  // Step 5 special: if verdict is already locked, always pass
-  if(req.verdictLocked && session.verdict) return { met: true, missing: [] };
-  const missing = req.needs.filter(n => !n.check(session));
-  return { met: missing.length === 0, missing };
-}
 
 let currentStepDrawer = null;
 let stepEditMode = false;
@@ -3896,12 +3133,6 @@ function openStepDrawer(stepNum){
   if(editBtn){editBtn.textContent='✎ Edit';editBtn.className='so-btn edit-mode';}
   smartExtractStep(stepNum,session);
   renderStepView(stepNum,session);
-  // Show/hide action buttons based on whether step has data
-  const hasD = hasStepData(session, stepNum);
-  const dlBtn = document.getElementById('so-download-btn');
-  const edBtn = document.getElementById('so-edit-btn');
-  if(dlBtn) dlBtn.style.display = hasD ? '' : 'none';
-  if(edBtn) edBtn.style.display = hasD ? '' : 'none';
   document.getElementById('step-overlay').classList.add('open');
 }
 
@@ -4010,16 +3241,10 @@ function renderStepView(stepNum,session){
   const merged=stepNum===2?mergeAlignmentToStepData(session):raw;
   const hasData=rawText||def.fields.some(f=>merged[f.key]&&String(merged[f.key]).trim().length>0)||raw._raw;
 
-  // ── Gate check: show requirements screen if not met ──────────────────────
   if(!hasData){
-    const gate = checkStepRequirements(stepNum, session);
-    if(!gate.met){
-      renderStepGate(stepNum, session, gate, body);
-      return;
-    }
-    // Requirements met but no data yet — this step was just unlocked, prompt to discuss
-    const req = STEP_REQUIREMENTS[stepNum];
-    renderStepNotStarted(stepNum, def, req, body);
+    body.innerHTML='<div class="so-empty-state"><span class="so-empty-icon" style="animation:spin 1.5s linear infinite;display:inline-block">&#x21BB;</span><div class="so-empty-title">Generating results...</div><div class="so-empty-body">Kickman is extracting output from your conversation.</div></div>';
+    if(!document.getElementById('spin-style')){const st=document.createElement('style');st.id='spin-style';st.textContent='@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';document.head.appendChild(st);}
+    setTimeout(()=>triggerStepGeneration(stepNum,session,body),300);
     return;
   }
 
@@ -4040,93 +3265,6 @@ function renderStepView(stepNum,session){
   body.innerHTML=html;
 }
 
-
-// ── Gate screen: requirements not met ─────────────────────────────────────────
-function renderStepGate(stepNum, session, gate, body){
-  const req = STEP_REQUIREMENTS[stepNum];
-  const def = STEP_DEFS[stepNum];
-
-  // Calculate overall progress
-  const total = req.needs.length;
-  const done = total - gate.missing.length;
-  const pct = Math.round(done / total * 100);
-
-  let html = '<div class="so-doc">';
-
-  // Header with step info
-  html += '<div class="so-doc-header" style="border-color:rgba(255,255,255,.08);">';
-  html += '<div class="so-doc-step-num" style="color:var(--text-3);">Step ' + def.num + ' &middot; Mission ' + def.mission + '</div>';
-  html += '<div class="so-doc-title" style="color:var(--text-3);">' + escHtml(def.title) + '</div>';
-  html += '<div style="margin-top:8px;font-family:var(--font-mono);font-size:10px;color:var(--text-3);">Not yet unlocked</div>';
-  html += '</div>';
-
-  // Progress bar
-  html += '<div style="margin-bottom:24px;">';
-  html += '<div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:9px;color:var(--text-3);margin-bottom:6px;">';
-  html += '<span>Requirements</span><span>' + done + ' / ' + total + ' met</span></div>';
-  html += '<div style="height:3px;background:rgba(255,255,255,.06);border-radius:2px;">';
-  html += '<div style="height:3px;background:var(--accent);border-radius:2px;width:' + pct + '%;transition:width .4s;"></div></div></div>';
-
-  // Checklist
-  html += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:28px;">';
-  req.needs.forEach(function(need){
-    const met = need.check(session);
-    html += '<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:var(--card);border:1px solid ' + (met?'rgba(45,158,107,.25)':'rgba(255,255,255,.06)') + ';">';
-    html += '<div style="width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:1px;background:' + (met?'rgba(45,158,107,.2)':'rgba(255,255,255,.05)') + ';color:' + (met?'var(--green)':'var(--text-3)') + ';">' + (met?'&#x2713;':'&#x25CB;') + '</div>';
-    html += '<div style="font-size:12px;color:' + (met?'var(--text-2)':'var(--text-3)') + ';line-height:1.5;">' + escHtml(need.label) + '</div>';
-    html += '</div>';
-  });
-  html += '</div>';
-
-  // Key info needed (for M3 steps)
-  if(req.key_info && req.key_info.length > 0 && gate.missing.length > 0){
-    html += '<div class="so-section"><div class="so-section-label">What Kickman needs from you</div>';
-    html += '<div style="display:flex;flex-direction:column;gap:6px;">';
-    req.key_info.forEach(function(item){
-      html += '<div style="padding:8px 14px;font-size:12px;color:var(--text-2);border-left:2px solid rgba(232,98,42,.3);background:var(--card);">&#x2192; ' + escHtml(item) + '</div>';
-    });
-    html += '</div></div>';
-  }
-
-  // CTA
-  if(gate.missing.length > 0){
-    html += '<div style="margin-top:28px;padding:16px 20px;background:rgba(232,98,42,.06);border:1px solid rgba(232,98,42,.2);">';
-    html += '<div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:1px;margin-bottom:6px;">NEXT STEP</div>';
-    html += '<div style="font-size:13px;color:var(--text-2);line-height:1.6;">' + escHtml(req.hint || 'Discuss this topic with Kickman in the chat to unlock this section.') + '</div>';
-    html += '<button onclick="closeStepDrawer()" style="margin-top:12px;font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;background:var(--accent);color:#fff;border:none;cursor:pointer;">&#x2190; Go to chat</button>';
-    html += '</div>';
-  }
-
-  html += '</div>';
-  body.innerHTML = html;
-}
-
-// ── Not-started screen: requirements met but no output yet ────────────────────
-function renderStepNotStarted(stepNum, def, req, body){
-  let html = '<div class="so-doc">';
-  html += '<div class="so-doc-header">';
-  html += '<div class="so-doc-step-num">Step ' + def.num + ' &middot; Mission ' + def.mission + '</div>';
-  html += '<div class="so-doc-title">' + escHtml(def.title) + '</div>';
-  html += '<div class="so-doc-subtitle" style="color:var(--green);">&#x2713; Ready to begin</div>';
-  html += '</div>';
-
-  html += '<div style="padding:20px 0;">';
-  html += '<div style="font-size:13px;color:var(--text-2);line-height:1.7;margin-bottom:20px;">All requirements met. Go to the chat and ask Kickman to work through this step. Results will appear here automatically.</div>';
-
-  if(req && req.key_info){
-    html += '<div class="so-section"><div class="so-section-label">Topics to cover</div><div style="display:flex;flex-direction:column;gap:6px;">';
-    req.key_info.forEach(function(item){
-      html += '<div style="padding:8px 14px;font-size:12px;color:var(--text-2);border-left:2px solid rgba(232,98,42,.3);background:var(--card);">&#x2192; ' + escHtml(item) + '</div>';
-    });
-    html += '</div></div>';
-  }
-
-  html += '<button onclick="closeStepDrawer()" style="margin-top:20px;font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;background:var(--accent);color:#fff;border:none;cursor:pointer;">&#x2190; Go to chat</button>';
-  html += '</div>';
-  html += '</div>';
-  body.innerHTML = html;
-}
-
 function renderAlignmentView(d){
   var toBullets=function(txt){var items=String(txt||'').split('\n').filter(function(l){return l.trim();}).map(function(l){return l.replace(/^[*-] */,'').replace(/\*+/g,'').trim();}).filter(Boolean);if(!items.length)return '<p class="so-empty">Not yet filled in.</p>';return '<ul>'+items.map(function(i){return'<li>'+escHtml(i)+'</li>';}).join('')+'</ul>';};
   var toQuotes=function(txt){var items=String(txt||'').split('\n').filter(function(l){return l.trim();}).map(function(l){return l.replace(/^[*-] */,'').replace(/^[\u201c"]/,'').replace(/[\u201d"]$/,'').replace(/\*+/g,'').trim();}).filter(function(l){return l.length>3;});if(!items.length)return '<p class="so-empty">Not yet filled in.</p>';return '<ul>'+items.map(function(i){return'<li>'+escHtml(i)+'</li>';}).join('')+'</ul>';};
@@ -4145,23 +3283,14 @@ function renderAlignmentView(d){
 }
 
 function renderGenericView(def,data){
-  // First try: render individual fields if they have their own content
   var html='';
-  var anyFieldHasData=def.fields.some(function(f){return data[f.key]&&String(data[f.key]).trim().length>10;});
-
-  if(anyFieldHasData){
-    // Has per-field data — render each field separately (never fall back to _raw per field)
-    def.fields.forEach(function(f){
-      var val=data[f.key]||'';
-      if(!String(val).trim()) return;
-      html+='<div class="so-section"><div class="so-section-label">'+escHtml(f.label)+'</div>';
-      html+='<div class="so-view">'+markdownToHTML(String(val))+'</div></div>';
-    });
-  } else if(data._raw){
-    // No per-field data — render the raw conversation output once, as a whole document
-    html='<div class="so-view">'+markdownToHTML(data._raw)+'</div>';
-  }
-
+  def.fields.forEach(function(f){
+    var val=data[f.key]||data._raw||'';
+    if(!String(val).trim()) return;
+    html+='<div class="so-section"><div class="so-section-label">'+escHtml(f.label)+'</div>';
+    html+='<div class="so-view">'+markdownToHTML(String(val))+'</div></div>';
+  });
+  if(!html&&data._raw) html='<div class="so-view">'+markdownToHTML(data._raw)+'</div>';
   return html||'<div class="so-view"><p style="color:var(--text-3);font-style:italic;">No content saved yet.</p></div>';
 }
 
@@ -4189,45 +3318,15 @@ function renderGoNoGoView(data,session){
   var raw=session.stepData&&session.stepData[5]&&session.stepData[5]._raw;
   var src=raw||Object.values(data).filter(function(v){return v&&typeof v==='string';}).join('\n\n');
   if(!src||src.trim().length<20) return '<div class="so-view"><p class="so-empty">No Go/No-Go report yet.</p></div>';
-
-  // Use session.verdict (locked at time of issue) — not re-derived from text
-  // This ensures the verdict never changes after it's been set
-  var storedVerdict = session.verdict || '';
-  var isGo = storedVerdict === 'go';
-  var isNoGo = storedVerdict === 'no-go';
-  var isCond = storedVerdict === 'conditional';
-
-  // Fallback: if session.verdict not set, try to read from raw text (first time)
-  if(!storedVerdict){
-    if(/VERDICT[^\r\n]*GO(?!.*NO-GO)/i.test(src) && !/VERDICT[^\r\n]*NO.GO/i.test(src)) isGo=true;
-    else if(/VERDICT.*NO.GO|NO-GO\s*&#x274C;/i.test(src)) isNoGo=true;
-    else if(/VERDICT.*CONDITIONAL|CONDITIONAL\s*&#x26A0;/i.test(src)) isCond=true;
-  }
-
-  var col = isGo?'var(--green)':isNoGo?'var(--red)':'var(--yellow)';
-  var bg  = isGo?'rgba(45,158,107,.08)':isNoGo?'rgba(192,57,43,.08)':'rgba(212,160,23,.08)';
-  var icon  = isGo?'&#x2705;':isNoGo?'&#x274C;':'&#x26A0;&#xFE0F;';
-  var label = isGo?'GO &mdash; This project is worth launching':
-              isNoGo?'NO-GO &mdash; Fundamental issues to resolve first':
-              'Conditional &mdash; GO once specific issues are fixed';
-
+  var verdict=(data.verdict||'').trim();
+  var isGo=/\bGO\b/i.test(verdict)&&!/NO.GO/i.test(verdict);
+  var isNoGo=/NO.GO/i.test(verdict);
+  var col=isGo?'var(--green)':isNoGo?'var(--red)':'var(--yellow)';
+  var bg=isGo?'rgba(45,158,107,.08)':isNoGo?'rgba(192,57,43,.08)':'rgba(212,160,23,.08)';
+  var icon=isGo?'&#x2705;':isNoGo?'&#x274C;':'&#x26A0;&#xFE0F;';
+  var label=isGo?'GO &mdash; Launch Validated':isNoGo?'NO-GO &mdash; Do Not Launch':'Conditional &mdash; Address Issues First';
   var html='';
-
-  // Locked verdict banner
-  if(isGo||isNoGo||isCond){
-    html+='<div style="padding:20px 24px;background:'+bg+';border:1px solid '+col+';margin-bottom:28px;">';
-    html+='<div style="display:flex;align-items:center;gap:12px;">';
-    html+='<div style="font-family:var(--font-serif);font-size:28px;color:'+col+';">'+icon+'</div>';
-    html+='<div>';
-    html+='<div style="font-family:var(--font-mono);font-size:8px;letter-spacing:3px;color:'+col+';text-transform:uppercase;margin-bottom:4px;">Strategic Verdict &mdash; Locked</div>';
-    html+='<div style="font-family:var(--font-serif);font-size:22px;color:'+col+';">'+label+'</div>';
-    html+='</div></div>';
-    if(isGo){
-      html+='<div style="margin-top:10px;font-family:var(--font-mono);font-size:10px;color:var(--green);opacity:.7;">This verdict is permanent. Subsequent challenges (manufacturing, timelines) do not change it.</div>';
-    }
-    html+='</div>';
-  }
-
+  if(verdict) html+='<div style="padding:20px 24px;background:'+bg+';border:1px solid '+col+';margin-bottom:28px;"><div style="font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:'+col+';text-transform:uppercase;margin-bottom:8px;">Verdict</div><div style="font-family:var(--font-serif);font-size:26px;color:'+col+';">'+icon+' '+label+'</div></div>';
   html+=markdownToHTML(src.replace(/<!--[\s\S]*?-->/g,''));
   return html;
 }
@@ -4460,99 +3559,6 @@ function alignmentRawToHTML(rawText){
   return html;
 }
 
-// ── Capture latest alignment raw text from history ───────────────────────────
-// Stores the complete markdown text — no field parsing, zero data loss
-function captureLatestAlignmentRaw(session){
-  if(!session || !session.history) return;
-  const msgs = [...session.history].reverse();
-  for(const msg of msgs){
-    if(msg.role !== 'assistant' && msg.role !== 'km') continue;
-    const text = typeof msg.content === 'string' ? msg.content : (msg.content?.[0]?.text || '');
-    const clean = text.replace(/<!--[\s\S]*?-->/g, '').trim();
-    const markers = [
-      /PRODUCT NAME/i, /INTERNAL DESCRIPTION/i, /ALL FEATURES/i,
-      /BENEFITS/i, /NEGATIVE THOUGHTS|RESISTANCE MAP/i,
-      /EMOTIONAL DESTINATION|WHAT WE WANT/i, /READINESS SCORE/i
-    ];
-    if(markers.filter(rx => rx.test(clean)).length < 2) continue;
-    if(!session.stepData) session.stepData = {};
-    if(!session.stepData[2]) session.stepData[2] = {};
-    if(session.stepData[2]._rawText !== clean){
-      session.stepData[2]._rawText = clean;
-      session.stepData[2].updatedAt = Date.now();
-      scheduleSave(session);
-    }
-    if(!session.alignment) session.alignment = {};
-    if(!session.alignment.productName){
-      // Simple extraction: first non-empty line after PRODUCT NAME
-      const lines = clean.split('\n');
-      let afterName = false;
-      for(const ln of lines){
-        if(/PRODUCT NAME/i.test(ln)){ afterName = true; continue; }
-        if(afterName && ln.trim() && !/^#/.test(ln.trim())){
-          session.alignment.productName = ln.replace(/\*+/g,'').trim();
-          break;
-        }
-      }
-    }
-    return;
-  }
-}
-
-// Render raw alignment markdown as HTML — no parsing, faithful to original
-function alignmentRawToHTML(rawText){
-  if(!rawText) return '<p style="color:var(--text-3);font-style:italic;">No content yet.</p>';
-  let html = '';
-  const lines = rawText.split('\n');
-  let inList = false;
-  const closeList = () => { if(inList){ html += '</ul>'; inList = false; } };
-
-  for(const rawLine of lines){
-    const line = rawLine.trim();
-    if(!line){ closeList(); continue; }
-
-    // Section headers: ## or **TEXT** alone or numbered 01. Title
-    if(/^#{1,3}\s/.test(line) || /^\*\*[^*]{2,}\*\*$/.test(line) ||
-       /^0?[1-9]\.\s+[A-Z\u4e00-\u9fff]/.test(line) ||
-       /^(?:PRODUCT NAME|INTERNAL DESC|ALL FEATURES|BENEFITS|NEGATIVE|EMOTIONAL|READINESS)/i.test(line)){
-      closeList();
-      const text = line.replace(/^#{1,3}\s*/,'').replace(/\*+/g,'').replace(/^\d+\.\s*/,'').trim();
-      html += '<div class="so-section-label" style="margin-top:24px;">' + escHtml(text) + '</div>';
-      continue;
-    }
-
-    // Bullet items and quoted items
-    if(/^[•\-\*]\s/.test(line) || /^["\u201c]/.test(line)){
-      if(!inList){ html += '<ul class="so-raw-list">'; inList = true; }
-      const text = line.replace(/^[•\-\*]\s*/,'').replace(/^["\u201c]/,'').replace(/["\u201d]$/,'').trim();
-      const fmt = text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>');
-      html += '<li>' + fmt + '</li>';
-      continue;
-    }
-
-    // Readiness score
-    if(/^\d+\s*\/\s*10/.test(line)){
-      closeList();
-      const m = line.match(/(\d+)\s*\/\s*10/);
-      if(m){
-        const s = parseInt(m[1]);
-        const col = s>=7?'var(--green)':s>=5?'var(--yellow)':'var(--red)';
-        html += '<div style="display:flex;align-items:baseline;gap:8px;padding:12px 0;">' +
-          '<span style="font-family:var(--font-serif);font-size:48px;color:'+col+';line-height:1;">'+s+'</span>' +
-          '<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);">/ 10</span></div>';
-      }
-      continue;
-    }
-
-    // Regular text
-    closeList();
-    const fmt = line.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>');
-    html += '<p style="margin:4px 0 10px;color:var(--text-2);font-size:13px;line-height:1.7;">' + fmt + '</p>';
-  }
-  closeList();
-  return html;
-}
-
 // ── Auto-extract step data from Kickman response ──────────────────────────────
 // Called after each Kickman response to auto-populate step data
 function autoExtractStepData(text, stepNum, sessionId){
@@ -4569,15 +3575,13 @@ function autoExtractStepData(text, stepNum, sessionId){
     return;
   }
 
+  // Store the raw Kickman output for the step
   const clean = text.replace(/<!--[\s\S]*?-->/g,'').trim();
   if(!session.stepData[stepNum]) session.stepData[stepNum] = {};
+
+  // Only overwrite if this is clearly a step deliverable (not a mid-step question)
+  // Heuristic: response is long enough to be a deliverable
   if(clean.length < 200) return;
-  // M3 steps: always refresh (pricing is iterative)
-  if(stepNum >= 11){
-    session.stepData[stepNum]._raw = clean;
-    session.stepData[stepNum].updatedAt = Date.now();
-    scheduleSave(session); return;
-  }
 
   // For step 1: extract founder answers
   if(stepNum === 1 && !session.stepData[1].whatItDoes){
@@ -4616,298 +3620,6 @@ function buildStepMemoryContext(session){
   return parts.join('\\n');
 }
 
-
-
-// ── KNOWLEDGE BASE — learn from every project ─────────────────────────────────
-
-let kbCache = []; // cached insights for current session
-let kbLoaded = false;
-
-// Categories map product types to KB buckets
-function inferProductCategory(session){
-  const name = ((session.alignment && session.alignment.productName) || session.name || '').toLowerCase();
-  const desc = ((session.alignment && session.alignment.internalDescription) || '').toLowerCase();
-  const combined = name + ' ' + desc;
-  if(/robot|robo|автомат/i.test(combined)) return 'robotics';
-  if(/ai|智能|machine learning/i.test(combined)) return 'ai-hardware';
-  if(/pet|猫|狗|dog|cat/i.test(combined)) return 'pet-tech';
-  if(/fitness|health|健康|运动/i.test(combined)) return 'health-fitness';
-  if(/home|家|smart home|家居/i.test(combined)) return 'smart-home';
-  if(/camera|photo|摄影/i.test(combined)) return 'camera';
-  if(/game|gaming|游戏/i.test(combined)) return 'gaming';
-  if(/bag|pack|carry|箱|包/i.test(combined)) return 'accessories';
-  if(/audio|speaker|headphone|音/i.test(combined)) return 'audio';
-  if(/food|kitchen|厨/i.test(combined)) return 'kitchen';
-  return 'general';
-}
-
-function inferPriceRange(session){
-  const a = session.alignment || {};
-  const score = a.readinessScore ? parseInt(a.readinessScore) : 0;
-  // Try to find price from stepData
-  const pricingRaw = session.stepData && session.stepData[11] && session.stepData[11]._raw || '';
-  const msrpMatch = pricingRaw.match(/MSRP[^:\n]*:\s*\$?([\d,]+)/i);
-  if(msrpMatch){
-    const price = parseInt(msrpMatch[1].replace(/,/g,''));
-    if(price < 50) return 'under-$50';
-    if(price < 100) return '$50-100';
-    if(price < 200) return '$100-200';
-    if(price < 400) return '$200-400';
-    if(price < 800) return '$400-800';
-    return '$800+';
-  }
-  return 'unknown';
-}
-
-// ── Submit benchmark data point (numerical — aggregated, raw discarded) ────────
-async function submitBenchmark(session, metricsObj){
-  // Only submit if we have meaningful data
-  if(!metricsObj || Object.keys(metricsObj).filter(k => metricsObj[k] != null).length === 0) return;
-  const category = inferProductCategory(session);
-  try {
-    await fetch('/api/insights', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        password: currentPw,
-        type: 'benchmark',
-        category,
-        metrics: metricsObj
-      })
-    });
-    console.log('[KB] Benchmark submitted for category:', category, Object.keys(metricsObj));
-  } catch(e) {
-    console.log('[KB] Benchmark submit failed silently');
-  }
-}
-
-// Extract validation metrics from session history (called at GO verdict)
-function extractValidationMetrics(session){
-  if(!session || !session.history) return null;
-  const allText = session.history
-    .filter(m => m.role === 'user')
-    .map(m => typeof m.content === 'string' ? m.content : (m.content?.[0]?.text || ''))
-    .join(' ');
-
-  const metrics = {};
-
-  // CPL — look for patterns like "$3.86 per email" or "CPL $4.20" or "cost per lead: $5"
-  const cplMatch = allText.match(/(?:CPL|cost per (?:lead|email|signup)|per (?:email|lead|signup))\s*[:\$]?\s*\$?([\d.]+)/i);
-  if(cplMatch) metrics.cpl = parseFloat(cplMatch[1]);
-
-  // CVR — "15% conversion" or "CVR 12%" or "conversion rate: 8%"
-  const cvrMatch = allText.match(/(?:CVR|conversion rate?)\s*[:\s]?([\d.]+)%/i) ||
-                   allText.match(/([\d.]+)%\s*(?:conversion|CVR)/i);
-  if(cvrMatch) metrics.cvr = parseFloat(cvrMatch[1]);
-
-  // CTR — "CTR 1.5%" or "click.through rate 2%"
-  const ctrMatch = allText.match(/(?:CTR|click.through)\s*[:\s]?([\d.]+)%/i);
-  if(ctrMatch) metrics.ctr = parseFloat(ctrMatch[1]);
-
-  // Email count — "725 emails" or "500 signups" or "collected 300"
-  const emailMatch = allText.match(/([\d,]+)\s*(?:emails?|signups?|leads?|subscribers?)/i);
-  if(emailMatch) metrics.emailCount = parseFloat(emailMatch[1].replace(/,/g, ''));
-
-  // Only return if we extracted at least one metric
-  return Object.keys(metrics).length > 0 ? metrics : null;
-}
-
-// ── Extract insight when GO verdict is issued ─────────────────────────────────
-async function extractAndStoreInsight(session, trigger){
-  // Don't extract from incomplete or very early sessions
-  if(!session || !session.alignment || !session.alignment.productName) return;
-  if((session.history || []).length < 10) return;
-
-  const category = inferProductCategory(session);
-  const priceRange = inferPriceRange(session);
-
-  // Use Claude to extract a clean, anonymized insight
-  // We only send alignment (no raw cost data) + trigger context
-  const alignmentSummary = [
-    'Product type: ' + (session.alignment.productName || ''),
-    'Category: ' + category,
-    'Features (count): ' + ((session.alignment.features || []).length) + ' features',
-    'Trigger: ' + trigger,
-    'Verdict: ' + (session.verdict || 'none'),
-    'Step reached: ' + (session.step || 1),
-    'Mission reached: ' + (session.mission || 1),
-  ].join('\n');
-
-  // Get winning angle from step 3 if available
-  const approach = session.stepData && session.stepData[3] && session.stepData[3]._raw
-    ? session.stepData[3]._raw.slice(0,500) : '';
-
-  const extractPrompt = `You are extracting an anonymized learning insight from a Kickstarter coaching session. 
-  
-Session context:
-${alignmentSummary}
-
-${approach ? 'Marketing approach discussed:\n' + approach : ''}
-
-Extract a single useful insight that would help future founders in a similar product category.
-
-STRICT RULES:
-- Do NOT include any numbers (costs, CPL, email counts, conversion rates, budget)
-- Do NOT include any company names, founder names, or identifying information  
-- DO include: what positioning/angle worked or didn't, what objections came up, what the winning narrative was
-- Keep it to 3 sentences max
-
-Respond in this exact JSON format (no other text):
-{
-  "headline": "one sentence summary of the insight",
-  "whatWorked": "what positioning or strategy showed promise (no numbers)",
-  "whatFailed": "what approach was rejected or didn't resonate (no numbers, or empty string)",
-  "keyTakeaway": "actionable lesson for future founders in this category"
-}`;
-
-  try {
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        messages: [{role:'user', content: extractPrompt}],
-        system: 'You extract anonymized product insights. Always respond with valid JSON only. Never include numbers, costs, or identifying information.',
-        password: currentPw,
-        max_tokens: 300
-      })
-    });
-    if(!res.ok) return;
-    const data = await res.json();
-    const text = data.content?.[0]?.text || '';
-    
-    // Parse JSON from response
-    const jsonMatch = text.match(/\{[\s\S]+\}/);
-    if(!jsonMatch) return;
-    const insight = JSON.parse(jsonMatch[0]);
-    
-    // Store to KB
-    await fetch('/api/insights', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        password: currentPw,
-        insight: {
-          category,
-          priceRange,
-          verdict: session.verdict || '',
-          mission: session.mission || 1,
-          headline: insight.headline || '',
-          whatWorked: insight.whatWorked || '',
-          whatFailed: insight.whatFailed || '',
-          keyTakeaway: insight.keyTakeaway || '',
-        }
-      })
-    });
-    console.log('[KB] Insight stored for category:', category);
-  } catch(e) {
-    console.log('[KB] Insight extraction failed silently:', e.message);
-  }
-}
-
-// ── Load relevant insights for current session ────────────────────────────────
-async function loadKBInsights(session){
-  if(kbLoaded && kbCache) return kbCache;
-  kbLoaded = true;
-  try {
-    const category = inferProductCategory(session);
-    const res = await fetch('/api/insights?type=both&category=' + encodeURIComponent(category) + '&limit=3');
-    if(!res.ok) { kbCache = {}; return {}; }
-    const data = await res.json();
-    kbCache = data; // { insights: [...], benchmarks: {...} }
-    return kbCache;
-  } catch(e) {
-    kbCache = {};
-    return {};
-  }
-}
-
-// ── Format KB insights + benchmarks for injection into system prompt ─────────
-function buildKBContext(data){
-  if(!data) return '';
-  const { insights, benchmarks } = (data.insights !== undefined) ? data : { insights: data, benchmarks: null };
-  let ctx = '';
-
-  // Benchmark section
-  if(benchmarks && benchmarks.categoryStats){
-    const stats = benchmarks.categoryStats;
-    const label = benchmarks.label || benchmarks.category || 'this category';
-    const lines = [];
-
-    const fmtStat = (stat, unit, label) => {
-      if(!stat || stat.n < 2) return null; // need at least 2 data points
-      const conf = stat.confidence === 'high' ? '' : ` (${stat.confidence} confidence, n=${stat.n})`;
-      return `${label}: avg ${stat.mean}${unit}${conf}`;
-    };
-
-    if(stats.cpl) lines.push(fmtStat(stats.cpl, '', 'CPL (cost per lead)'));
-    if(stats.cvr) lines.push(fmtStat(stats.cvr, '%', 'Landing page CVR'));
-    if(stats.ctr) lines.push(fmtStat(stats.ctr, '%', 'Ad CTR'));
-    if(stats.emailCount) lines.push(fmtStat(stats.emailCount, ' signups', 'Validation email count'));
-    if(stats.ksFunding) lines.push(fmtStat(stats.ksFunding, '', 'KS funding raised'));
-    if(stats.ksBackers) lines.push(fmtStat(stats.ksBackers, ' backers', 'KS backers'));
-    if(stats.ksPrice) lines.push(fmtStat(stats.ksPrice, '', 'KS pledge price'));
-
-    const validLines = lines.filter(Boolean);
-    if(validLines.length > 0){
-      ctx += '\n\n# CATEGORY BENCHMARKS — ' + label.toUpperCase() + '\n';
-      ctx += 'These are aggregated averages from real projects in this category (raw data is never stored). ';
-      ctx += 'Use these to benchmark the current project and tell founders whether their metrics are strong, average, or weak relative to similar products.\n';
-      ctx += 'IMPORTANT: When sharing benchmarks with founders, frame it as "similar projects in this category" — never attribute to any specific project.\n\n';
-      ctx += validLines.join('\n');
-    }
-  }
-
-  // Qualitative insights section
-  const insightList = Array.isArray(insights) ? insights : [];
-  if(insightList.length > 0){
-    const items = insightList.map(ins => {
-      const parts = [];
-      if(ins.headline) parts.push('Insight: ' + ins.headline);
-      if(ins.whatWorked) parts.push('What worked: ' + ins.whatWorked);
-      if(ins.keyTakeaway) parts.push('Takeaway: ' + ins.keyTakeaway);
-      return parts.join(' | ');
-    }).filter(Boolean);
-
-    if(items.length > 0){
-      ctx += '\n\n# LEARNINGS FROM SIMILAR PROJECTS\n';
-      ctx += 'Anonymized strategy insights from past coaching sessions (no identifying data):\n\n';
-      ctx += items.map((item, i) => (i+1) + '. ' + item).join('\n');
-    }
-  }
-
-  return ctx;
-}
-
-// ── Trigger insight extraction at key milestones ──────────────────────────────
-function maybeExtractInsight(session, trigger){
-  // Fire-and-forget — don't block UI
-  setTimeout(() => extractAndStoreInsight(session, trigger), 2000);
-}
-
-// Also store public Kickstarter data when user shares it
-async function storePublicKSData(session, ksUrl, fundingData){
-  if(!ksUrl || !ksUrl.includes('kickstarter.com')) return;
-  // Public campaign data — this is fully safe to store
-  const category = inferProductCategory(session);
-  await fetch('/api/insights', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      password: currentPw,
-      insight: {
-        category,
-        priceRange: fundingData.priceRange || '',
-        verdict: 'go',
-        mission: 3,
-        headline: fundingData.headline || 'Live KS campaign data',
-        whatWorked: fundingData.strategy || '',
-        whatFailed: '',
-        keyTakeaway: fundingData.takeaway || '',
-        campaignRef: ksUrl,  // public URL — safe to store
-      }
-    })
-  });
-}
 
 // ── EXPORT ────────────────────────────────────────────────────────────────────
 
