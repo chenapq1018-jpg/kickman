@@ -2616,7 +2616,7 @@ function setSyncStatus(state){const el=document.getElementById('sync-status');el
 
 // ── LOAD SESSION ───────────────────────────────────────────────────────────────
 function loadSession(id){
-  activeId=id; pendingImages=[]; renderPreviewStrip();
+  activeId=id; pendingImages=[]; renderPreviewStrip(); kbLoaded=false; kbCache=[];
   const session=getSession(id); if(!session)return;
   document.getElementById('messages').innerHTML=''; updateStepUI(session.step);
   if(!session.started||session.history.length===0){
@@ -2775,7 +2775,13 @@ async function callKickman(trigger){
     const hasActiveMs = tl && tl.some(m => m.status !== 'pending');
     if(hasAnyDate || hasActiveMs) tlContext = buildTimelineContext();
   }
-  const sysPrompt = baseSysPrompt + memoryContext + tlContext;
+  // Load KB insights (cached after first load per session)
+  let kbContext = '';
+  try {
+    const insights = await loadKBInsights(curSess);
+    kbContext = buildKBContext(insights);
+  } catch(e) {}
+  const sysPrompt = baseSysPrompt + memoryContext + tlContext + kbContext;
   let apiMessages;
   if(trigger==='m2start'){
     apiMessages=[{role:'user',content:'Begin Mission 2.'}];
@@ -2807,10 +2813,19 @@ async function callKickman(trigger){
       if(!prev || prev==='conditional' || v==='go'){
         fresh.verdict=v;
       }
-      if(v==='go'&&(fresh.mission||1)===1){setTimeout(()=>triggerMission2(fresh.id),1200);}
+      if(v==='go'&&(fresh.mission||1)===1){
+        setTimeout(()=>triggerMission2(fresh.id),1200);
+        maybeExtractInsight(fresh, 'go_verdict'); // Learn from this GO decision
+        // Also submit numerical benchmarks (aggregated, raw values never stored)
+        setTimeout(() => {
+          const metrics = extractValidationMetrics(fresh);
+          if(metrics) submitBenchmark(fresh, metrics);
+        }, 3000);
+      }
     }
     if((fresh.mission||1)===2 && /mission\s*3|开始.*定价|pricing.*strategy/i.test(typeof userMsg==='string'?userMsg:'')){
       setTimeout(()=>triggerMission3(fresh.id),800);
+      maybeExtractInsight(fresh, 'mission2_complete'); // Learn from M2 strategy choices
     }
     // After gen_alignment, re-check and if alignment is now complete, proceed to M2
     if(trigger==='gen_alignment'){
@@ -4345,6 +4360,298 @@ function buildStepMemoryContext(session){
   return parts.join('\\n');
 }
 
+
+
+// ── KNOWLEDGE BASE — learn from every project ─────────────────────────────────
+
+let kbCache = []; // cached insights for current session
+let kbLoaded = false;
+
+// Categories map product types to KB buckets
+function inferProductCategory(session){
+  const name = ((session.alignment && session.alignment.productName) || session.name || '').toLowerCase();
+  const desc = ((session.alignment && session.alignment.internalDescription) || '').toLowerCase();
+  const combined = name + ' ' + desc;
+  if(/robot|robo|автомат/i.test(combined)) return 'robotics';
+  if(/ai|智能|machine learning/i.test(combined)) return 'ai-hardware';
+  if(/pet|猫|狗|dog|cat/i.test(combined)) return 'pet-tech';
+  if(/fitness|health|健康|运动/i.test(combined)) return 'health-fitness';
+  if(/home|家|smart home|家居/i.test(combined)) return 'smart-home';
+  if(/camera|photo|摄影/i.test(combined)) return 'camera';
+  if(/game|gaming|游戏/i.test(combined)) return 'gaming';
+  if(/bag|pack|carry|箱|包/i.test(combined)) return 'accessories';
+  if(/audio|speaker|headphone|音/i.test(combined)) return 'audio';
+  if(/food|kitchen|厨/i.test(combined)) return 'kitchen';
+  return 'general';
+}
+
+function inferPriceRange(session){
+  const a = session.alignment || {};
+  const score = a.readinessScore ? parseInt(a.readinessScore) : 0;
+  // Try to find price from stepData
+  const pricingRaw = session.stepData && session.stepData[11] && session.stepData[11]._raw || '';
+  const msrpMatch = pricingRaw.match(/MSRP[^:\n]*:\s*\$?([\d,]+)/i);
+  if(msrpMatch){
+    const price = parseInt(msrpMatch[1].replace(/,/g,''));
+    if(price < 50) return 'under-$50';
+    if(price < 100) return '$50-100';
+    if(price < 200) return '$100-200';
+    if(price < 400) return '$200-400';
+    if(price < 800) return '$400-800';
+    return '$800+';
+  }
+  return 'unknown';
+}
+
+// ── Submit benchmark data point (numerical — aggregated, raw discarded) ────────
+async function submitBenchmark(session, metricsObj){
+  // Only submit if we have meaningful data
+  if(!metricsObj || Object.keys(metricsObj).filter(k => metricsObj[k] != null).length === 0) return;
+  const category = inferProductCategory(session);
+  try {
+    await fetch('/api/insights', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        password: currentPw,
+        type: 'benchmark',
+        category,
+        metrics: metricsObj
+      })
+    });
+    console.log('[KB] Benchmark submitted for category:', category, Object.keys(metricsObj));
+  } catch(e) {
+    console.log('[KB] Benchmark submit failed silently');
+  }
+}
+
+// Extract validation metrics from session history (called at GO verdict)
+function extractValidationMetrics(session){
+  if(!session || !session.history) return null;
+  const allText = session.history
+    .filter(m => m.role === 'user')
+    .map(m => typeof m.content === 'string' ? m.content : (m.content?.[0]?.text || ''))
+    .join(' ');
+
+  const metrics = {};
+
+  // CPL — look for patterns like "$3.86 per email" or "CPL $4.20" or "cost per lead: $5"
+  const cplMatch = allText.match(/(?:CPL|cost per (?:lead|email|signup)|per (?:email|lead|signup))\s*[:\$]?\s*\$?([\d.]+)/i);
+  if(cplMatch) metrics.cpl = parseFloat(cplMatch[1]);
+
+  // CVR — "15% conversion" or "CVR 12%" or "conversion rate: 8%"
+  const cvrMatch = allText.match(/(?:CVR|conversion rate?)\s*[:\s]?([\d.]+)%/i) ||
+                   allText.match(/([\d.]+)%\s*(?:conversion|CVR)/i);
+  if(cvrMatch) metrics.cvr = parseFloat(cvrMatch[1]);
+
+  // CTR — "CTR 1.5%" or "click.through rate 2%"
+  const ctrMatch = allText.match(/(?:CTR|click.through)\s*[:\s]?([\d.]+)%/i);
+  if(ctrMatch) metrics.ctr = parseFloat(ctrMatch[1]);
+
+  // Email count — "725 emails" or "500 signups" or "collected 300"
+  const emailMatch = allText.match(/([\d,]+)\s*(?:emails?|signups?|leads?|subscribers?)/i);
+  if(emailMatch) metrics.emailCount = parseFloat(emailMatch[1].replace(/,/g, ''));
+
+  // Only return if we extracted at least one metric
+  return Object.keys(metrics).length > 0 ? metrics : null;
+}
+
+// ── Extract insight when GO verdict is issued ─────────────────────────────────
+async function extractAndStoreInsight(session, trigger){
+  // Don't extract from incomplete or very early sessions
+  if(!session || !session.alignment || !session.alignment.productName) return;
+  if((session.history || []).length < 10) return;
+
+  const category = inferProductCategory(session);
+  const priceRange = inferPriceRange(session);
+
+  // Use Claude to extract a clean, anonymized insight
+  // We only send alignment (no raw cost data) + trigger context
+  const alignmentSummary = [
+    'Product type: ' + (session.alignment.productName || ''),
+    'Category: ' + category,
+    'Features (count): ' + ((session.alignment.features || []).length) + ' features',
+    'Trigger: ' + trigger,
+    'Verdict: ' + (session.verdict || 'none'),
+    'Step reached: ' + (session.step || 1),
+    'Mission reached: ' + (session.mission || 1),
+  ].join('\n');
+
+  // Get winning angle from step 3 if available
+  const approach = session.stepData && session.stepData[3] && session.stepData[3]._raw
+    ? session.stepData[3]._raw.slice(0,500) : '';
+
+  const extractPrompt = `You are extracting an anonymized learning insight from a Kickstarter coaching session. 
+  
+Session context:
+${alignmentSummary}
+
+${approach ? 'Marketing approach discussed:\n' + approach : ''}
+
+Extract a single useful insight that would help future founders in a similar product category.
+
+STRICT RULES:
+- Do NOT include any numbers (costs, CPL, email counts, conversion rates, budget)
+- Do NOT include any company names, founder names, or identifying information  
+- DO include: what positioning/angle worked or didn't, what objections came up, what the winning narrative was
+- Keep it to 3 sentences max
+
+Respond in this exact JSON format (no other text):
+{
+  "headline": "one sentence summary of the insight",
+  "whatWorked": "what positioning or strategy showed promise (no numbers)",
+  "whatFailed": "what approach was rejected or didn't resonate (no numbers, or empty string)",
+  "keyTakeaway": "actionable lesson for future founders in this category"
+}`;
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        messages: [{role:'user', content: extractPrompt}],
+        system: 'You extract anonymized product insights. Always respond with valid JSON only. Never include numbers, costs, or identifying information.',
+        password: currentPw,
+        max_tokens: 300
+      })
+    });
+    if(!res.ok) return;
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+    
+    // Parse JSON from response
+    const jsonMatch = text.match(/\{[\s\S]+\}/);
+    if(!jsonMatch) return;
+    const insight = JSON.parse(jsonMatch[0]);
+    
+    // Store to KB
+    await fetch('/api/insights', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        password: currentPw,
+        insight: {
+          category,
+          priceRange,
+          verdict: session.verdict || '',
+          mission: session.mission || 1,
+          headline: insight.headline || '',
+          whatWorked: insight.whatWorked || '',
+          whatFailed: insight.whatFailed || '',
+          keyTakeaway: insight.keyTakeaway || '',
+        }
+      })
+    });
+    console.log('[KB] Insight stored for category:', category);
+  } catch(e) {
+    console.log('[KB] Insight extraction failed silently:', e.message);
+  }
+}
+
+// ── Load relevant insights for current session ────────────────────────────────
+async function loadKBInsights(session){
+  if(kbLoaded && kbCache) return kbCache;
+  kbLoaded = true;
+  try {
+    const category = inferProductCategory(session);
+    const res = await fetch('/api/insights?type=both&category=' + encodeURIComponent(category) + '&limit=3');
+    if(!res.ok) { kbCache = {}; return {}; }
+    const data = await res.json();
+    kbCache = data; // { insights: [...], benchmarks: {...} }
+    return kbCache;
+  } catch(e) {
+    kbCache = {};
+    return {};
+  }
+}
+
+// ── Format KB insights + benchmarks for injection into system prompt ─────────
+function buildKBContext(data){
+  if(!data) return '';
+  const { insights, benchmarks } = (data.insights !== undefined) ? data : { insights: data, benchmarks: null };
+  let ctx = '';
+
+  // Benchmark section
+  if(benchmarks && benchmarks.categoryStats){
+    const stats = benchmarks.categoryStats;
+    const label = benchmarks.label || benchmarks.category || 'this category';
+    const lines = [];
+
+    const fmtStat = (stat, unit, label) => {
+      if(!stat || stat.n < 2) return null; // need at least 2 data points
+      const conf = stat.confidence === 'high' ? '' : ` (${stat.confidence} confidence, n=${stat.n})`;
+      return `${label}: avg ${stat.mean}${unit}${conf}`;
+    };
+
+    if(stats.cpl) lines.push(fmtStat(stats.cpl, '', 'CPL (cost per lead)'));
+    if(stats.cvr) lines.push(fmtStat(stats.cvr, '%', 'Landing page CVR'));
+    if(stats.ctr) lines.push(fmtStat(stats.ctr, '%', 'Ad CTR'));
+    if(stats.emailCount) lines.push(fmtStat(stats.emailCount, ' signups', 'Validation email count'));
+    if(stats.ksFunding) lines.push(fmtStat(stats.ksFunding, '', 'KS funding raised'));
+    if(stats.ksBackers) lines.push(fmtStat(stats.ksBackers, ' backers', 'KS backers'));
+    if(stats.ksPrice) lines.push(fmtStat(stats.ksPrice, '', 'KS pledge price'));
+
+    const validLines = lines.filter(Boolean);
+    if(validLines.length > 0){
+      ctx += '\n\n# CATEGORY BENCHMARKS — ' + label.toUpperCase() + '\n';
+      ctx += 'These are aggregated averages from real projects in this category (raw data is never stored). ';
+      ctx += 'Use these to benchmark the current project and tell founders whether their metrics are strong, average, or weak relative to similar products.\n';
+      ctx += 'IMPORTANT: When sharing benchmarks with founders, frame it as "similar projects in this category" — never attribute to any specific project.\n\n';
+      ctx += validLines.join('\n');
+    }
+  }
+
+  // Qualitative insights section
+  const insightList = Array.isArray(insights) ? insights : [];
+  if(insightList.length > 0){
+    const items = insightList.map(ins => {
+      const parts = [];
+      if(ins.headline) parts.push('Insight: ' + ins.headline);
+      if(ins.whatWorked) parts.push('What worked: ' + ins.whatWorked);
+      if(ins.keyTakeaway) parts.push('Takeaway: ' + ins.keyTakeaway);
+      return parts.join(' | ');
+    }).filter(Boolean);
+
+    if(items.length > 0){
+      ctx += '\n\n# LEARNINGS FROM SIMILAR PROJECTS\n';
+      ctx += 'Anonymized strategy insights from past coaching sessions (no identifying data):\n\n';
+      ctx += items.map((item, i) => (i+1) + '. ' + item).join('\n');
+    }
+  }
+
+  return ctx;
+}
+
+// ── Trigger insight extraction at key milestones ──────────────────────────────
+function maybeExtractInsight(session, trigger){
+  // Fire-and-forget — don't block UI
+  setTimeout(() => extractAndStoreInsight(session, trigger), 2000);
+}
+
+// Also store public Kickstarter data when user shares it
+async function storePublicKSData(session, ksUrl, fundingData){
+  if(!ksUrl || !ksUrl.includes('kickstarter.com')) return;
+  // Public campaign data — this is fully safe to store
+  const category = inferProductCategory(session);
+  await fetch('/api/insights', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      password: currentPw,
+      insight: {
+        category,
+        priceRange: fundingData.priceRange || '',
+        verdict: 'go',
+        mission: 3,
+        headline: fundingData.headline || 'Live KS campaign data',
+        whatWorked: fundingData.strategy || '',
+        whatFailed: '',
+        keyTakeaway: fundingData.takeaway || '',
+        campaignRef: ksUrl,  // public URL — safe to store
+      }
+    })
+  });
+}
 
 // ── EXPORT ────────────────────────────────────────────────────────────────────
 
