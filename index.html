@@ -3669,14 +3669,23 @@ function renderAlignmentView(d){
 }
 
 function renderGenericView(def,data){
+  // First try: render individual fields if they have their own content
   var html='';
-  def.fields.forEach(function(f){
-    var val=data[f.key]||data._raw||'';
-    if(!String(val).trim()) return;
-    html+='<div class="so-section"><div class="so-section-label">'+escHtml(f.label)+'</div>';
-    html+='<div class="so-view">'+markdownToHTML(String(val))+'</div></div>';
-  });
-  if(!html&&data._raw) html='<div class="so-view">'+markdownToHTML(data._raw)+'</div>';
+  var anyFieldHasData=def.fields.some(function(f){return data[f.key]&&String(data[f.key]).trim().length>10;});
+
+  if(anyFieldHasData){
+    // Has per-field data — render each field separately (never fall back to _raw per field)
+    def.fields.forEach(function(f){
+      var val=data[f.key]||'';
+      if(!String(val).trim()) return;
+      html+='<div class="so-section"><div class="so-section-label">'+escHtml(f.label)+'</div>';
+      html+='<div class="so-view">'+markdownToHTML(String(val))+'</div></div>';
+    });
+  } else if(data._raw){
+    // No per-field data — render the raw conversation output once, as a whole document
+    html='<div class="so-view">'+markdownToHTML(data._raw)+'</div>';
+  }
+
   return html||'<div class="so-view"><p style="color:var(--text-3);font-style:italic;">No content saved yet.</p></div>';
 }
 
