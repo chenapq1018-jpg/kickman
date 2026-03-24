@@ -3163,27 +3163,50 @@ function smartExtractStep(stepNum,session){
   if(!session||!session.history) return;
   if(stepNum===2){captureLatestAlignmentRaw(session);return;}
   const def=STEP_DEFS[stepNum]; if(!def) return;
+
+  // Pattern to detect relevant messages + section start markers
   const pats={
-    3:/APPROACH [ABC]:|Marketing Approach/i, 4:/LP VERSION [12]|VALIDATION PLAYBOOK/i,
-    5:/VERDICT|NO.GO|FINAL REPORT/i, 6:/VIDEO STYLE|MODULE A/i,
-    7:/SCENE ORDER|SCRIPT/i, 8:/PRODUCTION APPROACH|VIDEO BRIEF/i,
-    9:/CAMPAIGN PAGE|MODULE B/i, 10:/LAUNCH READY|MODULE C|PRE-LAUNCH CHECKLIST/i,
-    11:/MSRP|PRICING STRATEGY|M3-A/i, 12:/FINANCIAL FORECAST|BREAKEVEN|M3-D/i,
-    13:/SUPER EARLY BIRD|EARLY BIRD|PLEDGE TIER|STRETCH GOAL/i
+    3:{match:/APPROACH [ABC]:|Marketing Approach|营销方向/i, start:/APPROACH [ABC]/i},
+    4:{match:/LP VERSION [12]|VALIDATION PLAYBOOK|Landing Page/i, start:/LP VERSION/i},
+    5:{match:/VERDICT|NO.GO|FINAL REPORT/i, start:/VERDICT|FINAL REPORT/i},
+    6:{match:/VIDEO STYLE|视频风格|VIDEO STRATEGY|主视频/i, start:/VIDEO STYLE|VIDEO STRATEGY|视频风格/i},
+    7:{match:/SCENE ORDER|SCRIPT|场景|USP/i, start:/SCENE ORDER|CORE USP|场景/i},
+    8:{match:/CAMPAIGN PAGE|MODULE B|众筹页面/i, start:/CAMPAIGN PAGE|MODULE B/i},
+    9:{match:/PRE-CAMPAIGN|WARMUP|预热|VALIDATION PLAYBOOK/i, start:/PRE-CAMPAIGN|WARMUP|预热计划/i},
+    10:{match:/PRICING STRATEGY|MSRP|PLEDGE TIER|定价/i, start:/PRICING STRATEGY|MSRP|定价策略/i},
+    11:{match:/GO LIVE|LAUNCH CHECKLIST|上线清单/i, start:/GO LIVE|LAUNCH CHECKLIST/i},
   };
-  const pat=pats[stepNum]; if(!pat) return;
+
+  const cfg=pats[stepNum]; if(!cfg) return;
   const msgs=[...session.history].filter(m=>m.role==='assistant'||m.role==='km').reverse();
+
   for(const msg of msgs){
     const text=typeof msg.content==='string'?msg.content:(msg.content?.[0]?.text||'');
     const clean=text.replace(/<!--[\s\S]*?-->/g,'').trim();
-    if(clean.length<200||!pat.test(clean)) continue;
+    if(clean.length<200||!cfg.match.test(clean)) continue;
+
+    // Try to extract only the relevant section — skip progress summaries
+    let content = clean;
+    if(cfg.start){
+      const startIdx = clean.search(cfg.start);
+      if(startIdx > 100){
+        // There's content before the relevant section — probably a progress summary
+        // Only use content from the start of the relevant section
+        content = clean.slice(startIdx).trim();
+      }
+    }
+
+    // Skip if content looks like a pure progress summary (no step-specific content)
+    const isProgressSummary = /进度汇总|当前状态与下一步规划|已完成进度|待解决问题|下一步计划/i.test(content.slice(0,200));
+    if(isProgressSummary && content.length < 500) continue;
+
     if(!session.stepData) session.stepData={};
     if(!session.stepData[stepNum]) session.stepData[stepNum]={};
     const fk=def.fields[0].key;
-    const isM3=stepNum>=11;
+    const isM3=stepNum>=10;
     if(isM3||!session.stepData[stepNum][fk]){
-      session.stepData[stepNum][fk]=clean.slice(0,6000);
-      session.stepData[stepNum]._raw=clean;
+      session.stepData[stepNum][fk]=content.slice(0,6000);
+      session.stepData[stepNum]._raw=content;
       session.stepData[stepNum].updatedAt=Date.now();
       scheduleSave(session);
     }
@@ -3201,9 +3224,9 @@ async function triggerStepGeneration(stepNum,session,bodyEl){
     5:'Output the Go/No-Go Report: validation results, verdict, winning angle, risks, next steps.',
     6:'Summarize the Video Strategy: budget, timeline, chosen style, key video rules.',
     7:'Summarize Script and Scenes: core USP, scene order, recommended length.',
-    8:'Output the Video Brief: production approach, casting, production timeline.',
-    9:'Summarize the Campaign Page: 12-section structure, asset checklist, trust signals.',
-    10:'Output the Launch Ready checklist: community plan, content plan, IP, pre-launch.',
+    8:'Output the Campaign Page structure: 12-section page outline, hero headline and section copy hooks, asset checklist, trust signals audit.',
+    9:'Output the Pre-Campaign Warmup plan: which page to use, 3-5 ad creative directions to test, CPL and CVR targets, deposit strategy if applicable.',
+    10:'Output the Pricing Strategy: MSRP and KS price, complete pledge tier design (Super EB, Early Bird, Standard, Bundle, Premium), stretch goal ladder, competitive benchmarks.',
     11:'Output the Pricing Strategy: COGS, MSRP, competitive positioning, fee model.',
     12:'Output the Financial Forecast with 2 pricing scenarios x 3 volume scenarios.',
     13:'Output the Pledge Tier design: all tiers with prices, discounts, unit economics, stretch goals.',
@@ -3283,15 +3306,29 @@ function renderAlignmentView(d){
 }
 
 function renderGenericView(def,data){
-  var html='';
-  def.fields.forEach(function(f){
-    var val=data[f.key]||data._raw||'';
-    if(!String(val).trim()) return;
-    html+='<div class="so-section"><div class="so-section-label">'+escHtml(f.label)+'</div>';
-    html+='<div class="so-view">'+markdownToHTML(String(val))+'</div></div>';
+  // Check if any field has its OWN content (not falling back to _raw)
+  var anyFieldHasOwn = def.fields.some(function(f){
+    return data[f.key] && String(data[f.key]).trim().length > 10;
   });
-  if(!html&&data._raw) html='<div class="so-view">'+markdownToHTML(data._raw)+'</div>';
-  return html||'<div class="so-view"><p style="color:var(--text-3);font-style:italic;">No content saved yet.</p></div>';
+
+  if(anyFieldHasOwn){
+    // Render each field that has its own content — never fall back to _raw per field
+    var html='';
+    def.fields.forEach(function(f){
+      var val=data[f.key]||'';
+      if(!String(val).trim()) return;
+      html+='<div class="so-section"><div class="so-section-label">'+escHtml(f.label)+'</div>';
+      html+='<div class="so-view">'+markdownToHTML(String(val))+'</div></div>';
+    });
+    return html||'<div class="so-view"><p style="color:var(--text-3);font-style:italic;">No content saved yet.</p></div>';
+  }
+
+  // No per-field data — render the full _raw once as a single document
+  if(data._raw && String(data._raw).trim().length > 10){
+    return '<div class="so-view">'+markdownToHTML(data._raw)+'</div>';
+  }
+
+  return '<div class="so-view"><p style="color:var(--text-3);font-style:italic;">No content saved yet.</p></div>';
 }
 
 function markdownToHTML(text){
