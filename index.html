@@ -1271,17 +1271,24 @@ function buildMessageHistory(session){
 function convertHistoryToAPI(hist){
   return hist.map(msg => {
     if(msg.role==='user' && msg.images && msg.images.length>0){
-      const content=[{type:'text',text:msg.content||''}];
+      const content=[];
+      // Only add text block if there is actual text (API rejects empty text blocks)
+      const textContent = (msg.content||'').trim();
+      if(textContent) content.push({type:'text', text:textContent});
       msg.images.forEach(img=>{
         content.push({type:'image',source:{type:'base64',media_type:img.mediaType,data:img.base64}});
       });
+      // If no text and no images somehow, fall back to a placeholder
+      if(content.length===0) content.push({type:'text',text:'[image]'});
       return {role:'user',content};
     }
     // Strip TIMELINE_UPDATE blocks from assistant messages to save tokens
-    const text = typeof msg.content==='string'
+    const rawText = typeof msg.content==='string'
       ? msg.content.replace(/<!--TIMELINE_UPDATE:[\s\S]*?-->/g,'').trim()
-      : msg.content;
-    return {role:msg.role, content:text};
+      : (typeof msg.content==='string' ? msg.content : '');
+    // Never send empty content blocks
+    const safeText = rawText || '[...]';
+    return {role:msg.role==='km'?'assistant':msg.role, content:safeText};
   });
 }
 
@@ -2823,8 +2830,9 @@ async function sendMessage(){
   const msgImages=pendingImages.map(img=>({base64:img.base64,mediaType:img.mediaType}));
   pendingImages=[]; renderPreviewStrip();
 
-  // Add to history
-  const userMsg={role:'user',content:text,images:msgImages.length>0?msgImages:undefined};
+  // Add to history — ensure content is never empty (API rejects empty strings)
+  const safeContent = text.trim() || (msgImages.length > 0 ? '' : '[empty]');
+  const userMsg={role:'user',content:safeContent,images:msgImages.length>0?msgImages:undefined};
   session.history.push(userMsg);
   session.updatedAt=Date.now(); scheduleSave(session);
 
