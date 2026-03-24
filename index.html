@@ -255,6 +255,10 @@
   .img-btn:hover{border-color:var(--border-hover);color:var(--text-2);}
   .img-btn svg{width:16px;height:16px;}
   #file-input{display:none;}
+  .drag-overlay{display:none;position:absolute;inset:0;background:rgba(232,98,42,.08);border:2px dashed rgba(232,98,42,.5);z-index:20;border-radius:2px;pointer-events:none;justify-content:center;align-items:center;}
+  .drag-overlay.active{display:flex;}
+  .drag-overlay-inner{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--accent);font-family:var(--font-mono);font-size:11px;letter-spacing:1px;opacity:.8;}
+  .input-area{position:relative;}
   #user-input{flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:var(--font-sans);font-size:14px;line-height:1.6;padding:12px 16px;resize:none;min-height:46px;max-height:200px;outline:none;transition:border-color .2s;}
   #user-input:focus{border-color:rgba(232,98,42,.4);}
   #user-input::placeholder{color:var(--text-3);}
@@ -671,10 +675,17 @@
       <div class="welcome-note">14 days &middot; Go / No-Go decision &middot; Kickstarter-ready</div>
     </div>
     <div class="messages" id="messages" style="display:none"></div>
-    <div class="input-area" id="input-area" style="display:none">
+    <div class="input-area" id="input-area" style="display:none"
+         ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+      <div class="drag-overlay" id="drag-overlay">
+        <div class="drag-overlay-inner">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span>Drop image to analyze</span>
+        </div>
+      </div>
       <div class="image-preview-strip" id="image-preview-strip"></div>
       <div class="input-row">
-        <textarea id="user-input" placeholder="Type your message&#x2026;" rows="1" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+        <textarea id="user-input" placeholder="Type a message or drop an image…" rows="1" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
         <div class="input-actions">
           <button class="img-btn" onclick="document.getElementById('file-input').click()" title="Upload image">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -691,7 +702,7 @@
       </div>
       <input type="file" id="file-input" accept="image/*" multiple onchange="handleImageUpload(event)">
       <div class="input-meta">
-        <span class="input-hint">Enter &#x21B5; newline &middot; Shift+Enter send</span>
+        <span class="input-hint">Enter &#x21B5; newline &middot; Shift+Enter send &middot; Drop or paste image</span>
       </div>
     </div>
   </div>
@@ -1272,14 +1283,16 @@ function convertHistoryToAPI(hist){
   return hist.map(msg => {
     if(msg.role==='user' && msg.images && msg.images.length>0){
       const content=[];
-      // Only add text block if there is actual text (API rejects empty text blocks)
       const textContent = (msg.content||'').trim();
-      if(textContent) content.push({type:'text', text:textContent});
+      if(textContent){
+        content.push({type:'text', text:textContent});
+      } else {
+        // Image-only: add an implicit analysis prompt so API always gets non-empty text
+        content.push({type:'text', text:'Please analyze this image and tell me what you see. Apply your expertise as a crowdfunding coach — what does this tell you about the product, ad creative, data, or campaign material?'});
+      }
       msg.images.forEach(img=>{
         content.push({type:'image',source:{type:'base64',media_type:img.mediaType,data:img.base64}});
       });
-      // If no text and no images somehow, fall back to a placeholder
-      if(content.length===0) content.push({type:'text',text:'[image]'});
       return {role:'user',content};
     }
     // Strip TIMELINE_UPDATE blocks from assistant messages to save tokens
@@ -2637,7 +2650,13 @@ async function startCurrentSession(){
 // ── IMAGE UPLOAD ───────────────────────────────────────────────────────────────
 function handleImageUpload(event){
   const files=Array.from(event.target.files);
-  files.forEach(file=>{
+  addImageFiles(files);
+  event.target.value='';
+}
+
+// Shared image ingestion — used by file picker, drag/drop, and paste
+function addImageFiles(files){
+  files.filter(f=>f.type.startsWith('image/')).forEach(file=>{
     const reader=new FileReader();
     reader.onload=e=>{
       const b64=e.target.result.split(',')[1];
@@ -2647,7 +2666,76 @@ function handleImageUpload(event){
     };
     reader.readAsDataURL(file);
   });
-  event.target.value=''; // reset so same file can be re-uploaded
+}
+
+// ── Drag & Drop ───────────────────────────────────────────────────────────────
+let dragCounter = 0;
+
+function handleDragOver(e){
+  e.preventDefault();
+  e.stopPropagation();
+  e.dataTransfer.dropEffect = 'copy';
+}
+
+function handleDragLeave(e){
+  e.preventDefault();
+  dragCounter--;
+  if(dragCounter <= 0){
+    dragCounter = 0;
+    document.getElementById('drag-overlay').classList.remove('active');
+  }
+}
+
+function handleDrop(e){
+  e.preventDefault();
+  e.stopPropagation();
+  dragCounter = 0;
+  document.getElementById('drag-overlay').classList.remove('active');
+  const files = Array.from(e.dataTransfer.files);
+  if(files.length > 0){
+    addImageFiles(files);
+  }
+  // Also handle dragged image URLs (e.g. dragging from browser)
+  const imgSrc = e.dataTransfer.getData('text/html');
+  if(!files.length && imgSrc){
+    const match = imgSrc.match(/src="([^"]+)"/);
+    if(match) fetchImageFromUrl(match[1]);
+  }
+}
+
+// Show drag overlay when dragging into input area
+document.addEventListener('dragenter', function(e){
+  const area = document.getElementById('input-area');
+  if(!area || area.style.display === 'none') return;
+  if(e.dataTransfer && Array.from(e.dataTransfer.types).includes('Files')){
+    dragCounter++;
+    document.getElementById('drag-overlay').classList.add('active');
+  }
+});
+
+// ── Paste image support ───────────────────────────────────────────────────────
+document.addEventListener('paste', function(e){
+  const area = document.getElementById('input-area');
+  if(!area || area.style.display === 'none') return;
+  const items = Array.from(e.clipboardData.items);
+  const imageItems = items.filter(item => item.type.startsWith('image/'));
+  if(imageItems.length === 0) return;
+  e.preventDefault();
+  imageItems.forEach(item => {
+    const file = item.getAsFile();
+    if(file) addImageFiles([file]);
+  });
+});
+
+// Fetch image from URL (for dragged browser images)
+function fetchImageFromUrl(url){
+  fetch(url)
+    .then(r => r.blob())
+    .then(blob => {
+      const file = new File([blob], 'image.jpg', {type: blob.type||'image/jpeg'});
+      addImageFiles([file]);
+    })
+    .catch(()=>{});
 }
 
 function renderPreviewStrip(){
@@ -2830,7 +2918,7 @@ async function sendMessage(){
   const msgImages=pendingImages.map(img=>({base64:img.base64,mediaType:img.mediaType}));
   pendingImages=[]; renderPreviewStrip();
 
-  // Add to history — ensure content is never empty (API rejects empty strings)
+  // Add to history — image-only messages get an implicit analysis prompt
   const safeContent = text.trim() || (msgImages.length > 0 ? '' : '[empty]');
   const userMsg={role:'user',content:safeContent,images:msgImages.length>0?msgImages:undefined};
   session.history.push(userMsg);
