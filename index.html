@@ -2831,7 +2831,7 @@ async function sendMessage(){
   const session=getSession(activeId); if(!session)return;
 
   // Auto-name from first message
-  if(session.name==='New Project'&&text){session.name=text.slice(0,40).replace(/\n/g,' ').trim()+(text.length>40?'…':'');}
+  if(session.name==='New Project'&&text){const n=text.replace(/^#+\s*/,'').replace(/[*_`]/g,'').replace(/\n/g,' ').trim();session.name=n.slice(0,40)+(n.length>40?'…':'');}
 
   // Save images snapshot and clear pending
   const msgImages=pendingImages.map(img=>({base64:img.base64,mediaType:img.mediaType}));
@@ -2973,6 +2973,30 @@ function confirmStep(stepNum){
   updateStepUI(session.step||1, session.mission||1);
   const badge = document.getElementById('step-saved-badge');
   if(badge){ badge.textContent='✓ Confirmed'; badge.classList.add('show'); setTimeout(()=>{ badge.textContent='Saved ✓'; badge.classList.remove('show'); }, 2500); }
+}
+
+function handleConfirmClick(stepNum){
+  // Animate the button before confirming
+  const btn = document.getElementById('confirm-btn-'+stepNum);
+  const banner = document.getElementById('confirm-banner-'+stepNum);
+  if(btn){
+    btn.textContent = '✓ Confirmed';
+    btn.style.background = 'var(--green)';
+    btn.disabled = true;
+  }
+  if(banner){
+    setTimeout(()=>{
+      banner.style.background = 'rgba(45,158,107,.06)';
+      banner.style.borderColor = 'rgba(45,158,107,.25)';
+      if(banner.querySelector('div')) banner.querySelector('div').style.color = 'var(--green)';
+    }, 300);
+  }
+  setTimeout(()=>{
+    confirmStep(stepNum);
+    // Re-render the view to show confirmed state
+    const session = getSession(activeId);
+    if(session) renderStepView(stepNum, session);
+  }, 600);
 }
 
 function parseStepConfirmSignal(text){
@@ -3527,18 +3551,24 @@ function renderStepView(stepNum,session){
   let html='<div class="so-doc">';
   html+='<div class="so-doc-header"><div class="so-doc-step-num">Step '+def.num+' &middot; Mission '+def.mission+'</div>';
   html+='<div class="so-doc-title">'+escHtml(def.title)+'</div>';
-  const proj=session.name&&session.name!=='New Project'?escHtml(session.name):'';
-  if(proj) html+='<div class="so-doc-subtitle">'+proj+'</div>';
-  // Show confirm badge if not yet confirmed
+  // Only show project name if it looks like a real name (not raw markdown or generic)
+  var rawName = session.name||'';
+  var cleanName = rawName.replace(/^#+\s*/,'').replace(/[*_`]/g,'').trim();
+  var isRealName = cleanName && cleanName!=='New Project' && !/^(Begin|Project Overview|Strategic Direction)/i.test(cleanName) && cleanName.length < 60;
+  if(isRealName) html+='<div class="so-doc-subtitle">'+escHtml(cleanName)+'</div>';
+  // Confirmation banner
   var def2 = STEP_DEFS[stepNum];
   var alreadyConfirmed = def2 && def2.confirmKey && session.confirmations && session.confirmations[def2.confirmKey];
   if(def2 && def2.confirmKey && !alreadyConfirmed){
-    html += '<div style="margin-bottom:16px;padding:10px 16px;background:rgba(232,98,42,.06);border:1px solid rgba(232,98,42,.2);display:flex;align-items:center;justify-content:space-between;">' +
-      '<div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);">&#x26A0; This is a key result — confirm to proceed</div>' +
-      '<button onclick="confirmStep('+stepNum+')" style="font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:6px 14px;background:var(--accent);color:#fff;border:none;cursor:pointer;">Confirm &#x2713;</button>' +
+    html += '<div id="confirm-banner-'+stepNum+'" style="margin-bottom:20px;padding:12px 16px;background:rgba(232,98,42,.06);border:1px solid rgba(232,98,42,.25);display:flex;align-items:center;justify-content:space-between;gap:12px;">' +
+      '<div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:.5px;">&#x26A0;&nbsp; This is a key result — review and confirm to proceed</div>' +
+      '<button id="confirm-btn-'+stepNum+'" onclick="handleConfirmClick('+stepNum+')" style="font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:7px 16px;background:var(--accent);color:#fff;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;">Confirm &#x2713;</button>' +
       '</div>';
   } else if(alreadyConfirmed){
-    html += '<div style="margin-bottom:16px;padding:8px 16px;background:rgba(45,158,107,.06);border:1px solid rgba(45,158,107,.2);font-family:var(--font-mono);font-size:10px;color:var(--green);">&#x2713; Confirmed</div>';
+    html += '<div style="margin-bottom:20px;padding:10px 16px;background:rgba(45,158,107,.06);border:1px solid rgba(45,158,107,.25);display:flex;align-items:center;gap:8px;">' +
+      '<span style="color:var(--green);font-size:14px;">&#x2713;</span>' +
+      '<span style="font-family:var(--font-mono);font-size:10px;color:var(--green);letter-spacing:.5px;">Confirmed — this result is locked in</span>' +
+      '</div>';
   }
   html+='</div>';
 
