@@ -1831,10 +1831,40 @@ End with: "Set up your ads this week, run for 7–10 days, then bring me the num
 
 # STEP 5 — GO / NO-GO REPORT
 
-Ask for: clicks, leads/reservations, CPL per version, qualitative signals.
+## What this verdict means
+
+This is a ONE-TIME strategic feasibility judgment: is this product worth taking to Kickstarter?
+
+**CRITICAL: This is NOT an operational checklist.**
+- Do NOT factor in production status, prototype readiness, or manufacturing stage
+- Do NOT give NO-GO because "the product isn't manufactured yet" — that's the point of crowdfunding
+- Do NOT give NO-GO because "more market research is needed" — that's circular
+
+**The only question is: does the evidence suggest this product can succeed on Kickstarter?**
+
+GO criteria (any strong combination):
+- Clear demand signal from validation (clicks, emails, reservations)
+- Differentiated product with a believable story
+- Founder has the ability to execute or has a team
+- Price point is defensible relative to value
+- Market exists and is reachable
+
+NO-GO criteria (genuine dealbreakers):
+- Unit economics are fundamentally broken (can't be profitable at any realistic volume)
+- No meaningful differentiation — identical to existing products with no angle
+- The founder has acknowledged they cannot fulfill the product
+- Regulatory/legal barrier that cannot be resolved
+
+CONDITIONAL criteria:
+- Strong product but one fixable issue blocking launch readiness (e.g., pricing needs adjustment, one key feature not ready)
+- Give a specific condition: "GO if X is resolved"
+
+**Once GO is given, it stays GO.** Subsequent conversation about manufacturing, timelines, or challenges does not retroactively change the verdict. The verdict is locked at the time it is issued.
+
+Ask for: validation data (clicks, leads/reservations, CPL per version), qualitative signals, any concerns from testing.
 
 Output **KICKMAN MISSION 1 — FINAL REPORT** with:
-- Validation summary table with benchmarks
+- Validation summary with benchmarks
 - **VERDICT: GO ✅ / NO-GO ❌ / CONDITIONAL ⚠️**
 - WINNING ANGLE, WHAT THE DATA TELLS US, RISKS TO WATCH, RECOMMENDED NEXT STEP
 
@@ -2567,7 +2597,15 @@ async function callKickman(trigger){
     else{fresh.history.push({role:'assistant',content:text});}
     if(fresh.name==='New Project'){const fu=fresh.history.find(m=>m.role==='user'&&m.content!=='Begin.');if(fu){const c=typeof fu.content==='string'?fu.content:(fu.content[0]?.text||'');fresh.name=c.slice(0,40).replace(/\n/g,' ').trim()+(c.length>40?'…':'');}}
     const ns=detectStep(text,fresh.mission||1); if(ns>fresh.step)fresh.step=ns;
-    const v=detectVerdict(text); if(v){fresh.verdict=v;if(v==='go'&&(fresh.mission||1)===1){setTimeout(()=>triggerMission2(fresh.id),1200);}}
+    const v=detectVerdict(text);
+    if(v){
+      // Verdict is locked once set — never downgrade from GO
+      const prev=fresh.verdict;
+      if(!prev || prev==='conditional' || v==='go'){
+        fresh.verdict=v;
+      }
+      if(v==='go'&&(fresh.mission||1)===1){setTimeout(()=>triggerMission2(fresh.id),1200);}
+    }
     if((fresh.mission||1)===2 && /mission\s*3|开始.*定价|pricing.*strategy/i.test(typeof userMsg==='string'?userMsg:'')){
       setTimeout(()=>triggerMission3(fresh.id),800);
     }
@@ -2770,9 +2808,21 @@ function detectStep(t,mission=1){
   return 1;
 }
 function detectVerdict(t){
-  if(t.includes('VERDICT: GO')||t.includes('GO ✅'))return 'go';
-  if(t.includes('VERDICT: NO-GO')||t.includes('NO-GO ❌'))return 'no-go';
-  if(t.includes('VERDICT: CONDITIONAL')||t.includes('CONDITIONAL ⚠️'))return 'conditional';
+  // Only detect from explicit VERDICT lines to avoid false positives
+  var lines = t.split('\n');
+  for(var i=0;i<lines.length;i++){
+    var l = lines[i];
+    if(/\*\*VERDICT/i.test(l)||/^VERDICT[:\s]/i.test(l)){
+      if(/NO.GO/i.test(l)) return 'no-go';
+      if(/CONDITIONAL/i.test(l)) return 'conditional';
+      if(/\bGO\b/i.test(l)) return 'go';
+    }
+  }
+  // Fallback patterns
+  if(t.includes('VERDICT: GO')) return 'go';
+  if(t.includes('GO ✅') && !t.includes('NO-GO')) return 'go';
+  if(t.includes('VERDICT: NO-GO') || t.includes('NO-GO ❌')) return 'no-go';
+  if(t.includes('VERDICT: CONDITIONAL') || t.includes('CONDITIONAL ⚠️')) return 'conditional';
   return null;
 }
 function updateStepUI(step, mission=1){
@@ -3266,10 +3316,12 @@ const STEP_REQUIREMENTS = {
   5: {
     label: 'Go / No-Go Report',
     needs: [
-      { check: s => s.verdict || s.step >= 5 || hasStepData(s, 5), label: 'Validation completed and results reviewed' },
-      { check: s => hasStepData(s, 4), label: 'Landing page briefs complete (Step 04)' },
+      { check: s => hasStepData(s, 4) || s.step >= 5 || !!s.verdict, label: 'Landing page briefs discussed (Step 04)' },
+      { check: s => s.step >= 5 || hasStepData(s, 5) || !!s.verdict, label: 'Go/No-Go discussed with Kickman' },
     ],
-    hint: 'Run your validation test first. Once you have real data, Kickman will generate the Go/No-Go report.',
+    hint: 'Share your validation data with Kickman (clicks, leads, CPL). Kickman will issue a strategic feasibility verdict.',
+    // Special: if verdict is already set (GO/NO-GO/CONDITIONAL), always show results — never re-gate
+    verdictLocked: true,
   },
   6: {
     label: 'Video Strategy',
@@ -3346,6 +3398,8 @@ const STEP_REQUIREMENTS = {
 function checkStepRequirements(stepNum, session) {
   const req = STEP_REQUIREMENTS[stepNum];
   if(!req || !req.needs || req.needs.length === 0) return { met: true, missing: [] };
+  // Step 5 special: if verdict is already locked, always pass
+  if(req.verdictLocked && session.verdict) return { met: true, missing: [] };
   const missing = req.needs.filter(n => !n.check(session));
   return { met: missing.length === 0, missing };
 }
@@ -3650,15 +3704,45 @@ function renderGoNoGoView(data,session){
   var raw=session.stepData&&session.stepData[5]&&session.stepData[5]._raw;
   var src=raw||Object.values(data).filter(function(v){return v&&typeof v==='string';}).join('\n\n');
   if(!src||src.trim().length<20) return '<div class="so-view"><p class="so-empty">No Go/No-Go report yet.</p></div>';
-  var verdict=(data.verdict||'').trim();
-  var isGo=/\bGO\b/i.test(verdict)&&!/NO.GO/i.test(verdict);
-  var isNoGo=/NO.GO/i.test(verdict);
-  var col=isGo?'var(--green)':isNoGo?'var(--red)':'var(--yellow)';
-  var bg=isGo?'rgba(45,158,107,.08)':isNoGo?'rgba(192,57,43,.08)':'rgba(212,160,23,.08)';
-  var icon=isGo?'&#x2705;':isNoGo?'&#x274C;':'&#x26A0;&#xFE0F;';
-  var label=isGo?'GO &mdash; Launch Validated':isNoGo?'NO-GO &mdash; Do Not Launch':'Conditional &mdash; Address Issues First';
+
+  // Use session.verdict (locked at time of issue) — not re-derived from text
+  // This ensures the verdict never changes after it's been set
+  var storedVerdict = session.verdict || '';
+  var isGo = storedVerdict === 'go';
+  var isNoGo = storedVerdict === 'no-go';
+  var isCond = storedVerdict === 'conditional';
+
+  // Fallback: if session.verdict not set, try to read from raw text (first time)
+  if(!storedVerdict){
+    if(/VERDICT[^\r\n]*GO(?!.*NO-GO)/i.test(src) && !/VERDICT[^\r\n]*NO.GO/i.test(src)) isGo=true;
+    else if(/VERDICT.*NO.GO|NO-GO\s*&#x274C;/i.test(src)) isNoGo=true;
+    else if(/VERDICT.*CONDITIONAL|CONDITIONAL\s*&#x26A0;/i.test(src)) isCond=true;
+  }
+
+  var col = isGo?'var(--green)':isNoGo?'var(--red)':'var(--yellow)';
+  var bg  = isGo?'rgba(45,158,107,.08)':isNoGo?'rgba(192,57,43,.08)':'rgba(212,160,23,.08)';
+  var icon  = isGo?'&#x2705;':isNoGo?'&#x274C;':'&#x26A0;&#xFE0F;';
+  var label = isGo?'GO &mdash; This project is worth launching':
+              isNoGo?'NO-GO &mdash; Fundamental issues to resolve first':
+              'Conditional &mdash; GO once specific issues are fixed';
+
   var html='';
-  if(verdict) html+='<div style="padding:20px 24px;background:'+bg+';border:1px solid '+col+';margin-bottom:28px;"><div style="font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:'+col+';text-transform:uppercase;margin-bottom:8px;">Verdict</div><div style="font-family:var(--font-serif);font-size:26px;color:'+col+';">'+icon+' '+label+'</div></div>';
+
+  // Locked verdict banner
+  if(isGo||isNoGo||isCond){
+    html+='<div style="padding:20px 24px;background:'+bg+';border:1px solid '+col+';margin-bottom:28px;">';
+    html+='<div style="display:flex;align-items:center;gap:12px;">';
+    html+='<div style="font-family:var(--font-serif);font-size:28px;color:'+col+';">'+icon+'</div>';
+    html+='<div>';
+    html+='<div style="font-family:var(--font-mono);font-size:8px;letter-spacing:3px;color:'+col+';text-transform:uppercase;margin-bottom:4px;">Strategic Verdict &mdash; Locked</div>';
+    html+='<div style="font-family:var(--font-serif);font-size:22px;color:'+col+';">'+label+'</div>';
+    html+='</div></div>';
+    if(isGo){
+      html+='<div style="margin-top:10px;font-family:var(--font-mono);font-size:10px;color:var(--green);opacity:.7;">This verdict is permanent. Subsequent challenges (manufacturing, timelines) do not change it.</div>';
+    }
+    html+='</div>';
+  }
+
   html+=markdownToHTML(src.replace(/<!--[\s\S]*?-->/g,''));
   return html;
 }
