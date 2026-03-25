@@ -3511,10 +3511,10 @@ function renderList(){
       else if(s.verdict==='conditional'){bClass='conditional';bText='⚠️ Cond.';}
       html+=`<div class="session-row">
         <div class="session-item ${isActive?'active':''}" onclick="loadSession('${s.id}')">
-          <div class="session-name" ondblclick="startRename('${s.id}',this)" title="Double-click to rename">${escHtml(s.name)}</div>
+          <div class="session-name" ondblclick="event.stopPropagation();startRename('${s.id}',this)" title="Double-click to rename">${escHtml(s.name)}</div>
           <div class="session-meta"><span>${date}</span><span class="badge ${bClass}">${bText}</span></div>
         </div>
-        <button class="session-del" onclick="confirmDelete('${s.id}')" title="Delete">×</button>
+        <button class="session-del" onclick="event.stopPropagation();confirmDelete('${s.id}')" title="Delete project">×</button>
       </div>`;
     });
   }
@@ -3522,33 +3522,46 @@ function renderList(){
 }
 
 function startRename(id, el){
-  if(!el || el.querySelector('input')) return;
-  const old = el.textContent.trim();
+  if(!el) return;
+  if(el.querySelector('input')){ el.querySelector('input').focus(); return; }
+
+  const oldName = el.textContent.trim();
   el.innerHTML = '';
+
   const inp = document.createElement('input');
   inp.type = 'text';
-  inp.value = old;
-  inp.style.cssText = 'width:100%;box-sizing:border-box;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.5);color:var(--text);font-size:12px;font-weight:500;padding:2px 7px;outline:none;font-family:var(--font-sans);border-radius:1px;';
+  inp.value = oldName;
+  inp.style.cssText = 'width:100%;box-sizing:border-box;background:rgba(0,201,167,.08);border:none;border-bottom:1px solid rgba(0,201,167,.6);color:var(--text);font-size:12px;font-weight:500;padding:1px 4px;outline:none;font-family:var(--font-sans);';
   el.appendChild(inp);
-  inp.focus(); inp.select();
-  let saved = false;
-  function save(){
-    if(saved) return; saved = true;
-    const newName = inp.value.trim() || old;
-    const s = getSession(id);
-    if(s){ s.name = newName.slice(0,60); s.updatedAt = Date.now(); scheduleSave(s); }
+
+  // Block ALL events from bubbling to parent session-item onclick
+  ['click','mousedown','mouseup','dblclick'].forEach(ev =>
+    inp.addEventListener(ev, e => e.stopPropagation())
+  );
+
+  inp.focus();
+  inp.select();
+
+  let committed = false;
+
+  function commit(){
+    if(committed) return;
+    committed = true;
+    const newName = inp.value.trim() || oldName;
+    const sess = getSession(id);
+    if(sess){ sess.name = newName.slice(0,60); sess.updatedAt = Date.now(); scheduleSave(sess); }
     el.textContent = newName;
-    renderList();
     if(id === activeId && currentTab === 'playbook') renderPlaybook();
   }
-  inp.onclick = e => e.stopPropagation();
-  inp.onblur = () => { if(!saved) save(); };
-  inp.onkeydown = e => {
+
+  inp.addEventListener('blur', () => { if(!committed) commit(); });
+  inp.addEventListener('keydown', e => {
     e.stopPropagation();
-    if(e.key === 'Enter'){ e.preventDefault(); save(); }
-    if(e.key === 'Escape'){ saved = true; el.textContent = old; }
-  };
+    if(e.key === 'Enter'){ e.preventDefault(); inp.blur(); }
+    if(e.key === 'Escape'){ committed = true; el.textContent = oldName; }
+  });
 }
+
 
 async function confirmDelete(id){
   if(sessions.length <= 1){ showToast('You need at least one project.', 'warn'); return; }
