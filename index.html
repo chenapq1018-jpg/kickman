@@ -73,8 +73,8 @@
 
   /* ── PLAYBOOK PANE ── */
   .playbook-scroll{flex:1;overflow-y:auto;padding:0;}
-  .playbook-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:var(--border);}
-  .playbook-card{background:var(--surface);padding:18px 20px;cursor:pointer;transition:background .15s,transform .1s;display:flex;flex-direction:column;gap:6px;min-height:110px;position:relative;overflow:hidden;}
+  .playbook-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;background:var(--border);}
+  .playbook-card{background:var(--surface);padding:20px 22px;cursor:pointer;transition:background .15s;display:flex;flex-direction:column;gap:8px;min-height:130px;position:relative;overflow:hidden;}
   .playbook-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent;transition:background .2s;}
   .playbook-card.confirmed::before{background:var(--green);}
   .playbook-card.has-data::before{background:var(--accent);}
@@ -86,7 +86,7 @@
   .pc-badge{font-size:11px;}
   .pc-title{font-family:var(--font-serif);font-size:15px;color:var(--text);line-height:1.3;}
   .idle .pc-title{color:var(--text-3);}
-  .pc-preview{font-size:11px;color:var(--text-3);line-height:1.55;flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  .pc-preview{font-size:11px;color:var(--text-3);line-height:1.6;flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;}
   .has-data .pc-preview,.confirmed .pc-preview{color:var(--text-3);}
   .pc-cta{font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:1px;margin-top:auto;}
   .has-data .pc-cta{color:var(--accent);}
@@ -4582,9 +4582,15 @@ function renderPlaybook(){
   let doneCount = 0;
   let hasDataCount = 0;
 
-  let html = headerHTML + '<div class="playbook-grid">';
+  // Mission labels
+  const missionRanges = [{label:'MISSION 1 — Validation', steps:[1,2,3,4,5]},{label:'MISSION 2 — Campaign Production', steps:[6,7,8,9]},{label:'MISSION 3 — Pricing & Launch', steps:[10,11]}];
 
-  for(let i=1;i<=11;i++){
+  let html = headerHTML;
+
+  for(const mr of missionRanges){
+    html += '<div style="padding:14px 20px 8px;font-family:var(--font-mono);font-size:9px;letter-spacing:2.5px;color:var(--text-3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface);">'+mr.label+'</div>';
+    html += '<div class="playbook-grid" style="margin-bottom:1px;">';
+    for(const i of mr.steps){
     const def = STEP_DEFS[i];
     if(!def) continue;
     const confirmed = hasConfirmed(session, i);
@@ -4605,8 +4611,18 @@ function renderPlaybook(){
     } else if(session.stepData && session.stepData[i]){
       const d = session.stepData[i];
       const raw = d._raw||d._rawText||d[def.fields[0]&&def.fields[0].key]||'';
-      preview = String(raw).replace(/<!--[\s\S]*?-->/g,'').replace(/[#*`]/g,'').trim().slice(0,90);
-      if(preview.length===90) preview+='…';
+      preview = String(raw)
+        .replace(/<!--[\s\S]*?-->/g,'')   // strip HTML comments
+        .replace(/#+\s*/g,'')              // strip markdown headers
+        .replace(/\*{1,3}([^*]+)\*{1,3}/g,'$1')  // strip bold/italic
+        .replace(/`[^`]+`/g,'')            // strip inline code
+        .replace(/\[([^\]]+)\]\([^)]+\)/g,'$1') // strip links
+        .replace(/^[-•·>\s]+/gm,'')       // strip bullet chars
+        .replace(/\n{2,}/g,' · ')         // collapse newlines to separator
+        .replace(/\n/g,' ')
+        .replace(/\s{2,}/g,' ')
+        .trim().slice(0,100);
+      if(preview.length===100) preview+='…';
     }
 
     const cta = confirmed?'✓ Confirmed':hasData?'→ View & confirm':'→ Discuss with Kickman';
