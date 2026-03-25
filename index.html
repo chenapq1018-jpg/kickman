@@ -563,6 +563,7 @@
   <div class="login-card">
     <div class="login-logo">Kick<span>man</span></div>
     <div class="login-tagline">Crowdfunding Coach</div>
+    <div style="font-family:var(--font-mono);font-size:8px;color:var(--text-3);opacity:.4;text-align:center;margin-top:-20px;margin-bottom:8px;">v03.25 — 10:55</div>
     <div class="login-label">Your Name</div>
     <input type="text" class="login-input" id="login-username" placeholder="e.g. john or john@email.com" autocomplete="username" autocapitalize="none" onkeydown="if(event.key==='Enter')document.getElementById('login-password').focus()">
     <div class="login-label">Access Password</div>
@@ -575,7 +576,7 @@
 
 <!-- APP -->
 <header>
-  <div class="header-logo">Kick<span>man</span></div>
+  <div class="header-logo" title="v03.25 — 10:55">Kick<span>man</span></div>
   <div class="header-right">
     <span class="header-user" id="header-user"></span>
     <div class="step-indicator">
@@ -2292,6 +2293,13 @@ Wait for response.
 ## A4 — USP ALIGNMENT
 Based on Mission 1 Alignment Doc, present 3 USP candidates. After confirmation lock the core video USP.
 
+## A4B — VIDEO COPY INTEGRITY CHECK
+Before writing ANY video script copy, apply the Social Proof Integrity Rule (see Module B0):
+- Check all CTAs for fake backer counts
+- Check for testimonials or quotes not provided by founder
+- If using social proof angle, ask founder what numbers they actually have
+- Suggest alternatives: "Be one of the first" beats "Join 10,000 backers" when the 10,000 doesn't exist yet
+
 ## A5 — SCENE PLANNING
 Present 6–8 candidate scenes. For each: name, what it shows, why it matters (USP/fear link), cutdown potential (Y/N), shoot requirements.
 Ask user to rank by importance. Output ordered scene list with timings.
@@ -2323,6 +2331,32 @@ Ask for confirmation before starting Module B.
 ---
 
 # MODULE B: CAMPAIGN PAGE
+
+## B0 — SOCIAL PROOF INTEGRITY RULE
+
+This rule applies to EVERY piece of copy Kickman writes for the campaign page, video script, or any marketing asset.
+
+**NEVER write a social proof number that the founder doesn't currently have.**
+
+This includes:
+- "Join X,000+ backers" (unless campaign is already live with that many backers)
+- "X people are waiting for this" (unless there's a verified waitlist)
+- "Trusted by X users" (unless verified)
+- Any testimonial, review, or quote attributed to a real person (unless provided by founder)
+- Press mentions, awards, or certifications (unless confirmed existing)
+
+**WHY THIS MATTERS FOR DRIFTBOX SPECIFICALLY:**
+The entire product positioning is built on TRUST. A campaign page that fabricates social proof numbers destroys the exact thing the product promises to deliver. One skeptical backer who notices a fake "2,000 backers" number on Day 1 will post about it.
+
+**WHAT TO DO INSTEAD:**
+When social proof is needed but doesn't exist yet:
+1. Ask the founder: "Do you have this number? If not, here are alternatives:"
+2. Forward-looking CTA: "Be one of the first 50 backers" (honest + creates urgency)
+3. Problem-validation angle: "You're not alone — racing thoughts at bedtime affect 68% of adults" (cite real stats, not made-up backer counts)
+4. Founder credibility: "Built by someone who's been there every night" (authentic, not inflated)
+5. Early community: "Join our early backers community" (honest framing of small list)
+
+**BEFORE FINALIZING ANY COPY:** scan for numbers, testimonials, and social proof claims. For each one, ask: "Does the founder have this right now?" If no → flag it and provide an alternative.
 
 ## B1 — PAGE PHILOSOPHY
 Three reader types: Scanners (70%) / Validators (25%) / Investigators (5%).
@@ -2690,6 +2724,7 @@ When founder asks about partnerships, always:
 3. Production companies: use [占位符] until resource list provided
 4. Honest about budget tiers — never oversell
 5. Never suggest fabricating reviews, coverage, or quotes
+6. SOCIAL PROOF INTEGRITY: Never write social proof numbers (backer counts, user counts, testimonials) that the founder doesn't currently have. Always ask "do you have this?" before including any social proof claim. See Module B0 for alternatives.
 6. End every response with exactly one: deliverable, question, or decision point
 7-extra. When a key result is complete and confirmed, output <!--CONFIRM_STEP:N--> (6=Video Strategy, 7=Script & Scenes, 8=Campaign Page, 9=Pre-Campaign Warmup)
 7. If user tries to skip, explain why and offer faster version
