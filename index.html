@@ -92,19 +92,7 @@
   .has-data .pc-cta{color:var(--accent);}
   .confirmed .pc-cta{color:var(--green);}
 
-  /* ── INSIGHTS PANE ── */
-  .insights-scroll{flex:1;overflow-y:auto;padding:24px;}
-  .insight-section{margin-bottom:28px;}
-  .insight-section-title{font-family:var(--font-mono);font-size:9px;letter-spacing:2.5px;color:var(--text-3);text-transform:uppercase;margin-bottom:12px;}
-  .insight-kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;}
-  .insight-kpi{background:var(--card);border:1px solid var(--border);border-top:2px solid var(--border);padding:14px 16px;}
-  .insight-kpi.accent{border-top-color:var(--accent);}
-  .insight-kpi.green{border-top-color:var(--green);}
-  .ik-label{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-3);text-transform:uppercase;margin-bottom:5px;}
-  .ik-value{font-family:var(--font-serif);font-size:24px;color:var(--text);line-height:1.1;}
-  .insight-kpi.accent .ik-value{color:var(--accent);}
-  .insight-kpi.green .ik-value{color:var(--green);}
-  .ik-sub{font-size:10px;color:var(--text-3);margin-top:3px;}
+
 
   /* LEFT SIDEBAR */
   .sidebar{width:220px;min-width:220px;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
@@ -696,9 +684,7 @@
   <button class="proj-tab" id="tab-timeline" onclick="switchTab('timeline')">
     <span class="proj-tab-icon">&#x1F4C5;</span> Timeline
   </button>
-  <button class="proj-tab" id="tab-insights" onclick="switchTab('insights')">
-    <span class="proj-tab-icon">&#x1F4CA;</span> Insights
-  </button>
+
 </nav>
 
 <div class="app-layout">
@@ -823,10 +809,7 @@
   </div>
   </div></div>
 
-  <!-- PANE: INSIGHTS -->
-  <div class="view-pane" id="pane-insights">
-    <div class="insights-scroll" id="insights-scroll"></div>
-  </div>
+
 
 </div>
 
@@ -4539,19 +4522,18 @@ function switchTab(tab){
   // Body class for CSS hooks
   document.body.className = document.body.className.replace(/\bview-\w+/g,'').trim() + ' view-'+tab;
   // Update tab buttons
-  ['chat','playbook','timeline','insights'].forEach(t => {
+  ['chat','playbook','timeline'].forEach(t => {
     const btn = document.getElementById('tab-'+t);
     if(btn) btn.className = 'proj-tab' + (t===tab?' active':'');
   });
-  // Update panes
-  ['chat','playbook','timeline','insights'].forEach(t => {
+  ['chat','playbook','timeline'].forEach(t => {
     const pane = document.getElementById('pane-'+t);
     if(pane) pane.className = 'view-pane' + (t===tab?' active':'');
   });
   // Render content for the tab
   if(tab==='playbook') renderPlaybook();
   if(tab==='timeline'){ renderTimeline(); renderTimelineBoard(); }
-  if(tab==='insights') renderInsights();
+
 }
 
 function showProjectNav(show){
