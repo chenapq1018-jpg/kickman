@@ -68,7 +68,7 @@
   .proj-tab-badge{width:16px;height:16px;border-radius:50%;background:rgba(0,201,167,.2);color:var(--accent);font-size:8px;display:flex;align-items:center;justify-content:center;font-weight:700;}
 
   /* ── PANES ── */
-  .view-pane{display:none;flex:1;overflow:hidden;}
+  .view-pane{display:none;flex:1;overflow:hidden;min-width:0;}
   .view-pane.active{display:flex;flex-direction:column;}
 
   /* ── PLAYBOOK PANE ── */
@@ -132,7 +132,8 @@
   .sync-status.saving{color:var(--yellow);}
   .sync-status.saved{color:var(--green);}
   .sync-status.error{color:var(--red);}
-  .steps-section{padding:6px 0;flex-shrink:0;border-top:1px solid var(--border);}
+  .steps-section{padding:6px 0;flex-shrink:0;border-top:1px solid var(--border);transition:opacity .2s;}
+  body.view-playbook .steps-section,body.view-timeline .steps-section,body.view-insights .steps-section{opacity:.3;pointer-events:none;}
   .steps-label{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--text-3);text-transform:uppercase;padding:6px 16px 4px;}
   .sidebar-step{display:flex;align-items:center;gap:8px;padding:5px 14px;cursor:pointer;border-radius:2px;transition:background .15s;}
   .sidebar-step:hover{background:rgba(255,255,255,.05);}
@@ -302,6 +303,7 @@
 
   /* TIMELINE PANEL */
   .timeline-panel{width:240px;min-width:240px;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:var(--surface);}
+  #pane-timeline .timeline-panel{width:100%;min-width:0;border-left:none;max-width:720px;margin:0 auto;}
   .timeline-header{padding:12px 14px 10px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
   .timeline-title{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--text-3);text-transform:uppercase;}
   .timeline-toggle{font-family:var(--font-mono);font-size:9px;color:var(--text-3);background:none;border:none;cursor:pointer;letter-spacing:1px;padding:0;}
@@ -749,7 +751,7 @@
 
   <!-- PANE: TIMELINE -->
   <div class="view-pane" id="pane-timeline">
-  <!-- RIGHT TIMELINE PANEL -->
+  <div style="flex:1;overflow:auto;display:flex;justify-content:center;">
   <aside class="timeline-panel" id="timeline-panel">
     <div class="timeline-header">
       <span class="timeline-title">Campaign Timeline</span>
@@ -765,6 +767,7 @@
       Hover any item to edit date.<br>&#x7A7A;&#x767D; = &#x5C1A;&#x672A;&#x89C4;&#x5212;&#xFF0C;&#x968F;&#x65F6;&#x586B;&#x5145;<br>&#x6309;&#x8BA1;&#x5212;&#x6267;&#x884C;&#x5F88;&#x91CD;&#x8981; &#x26A0;&#xFE0F;
     </div>
   </aside>
+  </div>
   </div>
 
   <!-- PANE: INSIGHTS -->
@@ -4480,6 +4483,8 @@ let currentTab = 'chat';
 
 function switchTab(tab){
   currentTab = tab;
+  // Body class for CSS hooks
+  document.body.className = document.body.className.replace(/\bview-\w+/g,'').trim() + ' view-'+tab;
   // Update tab buttons
   ['chat','playbook','timeline','insights'].forEach(t => {
     const btn = document.getElementById('tab-'+t);
@@ -4509,11 +4514,19 @@ function renderPlaybook(){
 
   if(!session){ el.innerHTML='<div style="padding:40px;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--text-3);">No project selected.</div>'; return; }
 
+  // Project header
+  var projName = (session.name||'Untitled').replace(/^#+\s*/,'').replace(/[*_]/g,'').trim();
+  var missionBadge = ['','M1: Validation','M2: Campaign','M3: Pricing','M4: Live'][session.mission||1]||'M1';
+  var headerHTML = '<div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface);">' +
+    '<div><div style="font-family:var(--font-serif);font-size:22px;color:var(--text);margin-bottom:4px;">'+escHtml(projName)+'</div>' +
+    '<div style="font-family:var(--font-mono);font-size:9px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;">'+missionBadge+'</div></div>' +
+    '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);">Click any card to view or edit</div></div>';
+
   // Count completed steps for badge
   let doneCount = 0;
   let hasDataCount = 0;
 
-  let html = '<div class="playbook-grid">';
+  let html = headerHTML + '<div class="playbook-grid">';
 
   for(let i=1;i<=11;i++){
     const def = STEP_DEFS[i];
