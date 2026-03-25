@@ -88,9 +88,15 @@
   .sidebar-step{display:flex;align-items:center;gap:8px;padding:5px 14px;cursor:pointer;border-radius:2px;transition:background .15s;}
   .sidebar-step:hover{background:rgba(255,255,255,.05);}
   .step-icon{width:15px;height:15px;flex-shrink:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;transition:all .2s;}
-  .sidebar-step.done .step-icon{background:rgba(0,201,167,.15);color:var(--green);}
-  .sidebar-step.active .step-icon{background:rgba(0,201,167,.2);color:var(--accent);box-shadow:0 0 0 2px rgba(0,201,167,.2);}
-  .sidebar-step.idle .step-icon{background:rgba(255,255,255,.05);color:var(--text-3);}
+  .sidebar-step.done .step-icon{background:rgba(0,201,167,.18);color:var(--green);box-shadow:0 0 8px rgba(0,201,167,.2);}
+  .sidebar-step.done .step-num{color:var(--green);}
+  .sidebar-step.done .step-name{color:var(--text-2);}
+  .sidebar-step.has-data .step-icon{background:rgba(0,201,167,.1);color:var(--accent);animation:stepPulse 2.5s ease-in-out infinite;}
+  .sidebar-step.has-data .step-num{color:var(--accent);}
+  .sidebar-step.has-data .step-name{color:var(--text);font-weight:500;}
+  .sidebar-step.active .step-icon{background:rgba(0,201,167,.15);color:var(--accent);box-shadow:0 0 0 2px rgba(0,201,167,.2);}
+  .sidebar-step.idle .step-icon{background:rgba(255,255,255,.04);color:var(--text-3);}
+  @keyframes stepPulse{0%,100%{opacity:1;}50%{opacity:.65;box-shadow:0 0 0 3px rgba(0,201,167,.12);}}
   .sidebar-step.has-data .step-icon{background:rgba(45,158,107,.12);color:#4ecb8d;}
   .step-view-hint{display:none;}
   .sidebar-step.done{cursor:pointer;}
@@ -98,12 +104,12 @@
   .sidebar-step.done:hover .step-view-hint{opacity:1;}
   .step-view-hint{font-family:var(--font-mono);font-size:8px;color:var(--accent);opacity:0;transition:opacity .15s;margin-left:auto;padding-top:2px;}
   .step-num{font-family:var(--font-mono);font-size:11px;color:var(--text-3);min-width:18px;padding-top:1px;}
-  .sidebar-step.done .step-num{color:var(--green);}
-  .sidebar-step.active .step-num{color:var(--accent);}
+
+
   .step-info{flex:1;}
   .step-name{font-size:11px;font-weight:500;color:var(--text-3);line-height:1.3;}
   .sidebar-step.active .step-name{color:var(--text);}
-  .sidebar-step.done .step-name{color:var(--text-2);}
+
 
   /* Step results overlay — covers chat area */
   .step-overlay{display:none;position:absolute;inset:0;background:var(--bg);z-index:30;flex-direction:column;animation:msgIn .2s ease forwards;}
@@ -3215,41 +3221,53 @@ function parseStepConfirmSignal(text){
 }
 
 function updateStepUI(step, mission=1){
-  // Header dots (M1 only)
+  // Header dots — M1 progress
   for(let i=1;i<=5;i++){
     const dot=document.getElementById('dot-'+i);
     if(!dot) continue;
     dot.className='step-dot';
-    if(mission===1){ if(i<step) dot.classList.add('done'); else if(i===step) dot.classList.add('active'); else dot.classList.add('idle'); }
-    else dot.classList.add('done');
+    if(mission>1||i<step) dot.classList.add('done');
+    else if(i===step) dot.classList.add('active');
+    else dot.classList.add('idle');
   }
-  // Steps 1-11 — data-aware state
+
+  // Steps 1-11 — PURELY data-driven, not position-driven
   const session=getSession(activeId);
   for(let i=1;i<=11;i++){
     const el=document.getElementById('step-'+i);
     if(!el) continue;
-    // Mission boundary: 1-5=M1, 6-9=M2, 10-11=M3
-    const iMission=i<=5?1:i<=9?2:3;
-    let state;
-    if(iMission<mission) state='done';
-    else if(iMission>mission) state='idle';
-    else if(i<step) state='done';
-    else if(i===step) state='active';
-    else state='idle';
-    // Override idle with has-data if step has real content
-    if(state==='idle' && session && hasStepData(session,i)) state='has-data';
+
+    const confirmed = session && hasConfirmed(session, i);
+    const hasData   = session && hasStepData(session, i);
+
+    let state, icon;
+    if(confirmed){
+      // User explicitly confirmed this step
+      state='done'; icon='✓';
+    } else if(hasData){
+      // Kickman has produced content but user hasn't confirmed yet
+      state='has-data'; icon='◉';
+    } else {
+      // No content yet
+      state='idle'; icon='○';
+    }
+
     el.className='sidebar-step '+state;
-    const icon=el.querySelector('.step-icon');
-    if(icon) icon.textContent=state==='done'?'✓':state==='active'?'◉':state==='has-data'?'·':'○';
+    const iconEl=el.querySelector('.step-icon');
+    if(iconEl) iconEl.textContent=icon;
   }
 }
 
 function hasStepData(session, stepNum){
   if(!session) return false;
-  if(stepNum===2) return !!(session.alignment&&session.alignment.productName)||(session.stepData&&session.stepData[2]&&!!session.stepData[2]._rawText);
+  // Step 1: any history at all
+  if(stepNum===1) return (session.history||[]).filter(m=>m.role==='user').length >= 2;
+  // Step 2: alignment extracted
+  if(stepNum===2) return !!(session.alignment&&session.alignment.productName)||(session.stepData&&session.stepData[2]&&!!(session.stepData[2]._rawText||session.stepData[2]._raw));
+  // Steps 3-11: check stepData for any real content
   if(!session.stepData||!session.stepData[stepNum]) return false;
   const d=session.stepData[stepNum];
-  return !!(d._raw||d._rawText||Object.keys(d).some(k=>k!=='updatedAt'&&d[k]&&String(d[k]).length>20));
+  return !!(d._raw||d._rawText||Object.keys(d).some(k=>k!=='updatedAt'&&k!=='confirmedAt'&&d[k]&&String(d[k]).length>20));
 }
 
 
@@ -3743,6 +3761,51 @@ async function triggerStepGeneration(stepNum,session,bodyEl){
   }
 }
 
+// ── Not-started screen ────────────────────────────────────────────────────────
+function renderStepNotStarted(stepNum, def, req, body){
+  var html='<div class="so-doc"><div class="so-doc-header"><div class="so-doc-step-num">Step '+def.num+' &middot; Mission '+def.mission+'</div><div class="so-doc-title" style="color:var(--text-3);">'+escHtml(def.title)+'</div></div>';
+  html+='<div style="padding:24px 0 0;">';
+  html+='<div style="display:flex;align-items:flex-start;gap:14px;padding:16px 18px;background:var(--card);border:1px solid var(--border);margin-bottom:20px;">';
+  html+='<span style="font-size:22px;line-height:1;flex-shrink:0;">&#x1F4AC;</span>';
+  html+='<div><div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Not started yet</div>';
+  html+='<div style="font-size:13px;color:var(--text-2);line-height:1.7;">Go to the chat and work through this step with Kickman. Once the output is ready, it will appear here and the step will light up automatically.</div></div></div>';
+  if(req&&req.key_info&&req.key_info.length>0){
+    html+='<div style="margin-bottom:18px;"><div style="font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--text-3);text-transform:uppercase;margin-bottom:8px;">Topics to cover with Kickman</div>';
+    html+='<div style="display:flex;flex-direction:column;gap:5px;">';
+    req.key_info.forEach(function(item){html+='<div style="padding:7px 12px;font-size:12px;color:var(--text-2);border-left:2px solid rgba(0,201,167,.2);background:rgba(0,201,167,.03);">'+escHtml(item)+'</div>';});
+    html+='</div></div>';
+  }
+  html+='<button onclick="closeStepDrawer()" style="font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:9px 18px;background:linear-gradient(135deg,var(--accent),#009980);color:#060e14;border:none;cursor:pointer;font-weight:700;">&#x2190; Back to chat</button>';
+  html+='</div></div>';body.innerHTML=html;
+}
+
+// ── Gate screen: prerequisites not met ────────────────────────────────────────
+function renderStepGate(stepNum, session, gate, body){
+  var req=STEP_REQUIREMENTS[stepNum];
+  var def=STEP_DEFS[stepNum];
+  var total=req.needs.length;
+  var done=total-gate.missing.length;
+  var pct=Math.round(done/total*100);
+  var html='<div class="so-doc"><div class="so-doc-header"><div class="so-doc-step-num">Step '+def.num+' &middot; Mission '+def.mission+'</div>';
+  html+='<div class="so-doc-title" style="color:var(--text-3);">'+escHtml(def.title)+'</div>';
+  html+='<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);margin-top:4px;">Locked — complete earlier steps first</div></div>';
+  html+='<div style="margin-bottom:20px;"><div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:9px;color:var(--text-3);margin-bottom:6px;"><span>Prerequisites</span><span>'+done+'/'+total+' met</span></div>';
+  html+='<div style="height:3px;background:rgba(255,255,255,.06);border-radius:2px;"><div style="height:3px;background:var(--accent);border-radius:2px;width:'+pct+'%;transition:width .4s;"></div></div></div>';
+  html+='<div style="display:flex;flex-direction:column;gap:7px;margin-bottom:24px;">';
+  req.needs.forEach(function(need){
+    var met=need.check(session);
+    html+='<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--card);border:1px solid '+(met?'rgba(0,201,167,.2)':'rgba(255,255,255,.06)')+'">';
+    html+='<div style="width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;background:'+(met?'rgba(0,201,167,.15)':'rgba(255,255,255,.04)')+';color:'+(met?'var(--green)':'var(--text-3)')+';">'+(met?'&#x2713;':'&#x25CB;')+'</div>';
+    html+='<div style="font-size:12px;color:'+(met?'var(--text-2)':'var(--text-3)')+';">'+escHtml(need.label)+'</div></div>';
+  });
+  html+='</div>';
+  html+='<div style="padding:14px 18px;background:rgba(0,201,167,.04);border:1px solid rgba(0,201,167,.15);margin-bottom:16px;">';
+  html+='<div style="font-family:var(--font-mono);font-size:9px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Next step</div>';
+  html+='<div style="font-size:12px;color:var(--text-2);line-height:1.6;">'+escHtml(req.hint||'Complete the prerequisite steps first.')+'</div></div>';
+  html+='<button onclick="closeStepDrawer()" style="font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:9px 18px;background:linear-gradient(135deg,var(--accent),#009980);color:#060e14;border:none;cursor:pointer;font-weight:700;">&#x2190; Back to chat</button>';
+  html+='</div></div>';body.innerHTML=html;
+}
+
 function renderStepView(stepNum,session){
   const def=STEP_DEFS[stepNum];
   const raw=(session.stepData&&session.stepData[stepNum])||{};
@@ -3752,9 +3815,14 @@ function renderStepView(stepNum,session){
   const hasData=rawText||def.fields.some(f=>merged[f.key]&&String(merged[f.key]).trim().length>0)||raw._raw;
 
   if(!hasData){
-    body.innerHTML='<div class="so-empty-state"><span class="so-empty-icon" style="animation:spin 1.5s linear infinite;display:inline-block">&#x21BB;</span><div class="so-empty-title">Generating results...</div><div class="so-empty-body">Kickman is extracting output from your conversation.</div></div>';
-    if(!document.getElementById('spin-style')){const st=document.createElement('style');st.id='spin-style';st.textContent='@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';document.head.appendChild(st);}
-    setTimeout(()=>triggerStepGeneration(stepNum,session,body),300);
+    const req2 = STEP_REQUIREMENTS[stepNum];
+    const gate2 = checkStepRequirements(stepNum, session);
+    if(!gate2.met){
+      renderStepGate(stepNum, session, gate2, body);
+    } else {
+      // Requirements met, just not discussed yet
+      renderStepNotStarted(stepNum, def, req2, body);
+    }
     return;
   }
 
