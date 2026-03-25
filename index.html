@@ -304,6 +304,55 @@
   /* TIMELINE PANEL */
   .timeline-panel{width:240px;min-width:240px;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:var(--surface);}
   #pane-timeline .timeline-panel{width:100%;min-width:0;border-left:none;max-width:720px;margin:0 auto;}
+
+  /* ── TIMELINE BOARD ── */
+  #timeline-board{padding:24px;min-height:100%;}
+  .tlb-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+  .tlb-title{font-family:var(--font-serif);font-size:22px;color:var(--text);}
+  .tlb-subtitle{font-family:var(--font-mono);font-size:10px;color:var(--text-3);margin-top:2px;}
+  .tlb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;}
+  .tlb-card{background:var(--card);border:1px solid var(--border);border-top:3px solid var(--border);display:flex;flex-direction:column;gap:0;transition:border-color .2s,box-shadow .2s;overflow:hidden;}
+  .tlb-card:hover{border-top-color:var(--accent);box-shadow:0 4px 24px rgba(0,0,0,.3);}
+  .tlb-card.status-done{border-top-color:var(--green);}
+  .tlb-card.status-active{border-top-color:var(--accent);box-shadow:0 0 0 1px rgba(0,201,167,.15);}
+  .tlb-card.risk-high{border-left:3px solid rgba(255,107,107,.5);}
+  .tlb-card-head{padding:14px 16px 10px;display:flex;align-items:flex-start;gap:10px;}
+  .tlb-card-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px;border:2px solid var(--border);background:var(--bg);}
+  .tlb-card-dot.done{background:var(--green);border-color:var(--green);}
+  .tlb-card-dot.active{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,201,167,.15);}
+  .tlb-card-title{font-family:var(--font-serif);font-size:15px;color:var(--text);line-height:1.3;flex:1;}
+  .status-done .tlb-card-title{color:var(--text-2);}
+  .tlb-status-badge{font-family:var(--font-mono);font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:2px;}
+  .tlb-status-badge.done{background:rgba(0,201,167,.15);color:var(--green);}
+  .tlb-status-badge.active{background:rgba(0,201,167,.12);color:var(--accent);}
+  .tlb-status-badge.pending{background:rgba(255,255,255,.05);color:var(--text-3);}
+  .tlb-hint{padding:0 16px 10px;font-size:11px;color:var(--text-3);line-height:1.6;border-bottom:1px solid rgba(255,255,255,.04);}
+  .tlb-date-row{padding:10px 16px;display:flex;align-items:center;gap:8px;}
+  .tlb-date-label{font-family:var(--font-mono);font-size:9px;letter-spacing:1px;color:var(--text-3);text-transform:uppercase;flex-shrink:0;}
+  .tlb-date-val{font-family:var(--font-mono);font-size:11px;padding:4px 10px;cursor:pointer;transition:all .15s;border:1px solid transparent;}
+  .tlb-date-val:hover{border-color:var(--border);}
+  .tlb-date-val.has-date{color:var(--text-2);border-color:var(--border);}
+  .tlb-date-val.suggested{color:var(--accent);border-color:rgba(0,201,167,.2);font-style:italic;}
+  .tlb-date-val.overdue{color:var(--red);border-color:rgba(255,107,107,.25);}
+  .tlb-date-val.empty{color:var(--text-3);border-color:rgba(255,255,255,.06);}
+  .tlb-date-sug{font-family:var(--font-mono);font-size:8px;color:var(--text-3);letter-spacing:1px;font-style:italic;}
+  .tlb-subtasks{padding:0 16px 12px;display:flex;flex-direction:column;gap:4px;}
+  .tlb-subtask-title{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-3);text-transform:uppercase;margin-bottom:6px;}
+  .tlb-subtask{display:flex;align-items:center;gap:8px;padding:5px 8px;background:rgba(255,255,255,.02);cursor:pointer;transition:background .1s;}
+  .tlb-subtask:hover{background:rgba(255,255,255,.05);}
+  .tlb-st-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;border:1.5px solid var(--border);}
+  .tlb-st-dot.done{background:var(--green);border-color:var(--green);}
+  .tlb-st-dot.active{background:var(--accent);border-color:var(--accent);}
+  .tlb-st-name{font-size:11px;color:var(--text-3);flex:1;}
+  .tlb-st-date{font-family:var(--font-mono);font-size:9px;color:var(--text-3);}
+  .tlb-risk{padding:8px 16px 12px;display:flex;align-items:center;gap:8px;border-top:1px solid rgba(255,255,255,.04);}
+  .tlb-risk-badge{font-family:var(--font-mono);font-size:9px;padding:3px 8px;cursor:pointer;border:1px solid transparent;transition:all .15s;}
+  .tlb-risk-badge:hover{border-color:var(--border);}
+  .tlb-risk-badge.high{background:rgba(255,107,107,.12);color:var(--red);border-color:rgba(255,107,107,.2);}
+  .tlb-risk-badge.medium{background:rgba(244,201,93,.1);color:var(--yellow);border-color:rgba(244,201,93,.2);}
+  .tlb-risk-badge.low{background:rgba(0,201,167,.08);color:var(--green);border-color:rgba(0,201,167,.15);}
+  .tlb-discuss-btn{font-family:var(--font-mono);font-size:9px;color:var(--text-3);background:none;border:1px solid var(--border);padding:3px 8px;cursor:pointer;transition:all .15s;margin-left:auto;}
+  .tlb-discuss-btn:hover{border-color:var(--accent);color:var(--accent);}
   .timeline-header{padding:12px 14px 10px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
   .timeline-title{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--text-3);text-transform:uppercase;}
   .timeline-toggle{font-family:var(--font-mono);font-size:9px;color:var(--text-3);background:none;border:none;cursor:pointer;letter-spacing:1px;padding:0;}
@@ -751,7 +800,11 @@
 
   <!-- PANE: TIMELINE -->
   <div class="view-pane" id="pane-timeline">
-  <div style="flex:1;overflow:auto;display:flex;justify-content:center;">
+  <div id="timeline-board-wrap" style="flex:1;overflow:auto;background:var(--bg);">
+    <div id="timeline-board"></div>
+  </div>
+  <!-- Keep the original sidebar panel hidden here so its JS still works -->
+  <div style="display:none;">
   <aside class="timeline-panel" id="timeline-panel">
     <div class="timeline-header">
       <span class="timeline-title">Campaign Timeline</span>
@@ -768,7 +821,7 @@
     </div>
   </aside>
   </div>
-  </div>
+  </div></div>
 
   <!-- PANE: INSIGHTS -->
   <div class="view-pane" id="pane-insights">
@@ -4497,7 +4550,7 @@ function switchTab(tab){
   });
   // Render content for the tab
   if(tab==='playbook') renderPlaybook();
-  if(tab==='timeline') renderTimeline();
+  if(tab==='timeline'){ renderTimeline(); renderTimelineBoard(); }
   if(tab==='insights') renderInsights();
 }
 
@@ -4667,6 +4720,122 @@ function refreshPlaybookBadge(){
     badge.textContent=total;
     badge.style.display=total>0?'flex':'none';
   }
+}
+
+
+// ── TIMELINE BOARD (full-pane view) ──────────────────────────────────────────
+
+function renderTimelineBoard(){
+  const board = document.getElementById('timeline-board');
+  if(!board) return;
+  const tl = getTimeline();
+  const s = getSession(activeId);
+  if(!tl || !s || !s.history || s.history.length < 2){
+    board.innerHTML = '<div style="padding:60px;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--text-3);">Timeline will appear after product alignment is complete.</div>';
+    return;
+  }
+
+  const suggested = calcSuggestedDates(tl);
+  const projName = (s.name||'Project').replace(/^#+\s*/,'').replace(/[*_]/g,'').trim();
+
+  // Progress summary
+  const total = tl.length;
+  const done = tl.filter(m=>m.status==='done').length;
+  const active = tl.filter(m=>m.status==='active').length;
+
+  let html = '<div class="tlb-header">';
+  html += '<div><div class="tlb-title">'+escHtml(projName)+'</div>';
+  html += '<div class="tlb-subtitle">'+done+' of '+total+' milestones complete'+( active?' &nbsp;·&nbsp; '+active+' in progress':'')+'</div></div>';
+  html += '<div style="display:flex;gap:8px;align-items:center;">';
+  html += '<div style="display:flex;gap:6px;align-items:center;font-family:var(--font-mono);font-size:9px;color:var(--text-3);">';
+  html += '<span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;"></span>Done &nbsp;';
+  html += '<span style="width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;"></span>Active &nbsp;';
+  html += '<span style="width:8px;height:8px;border-radius:50%;border:1.5px solid var(--border);display:inline-block;"></span>Pending';
+  html += '</div></div></div>';
+
+  html += '<div class="tlb-grid">';
+
+  tl.forEach(function(ms){
+    const isDone   = ms.status==='done';
+    const isActive = ms.status==='active';
+    const dotCls   = isDone?'done':isActive?'active':'';
+    const cardCls  = (isDone?'status-done':isActive?'status-active':'') + (ms.risk==='high'?' risk-high':'');
+    const statusLabel = isDone?'Done':isActive?'In Progress':'Pending';
+    const statusCls   = isDone?'done':isActive?'active':'pending';
+
+    const sugDate    = !ms.date && suggested[ms.id] ? suggested[ms.id] : null;
+    const displayDate= ms.date || sugDate;
+    const dateLabel  = displayDate ? formatDate(displayDate) : (ms.duration ? '~'+ms.duration+'d' : '');
+    const dateCls    = ms.date ? (isOverdue(ms.date)?'overdue':isSoon(ms.date)?'soon':'has-date') : sugDate?'suggested':'empty';
+    const dateDisplay = dateLabel || '+ Set date';
+    const isSug      = !ms.date && !!sugDate;
+
+    const riskLabel  = ms.risk==='high'?'⚠ High Risk':ms.risk==='medium'?'· Watch':'✓ Low Risk';
+    const riskCls    = ms.risk||'low';
+
+    html += '<div class="tlb-card '+cardCls+'">';
+
+    // Card header
+    html += '<div class="tlb-card-head">';
+    html += '<div class="tlb-card-dot '+dotCls+'"></div>';
+    html += '<div class="tlb-card-title">'+escHtml(tlName(ms))+'</div>';
+    html += '<span class="tlb-status-badge '+statusCls+'">'+statusLabel+'</span>';
+    html += '</div>';
+
+    // Hint
+    if(ms.hint){
+      html += '<div class="tlb-hint">'+escHtml(ms.hint)+'</div>';
+    }
+
+    // Risk note (expanded, not collapsed)
+    if(ms.riskNote && ms.risk==='high'){
+      html += '<div style="padding:8px 16px;background:rgba(255,107,107,.05);border-top:1px solid rgba(255,107,107,.1);font-size:11px;color:rgba(255,107,107,.7);line-height:1.55;">'+escHtml(ms.riskNote)+'</div>';
+    }
+
+    // Date row
+    html += '<div class="tlb-date-row">';
+    html += '<span class="tlb-date-label">Date</span>';
+    const dateTitle = isSug ? 'Suggested — click to confirm' : 'Click to set date';
+    html += '<span class="tlb-date-val '+dateCls+'" onclick="editDate(\''+ms.id+'\',false);renderTimelineBoard()" title="'+dateTitle+'">'+escHtml(dateDisplay)+'</span>';
+    if(isSug) html += '<span class="tlb-date-sug">suggested</span>';
+    if(ms.date) html += '<button style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:11px;padding:2px 4px;" onclick="clearDate(\''+ms.id+'\',false);renderTimelineBoard()" title="Clear">\u2715</button>';
+    if(ms.duration) html += '<span style="font-family:var(--font-mono);font-size:9px;color:var(--text-3);margin-left:auto;">~'+ms.duration+'d duration</span>';
+    html += '</div>';
+
+    // Subtasks
+    if(ms.subtasks && ms.subtasks.length>0){
+      html += '<div class="tlb-subtasks">';
+      html += '<div class="tlb-subtask-title">Subtasks</div>';
+      ms.subtasks.forEach(function(st){
+        const stDone = st.status==='done';
+        const stActive = st.status==='active';
+        const stDotCls = stDone?'done':stActive?'active':'';
+        const stSug = !st.date && suggested[st.id] ? suggested[st.id] : null;
+        const stDate = st.date || stSug;
+        const stDateStr = stDate ? formatDate(stDate) : '';
+        html += '<div class="tlb-subtask" onclick="editDate(\''+st.id+'\',true);renderTimelineBoard()">';
+        html += '<div class="tlb-st-dot '+stDotCls+'"></div>';
+        html += '<span class="tlb-st-name"'+( stDone?' style="text-decoration:line-through;opacity:.5;"':'')+'">'+escHtml(st.name)+'</span>';
+        if(stDateStr) html += '<span class="tlb-st-date">'+escHtml(stDateStr)+(stSug&&!st.date?' ✦':'')+'</span>';
+        else html += '<span class="tlb-st-date" style="color:var(--text-3);opacity:.4;">+ date</span>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+
+    // Risk + discuss
+    html += '<div class="tlb-risk">';
+    html += '<span class="tlb-risk-badge '+riskCls+'" onclick="cycleRisk(\''+ms.id+'\',event);renderTimelineBoard()" title="Click to change risk level">'+riskLabel+'</span>';
+    if(ms.risk==='high'){
+      html += '<button class="tlb-discuss-btn" onclick="triggerRiskChat(\''+ms.id+'\');switchTab(\'chat\')">&#x1F4AC; Discuss</button>';
+    }
+    html += '</div>';
+
+    html += '</div>'; // end tlb-card
+  });
+
+  html += '</div>'; // end tlb-grid
+  board.innerHTML = html;
 }
 
 // ── EXPORT ────────────────────────────────────────────────────────────────────
