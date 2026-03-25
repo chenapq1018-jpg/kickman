@@ -560,9 +560,9 @@
     <div class="login-logo">Kick<span>man</span></div>
     <div class="login-tagline">Crowdfunding Coach</div>
     <div class="login-label">Your Name</div>
-    <input type="text" class="login-input" id="login-username" placeholder="e.g. john or john@email.com" autocomplete="username" autocapitalize="none">
+    <input type="text" class="login-input" id="login-username" placeholder="e.g. john or john@email.com" autocomplete="username" autocapitalize="none" onkeydown="if(event.key==='Enter')document.getElementById('login-password').focus()">
     <div class="login-label">Access Password</div>
-    <input type="password" class="login-input" id="login-password" placeholder="••••••••" autocomplete="current-password">
+    <input type="password" class="login-input" id="login-password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" id="login-btn" onclick="doLogin()">Enter &#x2192;</button>
     <div class="login-error" id="login-error">Wrong password. Try again.</div>
     <div class="login-hint">Use the same name on every device to sync your projects.</div>
@@ -4636,9 +4636,9 @@ function renderPlaybook(){
       ${preview?`<div class="pc-preview">${escHtml(preview)}</div>`:''}
       <div class="pc-cta">${cta}</div>
     </div>`;
+    }
+    html += '</div>'; // end mission grid
   }
-
-  html += '</div>';
   el.innerHTML = html;
 
   // Update badge
