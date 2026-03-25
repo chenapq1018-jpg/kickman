@@ -4796,9 +4796,9 @@ function renderTimelineBoard(){
     html += '<div class="tlb-date-row">';
     html += '<span class="tlb-date-label">Date</span>';
     const dateTitle = isSug ? 'Suggested — click to confirm' : 'Click to set date';
-    html += '<span class="tlb-date-val '+dateCls+'" onclick="editDate(\''+ms.id+'\',false);renderTimelineBoard()" title="'+dateTitle+'">'+escHtml(dateDisplay)+'</span>';
+    html += '<span id="tl-date-'+ms.id+'" class="tlb-date-val '+dateCls+'" onclick="editBoardDate(\''+ms.id+'\',false,this)" title="'+dateTitle+'">'+escHtml(dateDisplay)+'</span>';
     if(isSug) html += '<span class="tlb-date-sug">suggested</span>';
-    if(ms.date) html += '<button style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:11px;padding:2px 4px;" onclick="clearDate(\''+ms.id+'\',false);renderTimelineBoard()" title="Clear">\u2715</button>';
+    if(ms.date) html += '<button style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:11px;padding:2px 4px;" onclick="clearBoardDate(\''+ms.id+'\',false)" title="Clear">\u2715</button>';
     if(ms.duration) html += '<span style="font-family:var(--font-mono);font-size:9px;color:var(--text-3);margin-left:auto;">~'+ms.duration+'d duration</span>';
     html += '</div>';
 
@@ -4813,11 +4813,10 @@ function renderTimelineBoard(){
         const stSug = !st.date && suggested[st.id] ? suggested[st.id] : null;
         const stDate = st.date || stSug;
         const stDateStr = stDate ? formatDate(stDate) : '';
-        html += '<div class="tlb-subtask" onclick="editDate(\''+st.id+'\',true);renderTimelineBoard()">';
+        html += '<div class="tlb-subtask">';
         html += '<div class="tlb-st-dot '+stDotCls+'"></div>';
         html += '<span class="tlb-st-name"'+( stDone?' style="text-decoration:line-through;opacity:.5;"':'')+'">'+escHtml(st.name)+'</span>';
-        if(stDateStr) html += '<span class="tlb-st-date">'+escHtml(stDateStr)+(stSug&&!st.date?' ✦':'')+'</span>';
-        else html += '<span class="tlb-st-date" style="color:var(--text-3);opacity:.4;">+ date</span>';
+        html += '<span id="tl-date-'+st.id+'" class="tlb-st-date tlb-date-val '+(stDate?'has-date':'empty')+'" onclick="editBoardDate(\''+st.id+'\',true,this)" style="cursor:pointer;" title="Click to set date">'+(stDateStr?escHtml(stDateStr+(stSug&&!st.date?' ✦':'')):'+ date')+'</span>';
         html += '</div>';
       });
       html += '</div>';
@@ -4836,6 +4835,52 @@ function renderTimelineBoard(){
 
   html += '</div>'; // end tlb-grid
   board.innerHTML = html;
+}
+
+
+// ── Board date editing — wraps editDate + re-renders board after save ────────
+function editBoardDate(nodeId, isSub, spanEl){
+  const tl = getTimeline(); if(!tl) return;
+
+  let currentVal = '';
+  if(isSub){ tl.forEach(ms=>ms.subtasks.forEach(st=>{ if(st.id===nodeId&&st.date)currentVal=st.date; })); }
+  else { const ms=tl.find(m=>m.id===nodeId); if(ms&&ms.date)currentVal=ms.date; }
+
+  const input = document.createElement('input');
+  input.type='date';
+  input.value=currentVal;
+  input.style.cssText='font-family:var(--font-mono);font-size:11px;background:var(--card);color:var(--text);border:1px solid var(--accent);padding:3px 6px;outline:none;width:130px;';
+  spanEl.replaceWith(input);
+  input.focus();
+
+  let saved=false;
+  function save(){
+    if(saved) return; saved=true;
+    const newDate = input.value||null;
+    if(isSub){ tl.forEach(ms=>ms.subtasks.forEach(st=>{ if(st.id===nodeId)st.date=newDate; })); }
+    else { const ms=tl.find(m=>m.id===nodeId); if(ms)ms.date=newDate; }
+    saveTimeline(tl);
+    clearTimeout(window._tlBoardTimer);
+    window._tlBoardTimer = setTimeout(()=>{ renderTimeline(); renderTimelineBoard(); }, 100);
+  }
+  function cancel(){
+    if(saved) return; saved=true;
+    renderTimelineBoard();
+  }
+  input.onblur = save;
+  input.onkeydown = e => {
+    if(e.key==='Enter'){ e.preventDefault(); save(); }
+    if(e.key==='Escape'){ saved=true; cancel(); }
+  };
+}
+
+function clearBoardDate(nodeId, isSub){
+  const tl = getTimeline(); if(!tl) return;
+  if(isSub){ tl.forEach(ms=>ms.subtasks.forEach(st=>{ if(st.id===nodeId)st.date=null; })); }
+  else { const ms=tl.find(m=>m.id===nodeId); if(ms)ms.date=null; }
+  saveTimeline(tl);
+  renderTimeline();
+  renderTimelineBoard();
 }
 
 // ── EXPORT ────────────────────────────────────────────────────────────────────
