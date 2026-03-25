@@ -57,6 +57,55 @@
   /* LAYOUT */
   .app-layout{display:flex;flex:1;overflow:hidden;}
 
+  /* ── PROJECT NAV TABS ── */
+  .project-nav{display:none;height:44px;background:rgba(10,22,32,.98);border-bottom:1px solid var(--border);flex-shrink:0;align-items:center;padding:0 12px;gap:2px;backdrop-filter:blur(10px);position:relative;z-index:5;}
+  .project-nav.visible{display:flex;}
+  .proj-tab{font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);background:none;border:none;cursor:pointer;padding:6px 14px;transition:all .2s;display:flex;align-items:center;gap:6px;position:relative;}
+  .proj-tab:hover{color:var(--text-2);}
+  .proj-tab.active{color:var(--accent);}
+  .proj-tab.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--accent);box-shadow:0 0 8px rgba(0,201,167,.4);}
+  .proj-tab-icon{font-size:13px;}
+  .proj-tab-badge{width:16px;height:16px;border-radius:50%;background:rgba(0,201,167,.2);color:var(--accent);font-size:8px;display:flex;align-items:center;justify-content:center;font-weight:700;}
+
+  /* ── PANES ── */
+  .view-pane{display:none;flex:1;overflow:hidden;}
+  .view-pane.active{display:flex;flex-direction:column;}
+
+  /* ── PLAYBOOK PANE ── */
+  .playbook-scroll{flex:1;overflow-y:auto;padding:0;}
+  .playbook-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:var(--border);}
+  .playbook-card{background:var(--surface);padding:18px 20px;cursor:pointer;transition:background .15s,transform .1s;display:flex;flex-direction:column;gap:6px;min-height:110px;position:relative;overflow:hidden;}
+  .playbook-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent;transition:background .2s;}
+  .playbook-card.confirmed::before{background:var(--green);}
+  .playbook-card.has-data::before{background:var(--accent);}
+  .playbook-card:hover{background:var(--card);}
+  .playbook-card.idle{opacity:.5;}
+  .playbook-card.idle:hover{opacity:.75;}
+  .pc-meta{display:flex;align-items:center;gap:8px;}
+  .pc-num{font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:2px;}
+  .pc-badge{font-size:11px;}
+  .pc-title{font-family:var(--font-serif);font-size:15px;color:var(--text);line-height:1.3;}
+  .idle .pc-title{color:var(--text-3);}
+  .pc-preview{font-size:11px;color:var(--text-3);line-height:1.55;flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  .has-data .pc-preview,.confirmed .pc-preview{color:var(--text-3);}
+  .pc-cta{font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:1px;margin-top:auto;}
+  .has-data .pc-cta{color:var(--accent);}
+  .confirmed .pc-cta{color:var(--green);}
+
+  /* ── INSIGHTS PANE ── */
+  .insights-scroll{flex:1;overflow-y:auto;padding:24px;}
+  .insight-section{margin-bottom:28px;}
+  .insight-section-title{font-family:var(--font-mono);font-size:9px;letter-spacing:2.5px;color:var(--text-3);text-transform:uppercase;margin-bottom:12px;}
+  .insight-kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;}
+  .insight-kpi{background:var(--card);border:1px solid var(--border);border-top:2px solid var(--border);padding:14px 16px;}
+  .insight-kpi.accent{border-top-color:var(--accent);}
+  .insight-kpi.green{border-top-color:var(--green);}
+  .ik-label{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--text-3);text-transform:uppercase;margin-bottom:5px;}
+  .ik-value{font-family:var(--font-serif);font-size:24px;color:var(--text);line-height:1.1;}
+  .insight-kpi.accent .ik-value{color:var(--accent);}
+  .insight-kpi.green .ik-value{color:var(--green);}
+  .ik-sub{font-size:10px;color:var(--text-3);margin-top:3px;}
+
   /* LEFT SIDEBAR */
   .sidebar{width:220px;min-width:220px;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
   .sidebar-top{padding:14px;border-bottom:1px solid var(--border);flex-shrink:0;}
@@ -584,6 +633,23 @@
   <div class="mob-proj-list" id="mob-proj-list"></div>
 </div>
 
+<!-- PROJECT NAV TABS -->
+<nav class="project-nav" id="project-nav">
+  <button class="proj-tab active" id="tab-chat" onclick="switchTab('chat')">
+    <span class="proj-tab-icon">&#x1F4AC;</span> Chat
+  </button>
+  <button class="proj-tab" id="tab-playbook" onclick="switchTab('playbook')">
+    <span class="proj-tab-icon">&#x1F4CB;</span> Playbook
+    <span class="proj-tab-badge" id="playbook-badge" style="display:none">0</span>
+  </button>
+  <button class="proj-tab" id="tab-timeline" onclick="switchTab('timeline')">
+    <span class="proj-tab-icon">&#x1F4C5;</span> Timeline
+  </button>
+  <button class="proj-tab" id="tab-insights" onclick="switchTab('insights')">
+    <span class="proj-tab-icon">&#x1F4CA;</span> Insights
+  </button>
+</nav>
+
 <div class="app-layout">
 
   <!-- LEFT SIDEBAR -->
@@ -612,6 +678,8 @@
   </aside>
 
   <!-- CHAT -->
+  <!-- PANE: CHAT -->
+  <div class="view-pane active" id="pane-chat">
   <div class="chat-container">
     <!-- STEP RESULTS OVERLAY — covers chat area -->
     <div class="step-overlay" id="step-overlay">
@@ -672,6 +740,15 @@
     </div>
   </div>
 
+  </div>
+
+  <!-- PANE: PLAYBOOK -->
+  <div class="view-pane" id="pane-playbook">
+    <div class="playbook-scroll" id="playbook-scroll"></div>
+  </div>
+
+  <!-- PANE: TIMELINE -->
+  <div class="view-pane" id="pane-timeline">
   <!-- RIGHT TIMELINE PANEL -->
   <aside class="timeline-panel" id="timeline-panel">
     <div class="timeline-header">
@@ -688,6 +765,12 @@
       Hover any item to edit date.<br>&#x7A7A;&#x767D; = &#x5C1A;&#x672A;&#x89C4;&#x5212;&#xFF0C;&#x968F;&#x65F6;&#x586B;&#x5145;<br>&#x6309;&#x8BA1;&#x5212;&#x6267;&#x884C;&#x5F88;&#x91CD;&#x8981; &#x26A0;&#xFE0F;
     </div>
   </aside>
+  </div>
+
+  <!-- PANE: INSIGHTS -->
+  <div class="view-pane" id="pane-insights">
+    <div class="insights-scroll" id="insights-scroll"></div>
+  </div>
 
 </div>
 
@@ -2791,10 +2874,16 @@ function loadSession(id){
     document.getElementById('welcome-state').style.display='flex';
     document.getElementById('messages').style.display='none';
     document.getElementById('input-area').style.display='none';
+  showProjectNav(false);
+  switchTab('chat');
   } else {
     document.getElementById('welcome-state').style.display='none';
     document.getElementById('messages').style.display='flex';
     document.getElementById('input-area').style.display='block';
+  showProjectNav(true);
+  refreshPlaybookBadge();
+  if(currentTab==='playbook') renderPlaybook();
+  if(currentTab==='insights') renderInsights();
     session.history.forEach(msg=>{
       if(msg.role==='user'&&msg.content!=='Begin.')addMessageDOM('user',msg.content,msg.images||[]);
       else if(msg.role==='assistant')addMessageDOM('km',msg.content);
@@ -2943,6 +3032,7 @@ async function callKickman(trigger){
       if(nowHasAlignment){
         // Show the alignment download button
         updateAlignmentBtn(fresh);
+    refreshPlaybookBadge();
         // After user confirms, they can proceed — show a prompt
         setTimeout(()=>{
           addMessageDOM('km', '**Product Alignment is now locked. ✓**\n\nYou can download it anytime using the Export button at the top.\n\nWhenever you\'re ready — type "proceed to Mission 2" and we\'ll start building your video and campaign page.');
@@ -3189,6 +3279,7 @@ function confirmStep(stepNum){
   updateStepUI(session.step||1, session.mission||1);
   const badge = document.getElementById('step-saved-badge');
   if(badge){ badge.textContent='✓ Confirmed'; badge.classList.add('show'); setTimeout(()=>{ badge.textContent='Saved ✓'; badge.classList.remove('show'); }, 2500); }
+  refreshPlaybookBadge();
 }
 
 function handleConfirmClick(stepNum){
@@ -4380,6 +4471,189 @@ async function submitBenchmark(session, metricsObj){
 
 function maybeExtractInsight(session, trigger){
   setTimeout(()=>extractAndStoreInsight(session,trigger),2000);
+}
+
+
+// ── PROJECT NAV TABS ──────────────────────────────────────────────────────────
+
+let currentTab = 'chat';
+
+function switchTab(tab){
+  currentTab = tab;
+  // Update tab buttons
+  ['chat','playbook','timeline','insights'].forEach(t => {
+    const btn = document.getElementById('tab-'+t);
+    if(btn) btn.className = 'proj-tab' + (t===tab?' active':'');
+  });
+  // Update panes
+  ['chat','playbook','timeline','insights'].forEach(t => {
+    const pane = document.getElementById('pane-'+t);
+    if(pane) pane.className = 'view-pane' + (t===tab?' active':'');
+  });
+  // Render content for the tab
+  if(tab==='playbook') renderPlaybook();
+  if(tab==='timeline') renderTimeline();
+  if(tab==='insights') renderInsights();
+}
+
+function showProjectNav(show){
+  const nav = document.getElementById('project-nav');
+  if(nav) nav.className = 'project-nav' + (show?' visible':'');
+}
+
+// ── PLAYBOOK RENDERING ────────────────────────────────────────────────────────
+function renderPlaybook(){
+  const session = getSession(activeId);
+  const el = document.getElementById('playbook-scroll');
+  if(!el) return;
+
+  if(!session){ el.innerHTML='<div style="padding:40px;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--text-3);">No project selected.</div>'; return; }
+
+  // Count completed steps for badge
+  let doneCount = 0;
+  let hasDataCount = 0;
+
+  let html = '<div class="playbook-grid">';
+
+  for(let i=1;i<=11;i++){
+    const def = STEP_DEFS[i];
+    if(!def) continue;
+    const confirmed = hasConfirmed(session, i);
+    const hasData   = hasStepData(session, i);
+    if(confirmed) doneCount++;
+    else if(hasData) hasDataCount++;
+
+    const state = confirmed?'confirmed':hasData?'has-data':'idle';
+    const badge = confirmed?'✓':hasData?'◉':'○';
+    const badgeStyle = confirmed?'color:var(--green)':hasData?'color:var(--accent)':'color:var(--text-3)';
+
+    // Get preview text
+    let preview = '';
+    if(i===2 && session.alignment && session.alignment.productName){
+      preview = session.alignment.productName;
+      if(session.alignment.features && session.alignment.features.length)
+        preview += ' · '+session.alignment.features.length+' features';
+    } else if(session.stepData && session.stepData[i]){
+      const d = session.stepData[i];
+      const raw = d._raw||d._rawText||d[def.fields[0]&&def.fields[0].key]||'';
+      preview = String(raw).replace(/<!--[\s\S]*?-->/g,'').replace(/[#*`]/g,'').trim().slice(0,90);
+      if(preview.length===90) preview+='…';
+    }
+
+    const cta = confirmed?'✓ Confirmed':hasData?'→ View & confirm':'→ Discuss with Kickman';
+
+    html += `<div class="playbook-card ${state}" onclick="openPlaybookStep(${i})">
+      <div class="pc-meta">
+        <span class="pc-num">${def.num}</span>
+        <span class="pc-badge" style="${badgeStyle}">${badge}</span>
+        <span class="pc-title">${escHtml(def.title)}</span>
+      </div>
+      ${preview?`<div class="pc-preview">${escHtml(preview)}</div>`:''}
+      <div class="pc-cta">${cta}</div>
+    </div>`;
+  }
+
+  html += '</div>';
+  el.innerHTML = html;
+
+  // Update badge
+  const badge = document.getElementById('playbook-badge');
+  if(badge){
+    const total = doneCount + hasDataCount;
+    badge.textContent = total;
+    badge.style.display = total > 0 ? 'flex' : 'none';
+    badge.style.background = doneCount>0?'rgba(0,201,167,.2)':'rgba(244,132,95,.2)';
+    badge.style.color = doneCount>0?'var(--green)':'var(--accent)';
+  }
+}
+
+function openPlaybookStep(stepNum){
+  // Switch to chat tab first, then open the step drawer
+  switchTab('chat');
+  setTimeout(()=>openStepDrawer(stepNum), 50);
+}
+
+// ── INSIGHTS RENDERING ────────────────────────────────────────────────────────
+function renderInsights(){
+  const session = getSession(activeId);
+  const el = document.getElementById('insights-scroll');
+  if(!el) return;
+
+  if(!session){ el.innerHTML='<div style="padding:40px;text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--text-3);">No project selected.</div>'; return; }
+
+  const a = session.alignment || {};
+  let html = '';
+
+  // Project summary cards
+  html += '<div class="insight-section"><div class="insight-section-title">Project Overview</div>';
+  html += '<div class="insight-kpi-grid">';
+
+  const stepsDone = Array.from({length:11},(_,i)=>i+1).filter(i=>hasConfirmed(session,i)).length;
+  const stepsHaveData = Array.from({length:11},(_,i)=>i+1).filter(i=>hasStepData(session,i)&&!hasConfirmed(session,i)).length;
+  const mission = session.mission||1;
+  const missionLabel = mission===4?'Live 🚀':mission===3?'Mission 3':mission===2?'Mission 2':'Mission 1';
+  const verdictMap = {go:'✅ GO', 'no-go':'❌ No-Go', conditional:'⚠️ Conditional'};
+
+  html += `<div class="insight-kpi accent"><div class="ik-label">Current Phase</div><div class="ik-value" style="font-size:18px;">${missionLabel}</div></div>`;
+  html += `<div class="insight-kpi green"><div class="ik-label">Steps Confirmed</div><div class="ik-value">${stepsDone}<span style="font-size:14px;color:var(--text-3)">/11</span></div></div>`;
+  html += `<div class="insight-kpi"><div class="ik-label">In Progress</div><div class="ik-value">${stepsHaveData}</div><div class="ik-sub">steps awaiting confirm</div></div>`;
+  if(session.verdict) html += `<div class="insight-kpi ${session.verdict==='go'?'green':''}"><div class="ik-label">M1 Verdict</div><div class="ik-value" style="font-size:16px;">${verdictMap[session.verdict]||session.verdict}</div></div>`;
+  html += '</div></div>';
+
+  // Product alignment summary
+  if(a.productName){
+    html += '<div class="insight-section"><div class="insight-section-title">Product Alignment</div>';
+    html += `<div style="padding:16px 20px;background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);margin-bottom:10px;">`;
+    html += `<div style="font-family:var(--font-serif);font-size:18px;color:var(--text);margin-bottom:4px;">${escHtml(a.productName)}</div>`;
+    if(a.internalDescription) html += `<div style="font-size:12px;color:var(--text-2);line-height:1.6;">${escHtml(a.internalDescription)}</div>`;
+    html += '</div>';
+    if(a.features && a.features.length) html += `<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);">${a.features.length} features &nbsp;·&nbsp; Readiness: ${a.readinessScore||'—'}</div>`;
+    html += '</div>';
+  }
+
+  // Pricing summary
+  if(session.stepData && session.stepData[10] && session.stepData[10]._raw){
+    const pricingRaw = session.stepData[10]._raw;
+    const msrp = pricingRaw.match(/MSRP[^:\r\n]*:\s*\$?([\d,]+)/i);
+    const ks = pricingRaw.match(/KS[^:\r\n]*price[^:\r\n]*:\s*\$?([\d,]+)/i)||pricingRaw.match(/backer[^:\r\n]*:\s*\$?([\d,]+)/i);
+    if(msrp||ks){
+      html += '<div class="insight-section"><div class="insight-section-title">Pricing</div><div class="insight-kpi-grid">';
+      if(msrp) html += `<div class="insight-kpi accent"><div class="ik-label">MSRP</div><div class="ik-value">$${msrp[1]}</div></div>`;
+      if(ks) html += `<div class="insight-kpi"><div class="ik-label">KS Price</div><div class="ik-value">$${ks[1]}</div></div>`;
+      html += '</div></div>';
+    }
+  }
+
+  // Step progress list
+  html += '<div class="insight-section"><div class="insight-section-title">Step Progress</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:4px;">';
+  for(let i=1;i<=11;i++){
+    const def=STEP_DEFS[i];
+    const confirmed=hasConfirmed(session,i);
+    const hasD=hasStepData(session,i);
+    const col=confirmed?'var(--green)':hasD?'var(--accent)':'var(--text-3)';
+    const label=confirmed?'Confirmed':hasD?'In progress':'Not started';
+    html += `<div style="display:flex;align-items:center;gap:10px;padding:7px 12px;background:var(--card);border:1px solid var(--border);cursor:pointer;" onclick="openPlaybookStep(${i})">
+      <span style="font-family:var(--font-mono);font-size:9px;color:var(--text-3);min-width:22px;">${def.num}</span>
+      <span style="flex:1;font-size:12px;color:${confirmed?'var(--text-2)':hasD?'var(--text)':'var(--text-3)'};">${escHtml(def.title)}</span>
+      <span style="font-family:var(--font-mono);font-size:9px;color:${col};">${label}</span>
+    </div>`;
+  }
+  html += '</div></div>';
+
+  el.innerHTML = html;
+}
+
+// Update playbook badge whenever step data changes
+function refreshPlaybookBadge(){
+  const session = getSession(activeId);
+  if(!session) return;
+  const total = Array.from({length:11},(_,i)=>i+1).filter(i=>hasStepData(session,i)||hasConfirmed(session,i)).length;
+  const badge = document.getElementById('playbook-badge');
+  if(badge){
+    badge.textContent=total;
+    badge.style.display=total>0?'flex':'none';
+  }
 }
 
 // ── EXPORT ────────────────────────────────────────────────────────────────────
