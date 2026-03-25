@@ -3060,11 +3060,12 @@ async function callKickman(trigger){
     if(typeof parseStepConfirmSignal==='function'){const cn=parseStepConfirmSignal(text);if(cn&&fresh) confirmStep(cn);}
     if((fresh.mission||1)===2 && /mission.{0,2}3|开始.*定价|pricing.*strategy/i.test(typeof userMsg==='string'?userMsg:'')){
       setTimeout(()=>triggerMission3(fresh.id),800);
+      maybeExtractInsight(fresh,'mission2_complete');
     }
     if((fresh.mission||1)===3 && /mission.{0,2}4|上线了|campaign.*live|we.*launched|已.*上线|开始.*运营/i.test(typeof userMsg==='string'?userMsg:'')){
       setTimeout(()=>triggerMission4(fresh.id),800);
     }
-    const v=detectVerdict(text); if(v){fresh.verdict=v;if(v==='go'&&(fresh.mission||1)===1){setTimeout(()=>triggerMission2(fresh.id),1200);}}
+    const v=detectVerdict(text); if(v){fresh.verdict=v;if(v==='go'&&(fresh.mission||1)===1){setTimeout(()=>triggerMission2(fresh.id),1200);maybeExtractInsight(fresh,'go_verdict');setTimeout(()=>{const m=extractValidationMetrics(fresh);if(m)submitBenchmark(fresh,m);},3000);}}
     // After gen_alignment, re-check and if alignment is now complete, proceed to M2
     if(trigger==='gen_alignment'){
       const nowHasAlignment = fresh.alignment && fresh.alignment.productName && fresh.alignment.negativeThoughts && fresh.alignment.negativeThoughts.length > 0;
@@ -3402,6 +3403,24 @@ function hasStepData(session, stepNum){
 
 
 // ── SESSION LIST ───────────────────────────────────────────────────────────────
+function startRename(id, el){
+  if(!el) return;
+  const old = el.textContent;
+  const input = document.createElement('input');
+  input.value = old;
+  input.style.cssText='background:var(--card);border:1px solid var(--accent);color:var(--text);font-size:11px;padding:2px 6px;width:100%;outline:none;font-family:var(--font-sans);';
+  el.replaceWith(input);
+  input.focus(); input.select();
+  function save(){
+    const newName = input.value.trim() || old;
+    const session = getSession(id);
+    if(session){ session.name = newName; session.updatedAt=Date.now(); scheduleSave(session); }
+    renderList();
+  }
+  input.onblur = save;
+  input.onkeydown = e => { if(e.key==='Enter'){ e.preventDefault(); save(); } if(e.key==='Escape'){ input.replaceWith(el); } };
+}
+
 function renderList(){
   const container=document.getElementById('sessions-list');
   let html='<div class="sessions-label">Projects</div>';
@@ -3758,6 +3777,8 @@ let stepEditMode = false;
 function openStepDrawer(stepNum){
   const def=STEP_DEFS[stepNum]; if(!def) return;
   const session=getSession(activeId); if(!session) return;
+  // Extract any content from history before rendering
+  smartExtractStep(stepNum, session);
   currentStepDrawer=stepNum; stepEditMode=false;
   document.getElementById('step-drawer-title').textContent=def.num+' — '+def.title;
   const d=session.stepData&&session.stepData[stepNum];
