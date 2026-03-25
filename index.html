@@ -4589,7 +4589,9 @@ function renderPlaybook(){
 
   for(const mr of missionRanges){
     html += '<div style="padding:14px 20px 8px;font-family:var(--font-mono);font-size:9px;letter-spacing:2.5px;color:var(--text-3);text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--surface);">'+mr.label+'</div>';
-    html += '<div class="playbook-grid" style="margin-bottom:1px;">';
+    // Cap at 4 columns — 5 steps becomes 3+2 rows, looks better than 5-wide
+    const colCount = Math.min(mr.steps.length, 4);
+    html += '<div class="playbook-grid" style="margin-bottom:1px;grid-template-columns:repeat('+colCount+',1fr);">';
     for(const i of mr.steps){
     const def = STEP_DEFS[i];
     if(!def) continue;
@@ -4602,27 +4604,51 @@ function renderPlaybook(){
     const badge = confirmed?'✓':hasData?'◉':'○';
     const badgeStyle = confirmed?'color:var(--green)':hasData?'color:var(--accent)':'color:var(--text-3)';
 
-    // Get preview text
+    // Get preview text — skip progress summaries, use clean content
     let preview = '';
     if(i===2 && session.alignment && session.alignment.productName){
       preview = session.alignment.productName;
-      if(session.alignment.features && session.alignment.features.length)
+      if(session.alignment.internalDescription)
+        preview += ' — ' + session.alignment.internalDescription.slice(0,60);
+      else if(session.alignment.features && session.alignment.features.length)
         preview += ' · '+session.alignment.features.length+' features';
     } else if(session.stepData && session.stepData[i]){
       const d = session.stepData[i];
-      const raw = d._raw||d._rawText||d[def.fields[0]&&def.fields[0].key]||'';
-      preview = String(raw)
-        .replace(/<!--[\s\S]*?-->/g,'')   // strip HTML comments
-        .replace(/#+\s*/g,'')              // strip markdown headers
-        .replace(/\*{1,3}([^*]+)\*{1,3}/g,'$1')  // strip bold/italic
-        .replace(/`[^`]+`/g,'')            // strip inline code
-        .replace(/\[([^\]]+)\]\([^)]+\)/g,'$1') // strip links
-        .replace(/^[-•·>\s]+/gm,'')       // strip bullet chars
-        .replace(/\n{2,}/g,' · ')         // collapse newlines to separator
+      // Try each field for clean content before falling back to _raw
+      let raw = '';
+      for(const f of (def.fields||[])){
+        if(d[f.key] && String(d[f.key]).length > 30 && !isSummaryText(String(d[f.key]))){
+          raw = String(d[f.key]); break;
+        }
+      }
+      if(!raw) raw = d._raw||d._rawText||'';
+      if(raw && isSummaryText(raw)){
+        // Try to extract the actual step content after the summary
+        const stepMarkers = {
+          3:/APPROACH [ABC]:|营销方向/i, 4:/LP VERSION|LANDING PAGE/i,
+          5:/VERDICT|NO.GO|判决/i, 6:/VIDEO STRATEGY|视频策略|STYLE:/i,
+          7:/SCENE ORDER|SCRIPT|场景/i, 8:/CAMPAIGN PAGE|众筹页面/i,
+          9:/PRE-CAMPAIGN|WARMUP|预热/i, 10:/PRICING|MSRP|定价/i,
+          11:/GO LIVE|LAUNCH CHECKLIST/i
+        };
+        const marker = stepMarkers[i];
+        if(marker){
+          const mIdx = raw.search(marker);
+          if(mIdx > 100) raw = raw.slice(mIdx);
+        }
+      }
+      preview = raw
+        .replace(/<!--[\s\S]*?-->/g,'')
+        .replace(/#+\s*/g,'')
+        .replace(/\*{1,3}([^*]+)\*{1,3}/g,'$1')
+        .replace(/`[^`]+`/g,'')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g,'$1')
+        .replace(/^[-•·>\|\s]+/gm,'')
+        .replace(/\n{2,}/g,' · ')
         .replace(/\n/g,' ')
         .replace(/\s{2,}/g,' ')
-        .trim().slice(0,100);
-      if(preview.length===100) preview+='…';
+        .trim().slice(0,110);
+      if(preview.length===110) preview+='…';
     }
 
     const cta = confirmed?'✓ Confirmed':hasData?'→ View & confirm':'→ Discuss with Kickman';
@@ -4650,6 +4676,11 @@ function renderPlaybook(){
     badge.style.background = doneCount>0?'rgba(0,201,167,.2)':'rgba(244,132,95,.2)';
     badge.style.color = doneCount>0?'var(--green)':'var(--accent)';
   }
+}
+
+function isSummaryText(text){
+  // Detect progress summary text that shouldn't be shown as step preview
+  return /进度汇总|当前状态与下一步规划|已完成进度|待解决问题|CURRENT CAMPAIGN TIMELINE|PRODUCT ALIGNMENT DOCUMENT.*FINAL EXPORT|已更新Timeline/i.test(text.slice(0,200));
 }
 
 function openPlaybookStep(stepNum){
