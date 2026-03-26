@@ -3539,18 +3539,45 @@ async function callKickman(trigger){
   }
   let kbContext='';
   try{const insights=await loadKBInsights(curSess);kbContext=buildKBContext(insights);}catch(e){}
-  // Inject mandatory mission opening for FIRST message of each mission
+  // Inject mandatory mission opening — fires on m2start, m3start, AND first continue in M2/M3
   let missionContext = '';
-  if(trigger === 'continue' && curSess && !curSess[`_m${curSess.mission||1}Opened`]){
-    const m = curSess.mission || 1;
-    curSess[`_m${m}Opened`] = true;
+  const _curM = curSess ? (curSess.mission||1) : 1;
+  const _isFirstOpen = curSess && !curSess['_mOpened'+_curM];
+  const _isMissionTrigger = (trigger==='m2start'||trigger==='m3start'||trigger==='m4start');
+  const _isFirstContinue = (trigger==='continue' && _isFirstOpen);
+
+  if(curSess && (_isMissionTrigger || _isFirstContinue)){
+    curSess['_mOpened'+_curM] = true;
     scheduleSave(curSess);
-    if(m === 3){
-      const goal = (curSess.alignment && curSess.alignment.fundingGoal) ? '$'+(curSess.alignment.fundingGoal) : 'not yet confirmed';
-      const listSz = curSess._emailListSize || 'not yet confirmed';
-      missionContext = '\n\n# MANDATORY FIRST RESPONSE IN MISSION 3\nYou MUST output the DAY 1 MATH CHECK block BEFORE responding to anything else — even if the founder gave you pricing data. Format:\n\n📊 DAY 1 MATH CHECK\nFunding goal: '+goal+'\nDay 1 target (×10%): [calculate]\nBackers needed Day 1: [calculate]\nEmail subscribers needed: [calculate]\nCurrent list: '+listSz+'\nGap: [calculate]\nVerdict: [✅ On track | ⚠️ Borderline | 🔴 Insufficient]\n\nThen acknowledge Mission 2 completion (name what was built). Then respond to the founder.';
-    } else if(m === 2){
-      missionContext = '\n\n# MANDATORY FIRST RESPONSE IN MISSION 2\nYou MUST: (1) Acknowledge M1 wins by name (CPL, CVR, winning angle). (2) Output the DAY 1 MATH CHECK block (goal ×10% = Day 1, email list needed, gap, verdict). (3) Then respond. Do not skip the math block.';
+    if(_curM === 3){
+      const _goal = (curSess.alignment && curSess.alignment.fundingGoal) ? '$'+curSess.alignment.fundingGoal : '[ask: what is your funding goal?]';
+      const _list = curSess._emailListSize || '[ask: how many email subscribers do you have now?]';
+      missionContext = '\n\n# MISSION 3 — MANDATORY OPENING (execute before anything else)\n' +
+        'Step 1: Acknowledge Mission 2 completion — name the video strategy, campaign page structure, and pre-launch plan that were built.\n' +
+        'Step 2: Output this EXACT block before any pricing tier:\n\n' +
+        '📊 DAY 1 MATH CHECK\n' +
+        'Funding goal: '+_goal+'\n' +
+        'Day 1 target (goal × 10%): [calculate]\n' +
+        'Backers needed Day 1 (÷ avg pledge): [calculate]\n' +
+        'Email subscribers needed: [calculate]\n' +
+        'Current email list: '+_list+'\n' +
+        'Gap to close: [calculate]\n' +
+        'Verdict: [✅ On track | ⚠️ Borderline — action needed | 🔴 Insufficient — adjust plan]\n\n' +
+        'Step 3: ONLY AFTER the block above, respond to the founder\'s question or present pricing tiers.\n' +
+        'This block is REQUIRED even if the founder already provided COGS/MSRP/pricing data.';
+    } else if(_curM === 2){
+      missionContext = '\n\n# MISSION 2 — MANDATORY OPENING (execute before anything else)\n' +
+        'Step 1: Acknowledge M1 validation wins by name — state the CPL, CVR, winning angle, and audience discovery.\n' +
+        'Step 2: Ask the funding goal, then output the DAY 1 MATH CHECK block:\n\n' +
+        '📊 DAY 1 MATH CHECK\n' +
+        'Funding goal: [from founder]\n' +
+        'Day 1 target (× 10%): [calculate]\n' +
+        'Backers needed: [calculate]\n' +
+        'Email subscribers needed: [calculate]\n' +
+        'Current list: [from M1 data]\n' +
+        'Gap: [calculate]\n' +
+        'Verdict: [✅/⚠️/🔴]\n\n' +
+        'Step 3: Connect M1 learnings to M2 decisions. Step 4: Ask production budget and launch date.';
     }
   }
   const sysPrompt = baseSysPrompt + memoryContext + tlContext + kbContext + missionContext;
