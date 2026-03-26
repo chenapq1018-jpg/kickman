@@ -1353,9 +1353,9 @@ function parseTimelineUpdate(text){
 // ── CONTEXT MANAGEMENT ────────────────────────────────────────────────────────
 
 // How many recent messages to always keep verbatim
-const RECENT_MSGS_KEEP = 14;
+const RECENT_MSGS_KEEP = 10; // Reduced to prevent overload on long sessions
 // Trigger summarization when history exceeds this
-const SUMMARIZE_THRESHOLD = 22;
+const SUMMARIZE_THRESHOLD = 16; // Summarize earlier to keep context lean
 
 // Build the message array to send to API
 // Strategy: project memory in system prompt + recent N messages verbatim
