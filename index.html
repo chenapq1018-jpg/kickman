@@ -3539,7 +3539,21 @@ async function callKickman(trigger){
   }
   let kbContext='';
   try{const insights=await loadKBInsights(curSess);kbContext=buildKBContext(insights);}catch(e){}
-  const sysPrompt = baseSysPrompt + memoryContext + tlContext + kbContext;
+  // Inject mandatory mission opening for FIRST message of each mission
+  let missionContext = '';
+  if(trigger === 'continue' && curSess && !curSess[`_m${curSess.mission||1}Opened`]){
+    const m = curSess.mission || 1;
+    curSess[`_m${m}Opened`] = true;
+    scheduleSave(curSess);
+    if(m === 3){
+      const goal = (curSess.alignment && curSess.alignment.fundingGoal) ? '$'+(curSess.alignment.fundingGoal) : 'not yet confirmed';
+      const listSz = curSess._emailListSize || 'not yet confirmed';
+      missionContext = '\n\n# MANDATORY FIRST RESPONSE IN MISSION 3\nYou MUST output the DAY 1 MATH CHECK block BEFORE responding to anything else — even if the founder gave you pricing data. Format:\n\n📊 DAY 1 MATH CHECK\nFunding goal: '+goal+'\nDay 1 target (×10%): [calculate]\nBackers needed Day 1: [calculate]\nEmail subscribers needed: [calculate]\nCurrent list: '+listSz+'\nGap: [calculate]\nVerdict: [✅ On track | ⚠️ Borderline | 🔴 Insufficient]\n\nThen acknowledge Mission 2 completion (name what was built). Then respond to the founder.';
+    } else if(m === 2){
+      missionContext = '\n\n# MANDATORY FIRST RESPONSE IN MISSION 2\nYou MUST: (1) Acknowledge M1 wins by name (CPL, CVR, winning angle). (2) Output the DAY 1 MATH CHECK block (goal ×10% = Day 1, email list needed, gap, verdict). (3) Then respond. Do not skip the math block.';
+    }
+  }
+  const sysPrompt = baseSysPrompt + memoryContext + tlContext + kbContext + missionContext;
   let apiMessages;
   if(trigger==='m2start'){
     apiMessages=[{role:'user',content:'Mission 1 complete. GO verdict confirmed. Start Mission 2 now. Mandatory sequence: (1) Acknowledge the specific validation wins by name — CPL, CVR, winning angle, audience discovery. (2) Ask the funding goal, then output the DAY 1 MATH CHECK structured block: goal × 10% = Day 1 target, backers needed, email subscribers needed, current list size and gap, weekly lead target, weekly ad budget, and a verdict. This block must appear in your response. (3) Connect M1 learnings to M2 decisions. (4) Ask production budget and launch date.'}];
@@ -3608,6 +3622,15 @@ async function callKickman(trigger){
     }
     // Auto-extract step data from this response
     autoExtractStepData(text, fresh.step, fresh.id);
+    // Extract email list size if mentioned (for Day 1 Math Check)
+    const emailListMatch = text.match(/([\d,]+)\s*(?:email|subscriber|warm lead)/i);
+    if(emailListMatch && fresh){ fresh._emailListSize = emailListMatch[1].replace(/,/g,''); }
+    // Extract funding goal if mentioned
+    const goalMatch = text.match(/(?:goal|target|raise)[^$]*\$([\d,K]+)/i);
+    if(goalMatch && fresh && !fresh.alignment?.fundingGoal){
+      if(!fresh.alignment) fresh.alignment = {};
+      fresh.alignment.fundingGoal = goalMatch[1];
+    }
     syncTimelineToStep(fresh.step,fresh.mission||1);
     renderTimeline();
     updateAlignmentBtn(fresh);
