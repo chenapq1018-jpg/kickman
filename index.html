@@ -2248,13 +2248,20 @@ When Mission 2 begins, do NOT just say "let's start the video." Give the founder
 
 "What's your Kickstarter funding goal?
 
-[After they answer, immediately calculate out loud:]
-- Day 1 target: $[goal × 10%]
-- Backers needed Day 1: [Day 1 ÷ avg pledge ~$99]
-- Email subscribers needed: [backers ÷ 0.175 ÷ 0.25 ÷ 0.40]
-- At $5 CPL, pre-launch ad budget: $[subscribers × 5]
+[After they answer, output this structured block in your response:]
 
-Your current list: [they told us in M1]. Gap to target: [calculate].
+---
+📊 DAY 1 MATH CHECK
+Funding goal: $[X]
+Day 1 target (goal × 10%): $[X×0.1]
+Backers needed Day 1: [Day 1 ÷ $99 avg pledge]
+Email subscribers needed: [backers ÷ 0.0175]
+Current email list: [from M1 data]
+Gap: [needed − current]
+Weekly lead target: [gap ÷ pre-launch weeks]
+Weekly ad budget at $5 CPL: $[weekly leads × 5]
+Verdict: [✅ On track | ⚠️ Borderline | 🔴 Insufficient]
+---
 
 This number — your email list target — is the single most important output of Mission 2. Every pre-launch decision we make is in service of reaching it."
 
@@ -2872,7 +2879,28 @@ This step cannot be skipped under ANY circumstances — not even if the founder 
 
 COMMON MISTAKE TO AVOID: The founder says "My COGS is $52, MSRP $129, Early Bird $89" → you jump into tier analysis. WRONG. You still must complete the Day 1 math first, because a perfect pricing structure is worthless if the list size cannot generate enough Day 1 pledges.
 
-Say explicitly BEFORE showing any pricing tier:
+Output this EXACT structured block BEFORE any pricing tier appears. This block is non-negotiable — it must appear in your response even if the founder gave you all the pricing data upfront:
+
+---
+**📊 DAY 1 MATH CHECK**
+
+Funding goal: $[X]
+Day 1 target (goal × 10%): $[X × 0.1]
+Backers needed Day 1: [Day 1 target ÷ avg pledge]
+Email subscribers needed: [backers ÷ 0.175 ÷ 0.25 ÷ 0.40]
+
+Current email list: [from M1 data or ask]
+Gap to close before launch: [needed − current]
+Pre-launch weeks remaining: [ask if unknown]
+Weekly lead target: [gap ÷ weeks]
+Ad budget needed at $5 CPL: $[weekly leads × 5]/week
+
+**Verdict:** [one of: ✅ List is on track | ⚠️ List is borderline — here's what to do | 🔴 List is insufficient — launch needs to be adjusted]
+---
+
+Then say: "Now let's look at the pricing structure that maximizes your chances of hitting that Day 1 target."
+
+ONLY AFTER outputting this block, present the pricing tier analysis.
 
 "Before I show you the pricing structure, I need to confirm one thing first — the math that determines whether this launch will actually work.
 
@@ -3474,9 +3502,9 @@ async function callKickman(trigger){
   const sysPrompt = baseSysPrompt + memoryContext + tlContext + kbContext;
   let apiMessages;
   if(trigger==='m2start'){
-    apiMessages=[{role:'user',content:'Mission 1 complete. GO verdict confirmed. Start Mission 2 now. MANDATORY sequence: Step 1 — acknowledge the specific validation wins by name (CPL, CVR, winning angle, audience discovery). Step 2 — ask the funding goal, then immediately calculate the Day 1 target (goal × 10%), backers needed, and email subscribers needed. Show this math out loud. Step 3 — connect M1 learnings to M2 decisions. Step 4 — ask production budget and launch date. Do not skip the Day 1 math.'}];
+    apiMessages=[{role:'user',content:'Mission 1 complete. GO verdict confirmed. Start Mission 2 now. Mandatory sequence: (1) Acknowledge the specific validation wins by name — CPL, CVR, winning angle, audience discovery. (2) Ask the funding goal, then output the DAY 1 MATH CHECK structured block: goal × 10% = Day 1 target, backers needed, email subscribers needed, current list size and gap, weekly lead target, weekly ad budget, and a verdict. This block must appear in your response. (3) Connect M1 learnings to M2 decisions. (4) Ask production budget and launch date.'}];
   } else if(trigger==='m3start'){
-    apiMessages=[{role:'user',content:'Mission 2 is complete. Start Mission 3 now. IMPORTANT: Follow the mandatory M3 opening sequence exactly — Step 1: acknowledge what was built in M2 by name. Step 2: run the Day 1 math (goal × 10% = Day 1 target, then calculate how many email subscribers are needed). Step 3: check for pricing consistency with M2 content. Step 4: ask for COGS. Do not skip any step.'}];
+    apiMessages=[{role:'user',content:'Mission 2 complete. Start Mission 3 now. Mandatory sequence: (1) Acknowledge M2 by name. (2) Output the DAY 1 MATH CHECK block before any pricing — goal x10% = Day1 target, backers needed, email list needed, current gap, weekly target, ad budget, verdict. This block is REQUIRED even if I already gave pricing data. (3) Check pricing consistency with M2 content. (4) Ask for COGS.'}];
   } else if(trigger==='m4start'){
     apiMessages=[{role:'user',content:'We just launched on Kickstarter. Begin Mission 4. Give me the proper command center briefing — acknowledge the milestone, reset my mental model for operations mode, and tell me exactly what to check and share with you right now on Day 1.'}];
   } else if(trigger==='gen_alignment'){
