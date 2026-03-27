@@ -609,13 +609,13 @@ YPE html>
       <div class="lp-feat"><span class="lp-feat-icon">✓</span> Flags red flags before you waste money</div>
     </div>
 
-    <button class="lp-cta" onclick="document.getElementById('lp-login').scrollIntoView({behavior:'smooth'})">Try Kickman Free ↓</button>
+    <button class="lp-cta" onclick="var el=document.getElementById('login-username');el.focus();el.style.borderColor='var(--accent)';setTimeout(function(){el.style.borderColor='';},1500)">Try Kickman Free ↓</button>
     <div class="lp-built">Built for hardware founders · Consumer products · First-time launchers</div>
   </div>
 
   <!-- LOGIN CARD -->
   <div class="login-card" id="lp-login">
-    <div class="login-logo">Kick<span>man</span></div>
+    <div class="login-logo" id="lp-login">Kick<span>man</span></div>
     <div class="login-tagline">Sign in to start</div>
     <div class="login-label">Your Name</div>
     <input type="text" class="login-input" id="login-username" placeholder="e.g. alex or alex@email.com" autocomplete="username" autocapitalize="none" onkeydown="if(event.key==='Enter')document.getElementById('login-password').focus()">
