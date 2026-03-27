@@ -4212,54 +4212,75 @@ function toggleChatSearch(){
 function chatSearch(query){
   clearChatSearchHighlights();
   chatSearchMatches = []; chatSearchIdx = -1;
-  const clearBtn = document.getElementById('nav-search-clear');
-  if(clearBtn) clearBtn.style.display = query.trim() ? 'block' : 'none';
   const q = query.trim().toLowerCase();
   if(!q){ document.getElementById('chat-search-count').textContent = ''; return; }
 
-  // Find all text nodes in messages and highlight
   const msgs = document.getElementById('messages');
   if(!msgs) return;
 
-  // Walk all message bubbles
-  const bubbles = msgs.querySelectorAll('.km-bubble, .user-bubble');
-  bubbles.forEach((bubble, bi) => {
-    const text = bubble.textContent || '';
-    const lc = text.toLowerCase();
-    let idx = 0;
-    while((idx = lc.indexOf(q, idx)) !== -1){
-      chatSearchMatches.push({ bubble, charIdx: idx });
-      idx += q.length;
+  // Search in msg-content divs (actual message text containers)
+  const bubbles = msgs.querySelectorAll('.msg-content');
+  bubbles.forEach(bubble => {
+    if(bubble.textContent.toLowerCase().includes(q)){
+      bubble.innerHTML = highlightInHTML(bubble.innerHTML, q);
     }
   });
 
-  const clr = document.getElementById('nav-search-clear');
-  if(clr) clr.style.display = q ? 'block' : 'none';
+  // Re-query highlights after DOM update
+  const allHL = Array.from(msgs.querySelectorAll('.msg-search-highlight, .msg-search-current'));
+  chatSearchMatches = allHL;
 
-  if(chatSearchMatches.length === 0){
+  if(allHL.length === 0){
     document.getElementById('chat-search-count').textContent = 'No results';
+    document.getElementById('chat-search-prev').disabled = true;
+    document.getElementById('chat-search-next').disabled = true;
     return;
   }
 
-  // Highlight all using innerHTML replacement
-  bubbles.forEach(bubble => {
-    const orig = bubble.innerHTML;
-    // Simple text highlight (works for plain text, may skip styled spans)
-    bubble.innerHTML = highlightInHTML(bubble.innerHTML, q);
-  });
-
-  // Re-query after highlight
-  const allHighlights = msgs.querySelectorAll('.msg-search-highlight, .msg-search-current');
-  chatSearchMatches = Array.from(allHighlights);
   chatSearchIdx = 0;
   navigateToMatch(0);
 }
 
+
 function highlightInHTML(html, query){
-  // Only highlight in text nodes (avoid breaking HTML tags)
-  const esc = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const re = new RegExp('(' + esc + ')(?![^<]*>)', 'gi');
-  return html.replace(re, '<span class="msg-search-highlight">$1</span>');
+  // Walk the DOM tree and highlight only in text nodes
+  // This correctly handles Chinese, Japanese, Arabic, numbers, symbols
+  // without breaking any HTML tags or attributes
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  highlightTextNodes(tmp, query.toLowerCase());
+  return tmp.innerHTML;
+}
+
+function highlightTextNodes(node, query){
+  if(node.nodeType === Node.TEXT_NODE){
+    const text = node.textContent;
+    const lower = text.toLowerCase();
+    let idx = lower.indexOf(query);
+    if(idx === -1) return;
+    // Split into fragments and wrap matches
+    const frag = document.createDocumentFragment();
+    let last = 0;
+    while(idx !== -1){
+      if(idx > last){
+        frag.appendChild(document.createTextNode(text.slice(last, idx)));
+      }
+      const span = document.createElement('span');
+      span.className = 'msg-search-highlight';
+      span.textContent = text.slice(idx, idx + query.length);
+      frag.appendChild(span);
+      last = idx + query.length;
+      idx = lower.indexOf(query, last);
+    }
+    if(last < text.length){
+      frag.appendChild(document.createTextNode(text.slice(last)));
+    }
+    node.parentNode.replaceChild(frag, node);
+  } else if(node.nodeType === Node.ELEMENT_NODE &&
+            !['SCRIPT','STYLE','INPUT','TEXTAREA'].includes(node.tagName)){
+    // Clone children array since we'll modify the DOM
+    Array.from(node.childNodes).forEach(child => highlightTextNodes(child, query));
+  }
 }
 
 function navigateToMatch(idx){
@@ -4287,12 +4308,14 @@ function chatSearchNav(dir){
 function clearChatSearchHighlights(){
   const msgs = document.getElementById('messages');
   if(!msgs) return;
-  // Restore original text by removing highlight spans
+  // Unwrap all highlight spans safely
   msgs.querySelectorAll('.msg-search-highlight, .msg-search-current').forEach(el => {
-    el.replaceWith(document.createTextNode(el.textContent));
+    const parent = el.parentNode;
+    if(parent){
+      parent.replaceChild(document.createTextNode(el.textContent), el);
+      parent.normalize();
+    }
   });
-  // Normalize text nodes
-  msgs.normalize();
 }
 
 // Keyboard shortcut: Cmd/Ctrl+F to open search
