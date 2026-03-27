@@ -169,7 +169,9 @@ YPE html>
   .step-overlay-head{height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;}
   .step-overlay-back{font-family:var(--font-mono);font-size:10px;letter-spacing:1px;color:var(--text-3);background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;transition:color .15s;padding:0;}
   .step-overlay-back:hover{color:var(--text);}
-  .step-overlay-title{font-family:var(--font-serif);font-size:18px;color:var(--text);flex:1;}
+  .step-overlay-title{font-family:var(--font-serif);font-size:16px;color:var(--text);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .step-overlay-title-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .step-overlay-subtitle{font-family:var(--font-mono);font-size:9px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .step-overlay-meta{font-family:var(--font-mono);font-size:9px;color:var(--text-3);}
   .step-overlay-actions{display:flex;gap:8px;align-items:center;}
   .step-overlay-btn{font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:6px 12px;border:1px solid var(--border);background:none;color:var(--text-2);cursor:pointer;transition:all .15s;white-space:nowrap;}
@@ -823,7 +825,10 @@ YPE html>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
           Back to chat
         </button>
-        <div class="step-overlay-title" id="step-drawer-title">Step Results</div>
+        <div class="step-overlay-title-wrap">
+          <div class="step-overlay-subtitle" id="step-drawer-subtitle"></div>
+          <div class="step-overlay-title" id="step-drawer-title">Step Results</div>
+        </div>
         <div class="step-overlay-meta" id="step-drawer-meta"></div>
         <div class="step-overlay-actions">
           <span class="step-saved-badge" id="step-saved-badge">Saved ✓</span>
@@ -2778,7 +2783,11 @@ function openStepDrawer(stepNum){
   // Extract any content from history before rendering
   smartExtractStep(stepNum, session);
   currentStepDrawer=stepNum; stepEditMode=false;
-  document.getElementById('step-drawer-title').textContent=def.num+' — '+def.title;
+  // Compact header: subtitle = "Step 02 · Mission 1", title = "Product Alignment"
+  const missionLabel = (def.mission||1) > 1 ? 'Mission '+(def.mission||1) : 'Mission 1';
+  const subtitleEl = document.getElementById('step-drawer-subtitle');
+  if(subtitleEl) subtitleEl.textContent = def.num + ' · ' + missionLabel;
+  document.getElementById('step-drawer-title').textContent = def.title;
   const d=session.stepData&&session.stepData[stepNum];
   document.getElementById('step-drawer-meta').textContent=d&&d.updatedAt?'Edited '+new Date(d.updatedAt).toLocaleDateString('en',{month:'short',day:'numeric'}):'';
   const saveBtn=document.getElementById('so-save-btn');
