@@ -248,6 +248,10 @@
   @keyframes tdot{0%,60%,100%{opacity:.3;transform:scale(.9)}30%{opacity:1;transform:scale(1)}}
   .welcome-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px;text-align:center;gap:16px;}
   .welcome-logo{font-family:var(--font-serif);font-size:52px;color:var(--text);line-height:1;margin-bottom:4px;}
+  .welcome-pitch{font-family:var(--font-sans);font-size:13px;color:var(--text-3);text-align:center;line-height:1.7;margin:4px 0 20px;max-width:280px;}
+  .welcome-steps{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;justify-content:center;}
+  .ws-step{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:1px;background:var(--card);border:1px solid var(--border);padding:5px 10px;}
+  .ws-num{color:var(--accent);font-weight:700;}
   .welcome-logo span{color:var(--accent);font-style:italic;}
   .welcome-sub{font-family:var(--font-mono);font-size:11px;letter-spacing:3px;color:var(--text-3);text-transform:uppercase;margin-bottom:32px;}
   .start-btn{background:var(--accent);color:#fff;border:none;font-family:var(--font-mono);font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:14px 36px;cursor:pointer;transition:opacity .2s;}
@@ -563,6 +567,9 @@
   <div class="login-card">
     <div class="login-logo">Kick<span>man</span></div>
     <div class="login-tagline">Crowdfunding Coach</div>
+    <div style="font-family:var(--font-sans);font-size:11px;color:var(--text-3);text-align:center;margin:-12px 0 16px;line-height:1.6;padding:0 8px;">
+      From idea to Kickstarter launch.<br>Validation · Campaign · Go Live.
+    </div>
     <div style="font-family:var(--font-mono);font-size:8px;color:var(--text-3);opacity:.4;text-align:center;margin-top:-20px;margin-bottom:8px;">v03.26.1026 — 10:55</div>
     <div class="login-label">Your Name</div>
     <input type="text" class="login-input" id="login-username" placeholder="e.g. john or john@email.com" autocomplete="username" autocapitalize="none" onkeydown="if(event.key==='Enter')document.getElementById('login-password').focus()">
@@ -745,9 +752,18 @@
 
     <div class="welcome-state" id="welcome-state">
       <div class="welcome-logo">Kick<span>man</span></div>
-      <div class="welcome-sub">Crowdfunding Coach · Mission 1</div>
-      <button class="start-btn" onclick="startCurrentSession()">Begin &#x2192;</button>
-      <div class="welcome-note">14 days &middot; Go / No-Go decision &middot; Kickstarter-ready</div>
+      <div class="welcome-sub">Your Crowdfunding Coach</div>
+      <div class="welcome-pitch">
+        Tell me your product idea.<br>
+        I'll tell you if it's worth launching — and build the exact plan to win.
+      </div>
+      <div class="welcome-steps">
+        <div class="ws-step"><span class="ws-num">M1</span><span>Validate in 14 days</span></div>
+        <div class="ws-step"><span class="ws-num">M2</span><span>Build the campaign</span></div>
+        <div class="ws-step"><span class="ws-num">M3</span><span>Price &amp; go live</span></div>
+      </div>
+      <button class="start-btn" onclick="startCurrentSession()">Start your campaign &#x2192;</button>
+      <div class="welcome-note">Honest evaluation &middot; Go / No-Go decision &middot; Full launch plan</div>
     </div>
     <div class="messages" id="messages" style="display:none"></div>
     <div class="input-area" id="input-area" style="display:none"
@@ -1615,19 +1631,19 @@ When the user uploads product images, prototypes, or sketches:
 
 When a new conversation begins, say exactly this:
 
-"Welcome. I'm Kickman.
+"I'm Kickman — your crowdfunding coach.
 
-My job: figure out in 14 days whether your product is worth launching on Kickstarter — and exactly how to position it to win.
+My job: tell you honestly whether your product is worth launching on Kickstarter, and build the exact plan to win if it is.
 
-Answer these 4 questions honestly. The more raw, the better.
+Five questions to start. Answer them raw — the less polished, the better:
 
-1. Why are you building this? What's the personal story or frustration behind it?
-2. What does the product do? Plain language, no jargon.
-3. What does it cost to make one unit (rough estimate)? What price were you thinking?
-4. Timeline — when will you have a sample ready? When do you want to launch? When can you ship to backers?
-5. Funding goal — what are you targeting on Kickstarter? (This is critical: a $1M goal requires $100K+ on Day 1, which requires 6,000+ warm email leads before launch. I'll help you build the plan to get there.)
+1. Why are you building this? Personal story or frustration behind it.
+2. What does it do? Plain language, no jargon.
+3. Cost to make one unit (rough estimate) + price you're thinking.
+4. Timeline: sample ready when? Launch when? Ship to backers when?
+5. Funding goal: what are you targeting? (A $500K goal needs a very different plan than a $50K goal — I'll show you the math.)
 
-Take your time."
+Go."
 
 After they respond, ask 2–3 sharp follow-up questions if anything is unclear. Keep asking until ALL of these are confirmed:
 - Core problem being solved
@@ -3588,7 +3604,7 @@ async function callKickman(trigger){
   // Build messages array — smart context management to prevent token overflow
   let messages;
   if(trigger==='start'){
-    messages=[{role:'user',content:'Begin.'}];
+    messages=[{role:'user',content:'Start. This is a new project. Introduce yourself briefly (2-3 sentences max), then immediately ask your opening questions. Be direct and energetic — this founder is about to spend weeks with you.'}];
   } else {
     messages = buildMessageHistory(session);
   }
