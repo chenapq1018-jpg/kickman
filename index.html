@@ -102,6 +102,14 @@ YPE html>
   .new-btn{width:100%;background:linear-gradient(135deg,var(--accent),#00a88a);color:#060e14;border:none;font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:11px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:700;}
   .new-btn:hover{opacity:.9;box-shadow:0 0 18px rgba(0,201,167,0.25);}
   .sessions-list{flex:1;overflow-y:auto;padding:6px 0;}
+  .search-box{padding:6px 10px;position:relative;display:flex;align-items:center;}
+  .search-input{width:100%;background:var(--card);border:1px solid var(--border);color:var(--text-2);font-family:var(--font-mono);font-size:10px;padding:6px 28px 6px 10px;outline:none;transition:border-color .15s;letter-spacing:.3px;}
+  .search-input:focus{border-color:rgba(0,201,167,.4);color:var(--text);}
+  .search-input::placeholder{color:var(--text-3);}
+  .search-clear{position:absolute;right:16px;background:none;border:none;color:var(--text-3);cursor:pointer;font-size:14px;padding:0;line-height:1;}
+  .search-clear:hover{color:var(--text-2);}
+  .search-highlight{background:rgba(0,201,167,.25);color:var(--accent);border-radius:1px;}
+  .search-match-snippet{font-family:var(--font-sans);font-size:10px;color:var(--text-3);line-height:1.5;padding:2px 0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
   .sessions-label{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;color:var(--text-3);text-transform:uppercase;padding:8px 16px 4px;}
   .session-row{display:flex;align-items:stretch;}
   .session-item{flex:1;min-width:0;padding:9px 14px;cursor:pointer;border-left:2px solid transparent;transition:all .15s;}
@@ -754,6 +762,10 @@ YPE html>
   <aside class="sidebar">
     <div class="sidebar-top">
       <button class="new-btn" onclick="createNewSession()">+ New Project</button>
+    </div>
+    <div class="search-box">
+      <input type="text" id="search-input" class="search-input" placeholder="Search projects..." oninput="handleSearch(this.value)" autocomplete="off">
+      <button class="search-clear" id="search-clear" onclick="clearSearch()" style="display:none">×</button>
     </div>
     <div class="sessions-list" id="sessions-list">
       <div class="sessions-label">Projects</div>
@@ -2283,12 +2295,81 @@ function hasStepData(session, stepNum){
 
 // ── SESSION LIST ───────────────────────────────────────────────────────────────
 
+
+// ── SEARCH ────────────────────────────────────────────────────────────────────
+let searchQuery = '';
+
+function handleSearch(query){
+  searchQuery = query.trim().toLowerCase();
+  document.getElementById('search-clear').style.display = searchQuery ? 'block' : 'none';
+  renderList();
+}
+
+function clearSearch(){
+  searchQuery = '';
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-clear').style.display = 'none';
+  renderList();
+}
+
+function searchInSession(session, query){
+  if(!query) return null;
+  // Search in name
+  if(session.name && session.name.toLowerCase().includes(query)){
+    return { field:'name', snippet: session.name };
+  }
+  // Search in history messages
+  const hist = session.history || [];
+  for(const msg of hist){
+    const text = typeof msg.content === 'string' ? msg.content :
+      (Array.isArray(msg.content) ? msg.content.map(b=>b.text||'').join(' ') : '');
+    const lc = text.toLowerCase();
+    const idx = lc.indexOf(query);
+    if(idx >= 0){
+      // Extract snippet around match
+      const start = Math.max(0, idx - 40);
+      const end = Math.min(text.length, idx + query.length + 60);
+      const snippet = (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
+      return { field: msg.role, snippet, matchIdx: idx - start + (start > 0 ? 1 : 0) };
+    }
+  }
+  // Search in project memory
+  if(session.projectMemory){
+    const lc = session.projectMemory.toLowerCase();
+    const idx = lc.indexOf(query);
+    if(idx >= 0){
+      const start = Math.max(0, idx - 40);
+      const end = Math.min(session.projectMemory.length, idx + query.length + 60);
+      return { field:'memory', snippet: session.projectMemory.slice(start, end) };
+    }
+  }
+  return null;
+}
+
+function highlightText(text, query){
+  if(!query) return escHtml(text);
+  const lc = text.toLowerCase();
+  const idx = lc.indexOf(query);
+  if(idx < 0) return escHtml(text);
+  return escHtml(text.slice(0, idx)) +
+    '<span class="search-highlight">' + escHtml(text.slice(idx, idx + query.length)) + '</span>' +
+    escHtml(text.slice(idx + query.length));
+}
+
 function renderList(){
   const container=document.getElementById('sessions-list');
-  let html='<div class="sessions-label">Projects</div>';
-  if(sessions.length===0){html+='<div style="padding:10px 16px;font-family:var(--font-mono);font-size:10px;color:var(--text-3)">No projects yet</div>';}
-  else{
-    sessions.forEach(s=>{
+  const filteredSessions = searchQuery
+    ? sessions.filter(s => searchInSession(s, searchQuery) !== null)
+    : sessions;
+
+  let html = searchQuery
+    ? '<div class="sessions-label">' + filteredSessions.length + ' result' + (filteredSessions.length!==1?'s':'') + '</div>'
+    : '<div class="sessions-label">Projects</div>';
+
+  if(filteredSessions.length===0){
+    html += '<div style="padding:16px;font-family:var(--font-mono);font-size:10px;color:var(--text-3);text-align:center;line-height:1.8;">No matches found<br><span style="opacity:.5">Try a product name or keyword</span></div>';
+  } else {
+    filteredSessions.forEach(s=>{
       const isActive=s.id===activeId;
       const date=new Date(s.updatedAt).toLocaleDateString('en',{month:'short',day:'numeric'});
       let bClass='',bText=(s.mission||1)===2?'M2':'Step '+s.step;
@@ -2299,12 +2380,13 @@ function renderList(){
       html+=`<div class="session-row">
         <div class="session-item ${isActive?'active':''}" onclick="loadSession('${s.id}')">
           <div class="session-name-row">
-            <div class="session-name" id="sname-${s.id}">${escHtml(s.name)}</div>
+            <div class="session-name" id="sname-${s.id}">${searchQuery ? highlightText(s.name, searchQuery) : escHtml(s.name)}</div>
             <button class="session-rename-btn" onclick="event.stopPropagation();openRenameModal('${s.id}')" title="Rename project">
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             </button>
           </div>
           <div class="session-meta"><span>${date}</span><span class="badge ${bClass}">${bText}</span></div>
+          ${searchQuery ? (()=>{ const m=searchInSession(s,searchQuery); return m&&m.field!=='name'?'<div class="search-match-snippet">'+highlightText(m.snippet,searchQuery)+'</div>':''; })() : ''}
         </div>
         <button class="session-del" onclick="event.stopPropagation();confirmDelete('${s.id}')" title="Delete project">×</button>
       </div>`;
