@@ -1953,12 +1953,18 @@ export default async function handler(req, res) {
   if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
 
   // Build system prompt server-side — client never sees these prompts
-  const baseSysPrompt = getSystemPrompt(mission || 1);
-  const sysPrompt = baseSysPrompt
-    + (memoryContext || '')
-    + (tlContext || '')
-    + (kbContext || '')
-    + (missionContext || '');
+  // mission=0 means use missionContext as the full system prompt (for utility calls)
+  let sysPrompt;
+  if(mission === 0){
+    sysPrompt = missionContext || '';
+  } else {
+    const baseSysPrompt = getSystemPrompt(mission || 1);
+    sysPrompt = baseSysPrompt
+      + (memoryContext || '')
+      + (tlContext || '')
+      + (kbContext || '')
+      + (missionContext || '');
+  }
 
   const callAPI = async () => {
     return fetch('https://api.anthropic.com/v1/messages', {
