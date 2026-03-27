@@ -1935,12 +1935,6 @@ function getSystemPrompt(mission){
   return mission===2 ? SYSTEM_M2 : SYSTEM_M1;
 }
 
-function getSystemPrompt(mission){
-  if(mission===4) return SYSTEM_M4;
-  if(mission===3) return SYSTEM_M3;
-  return mission===2 ? SYSTEM_M2 : SYSTEM_M1;
-}
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
