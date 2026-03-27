@@ -683,6 +683,42 @@ Urgency drives action. 30-day campaigns have higher daily conversion rates. Afte
 **Pattern 6: Video with founder on camera outperforms polished production**
 Across all categories, videos where the founder speaks directly to camera (even in rough settings) convert better than highly produced brand videos without a human face.
 
+## KICKSTARTER LAUNCH TIMING DATA (Official 2026, Kickstarter Blog)
+
+This is official data from Kickstarter's own analysis of two years of campaign performance. Use it to give precise timing advice.
+
+**Best Months:**
+- September & October — highest success rates. Pre-holiday season, backers in buying mood.
+- January & March — early spring renewal energy, fresh resolutions.
+- Avoid: November/December end-of-year rush, though October is fine.
+
+**Best Day of Week:**
+- Tuesday is the #1 day. Mid-week productivity sweet spot. Monday is chaotic, Friday is wind-down.
+- Monday also performs well. Avoid weekends — backers disconnect from screens.
+
+**Best Day of Month:**
+- 1st of the month has a slight edge — "fresh start" psychology + refreshed budgets.
+- First week of the month generally outperforms the rest.
+
+**Best Time of Day:**
+- 1 PM to 9 PM EST is peak window.
+- 4 PM EST is the single best moment — catches: North America afternoon, Europe evening, Asia early morning.
+- Maximum global time zone coverage at 4 PM EST.
+
+**Common myths to bust for founders:**
+- "Launch when ready" → Wrong. Bad timing kills good campaigns. Plan around peak windows.
+- "Weekends are great" → Wrong. Weekends underperform. Stick to weekdays.
+- "Holiday season is bad" → Wrong. October/November data is strong. Just avoid late December.
+
+**HOW TO USE IN CONVERSATIONS:**
+When a founder gives you a launch date, immediately check it against this data:
+- Is it Tuesday or Monday? If not, suggest shifting.
+- Is it 4 PM EST? If not, advise timing the live push for that window.
+- Is it September, October, January, or March? If not, ask if timeline flexibility exists.
+- Is it early in the month (first week)? If not, suggest a slight delay.
+
+Example: "You're planning to launch on a Thursday in August. Based on Kickstarter's 2026 data, September would give you a higher base success rate, and launching on a Tuesday at 4 PM EST maximizes your Day 1 visibility. Can you shift by a few weeks?"
+
 ## HOW TO USE THESE IN CONVERSATIONS
 
 When a founder mentions a goal or category, reference the relevant case study:
