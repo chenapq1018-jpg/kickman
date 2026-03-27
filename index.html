@@ -589,6 +589,26 @@ YPE html>
   .lp-access-hint{font-family:var(--font-mono);font-size:10px;color:var(--text-3);margin-bottom:8px;letter-spacing:.5px;}
   .lp-built{font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:1px;margin-bottom:60px;}
   /* ─────────────────────────────────────────────────────── */
+
+  /* ── Chat Search ──────────────────────────────────────────────────────────── */
+  .chat-search-bar{background:var(--card);border-bottom:1px solid var(--border);padding:8px 12px;display:none;flex-shrink:0;}
+  .chat-search-bar.active{display:block;}
+  .chat-search-inner{display:flex;align-items:center;gap:6px;}
+  .chat-search-icon{color:var(--text-3);font-size:16px;flex-shrink:0;}
+  .chat-search-input{flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font-sans);font-size:12px;padding:6px 10px;outline:none;min-width:0;}
+  .chat-search-input:focus{border-color:rgba(0,201,167,.4);}
+  .chat-search-input::placeholder{color:var(--text-3);}
+  .chat-search-count{font-family:var(--font-mono);font-size:10px;color:var(--text-3);white-space:nowrap;min-width:50px;text-align:center;}
+  .chat-search-nav{background:none;border:1px solid var(--border);color:var(--text-3);cursor:pointer;padding:4px 8px;font-size:12px;transition:all .15s;}
+  .chat-search-nav:hover{border-color:var(--accent);color:var(--accent);}
+  .chat-search-nav:disabled{opacity:.3;cursor:default;}
+  .chat-search-close{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;padding:0 4px;line-height:1;}
+  .chat-search-close:hover{color:var(--text);}
+  .msg-search-highlight{background:rgba(0,201,167,.25);color:var(--accent);border-radius:2px;padding:0 1px;}
+  .msg-search-current{background:rgba(0,201,167,.5);color:#060e14;border-radius:2px;padding:0 1px;}
+  /* search CSS from sidebar cleanup */
+  .search-box{display:none;}
+  /* ─────────────────────────────────────────────────────────────────────────── */
 </style>
 </head>
 <body>
@@ -753,6 +773,10 @@ YPE html>
   <button class="proj-tab" id="tab-timeline" onclick="switchTab('timeline')">
     <span class="proj-tab-icon">&#x1F4C5;</span> Timeline
   </button>
+  <div style="flex:1"></div>
+  <button class="proj-tab" id="pn-search-btn" onclick="toggleChatSearch()" title="Search (⌘F)" style="padding:6px 10px;opacity:.7;">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:block;vertical-align:middle"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+  </button>
 
 </nav>
 
@@ -825,6 +849,16 @@ YPE html>
       </div>
       <button class="start-btn" onclick="startCurrentSession()">Start your campaign &#x2192;</button>
       <div class="welcome-note">Honest evaluation &middot; Go / No-Go decision &middot; Full launch plan</div>
+    </div>
+    <div class="chat-search-bar" id="chat-search-bar" style="display:none">
+      <div class="chat-search-inner">
+        <span class="chat-search-icon">⌕</span>
+        <input type="text" id="chat-search-input" class="chat-search-input" placeholder="Search in this conversation..." oninput="chatSearch(this.value)" autocomplete="off">
+        <span class="chat-search-count" id="chat-search-count"></span>
+        <button class="chat-search-nav" id="chat-search-prev" onclick="chatSearchNav(-1)">↑</button>
+        <button class="chat-search-nav" id="chat-search-next" onclick="chatSearchNav(1)">↓</button>
+        <button class="chat-search-close" onclick="closeChatSearch()">×</button>
+      </div>
     </div>
     <div class="messages" id="messages" style="display:none"></div>
     <div class="input-area" id="input-area" style="display:none"
@@ -2296,80 +2330,13 @@ function hasStepData(session, stepNum){
 // ── SESSION LIST ───────────────────────────────────────────────────────────────
 
 
-// ── SEARCH ────────────────────────────────────────────────────────────────────
-let searchQuery = '';
-
-function handleSearch(query){
-  searchQuery = query.trim().toLowerCase();
-  document.getElementById('search-clear').style.display = searchQuery ? 'block' : 'none';
-  renderList();
-}
-
-function clearSearch(){
-  searchQuery = '';
-  document.getElementById('search-input').value = '';
-  document.getElementById('search-clear').style.display = 'none';
-  renderList();
-}
-
-function searchInSession(session, query){
-  if(!query) return null;
-  // Search in name
-  if(session.name && session.name.toLowerCase().includes(query)){
-    return { field:'name', snippet: session.name };
-  }
-  // Search in history messages
-  const hist = session.history || [];
-  for(const msg of hist){
-    const text = typeof msg.content === 'string' ? msg.content :
-      (Array.isArray(msg.content) ? msg.content.map(b=>b.text||'').join(' ') : '');
-    const lc = text.toLowerCase();
-    const idx = lc.indexOf(query);
-    if(idx >= 0){
-      // Extract snippet around match
-      const start = Math.max(0, idx - 40);
-      const end = Math.min(text.length, idx + query.length + 60);
-      const snippet = (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
-      return { field: msg.role, snippet, matchIdx: idx - start + (start > 0 ? 1 : 0) };
-    }
-  }
-  // Search in project memory
-  if(session.projectMemory){
-    const lc = session.projectMemory.toLowerCase();
-    const idx = lc.indexOf(query);
-    if(idx >= 0){
-      const start = Math.max(0, idx - 40);
-      const end = Math.min(session.projectMemory.length, idx + query.length + 60);
-      return { field:'memory', snippet: session.projectMemory.slice(start, end) };
-    }
-  }
-  return null;
-}
-
-function highlightText(text, query){
-  if(!query) return escHtml(text);
-  const lc = text.toLowerCase();
-  const idx = lc.indexOf(query);
-  if(idx < 0) return escHtml(text);
-  return escHtml(text.slice(0, idx)) +
-    '<span class="search-highlight">' + escHtml(text.slice(idx, idx + query.length)) + '</span>' +
-    escHtml(text.slice(idx + query.length));
-}
 
 function renderList(){
   const container=document.getElementById('sessions-list');
-  const filteredSessions = searchQuery
-    ? sessions.filter(s => searchInSession(s, searchQuery) !== null)
-    : sessions;
-
-  let html = searchQuery
-    ? '<div class="sessions-label">' + filteredSessions.length + ' result' + (filteredSessions.length!==1?'s':'') + '</div>'
-    : '<div class="sessions-label">Projects</div>';
-
-  if(filteredSessions.length===0){
-    html += '<div style="padding:16px;font-family:var(--font-mono);font-size:10px;color:var(--text-3);text-align:center;line-height:1.8;">No matches found<br><span style="opacity:.5">Try a product name or keyword</span></div>';
-  } else {
-    filteredSessions.forEach(s=>{
+  let html='<div class="sessions-label">Projects</div>';
+  if(sessions.length===0){html+='<div style="padding:10px 16px;font-family:var(--font-mono);font-size:10px;color:var(--text-3)">No projects yet</div>';}
+  else{
+    sessions.forEach(s=>{
       const isActive=s.id===activeId;
       const date=new Date(s.updatedAt).toLocaleDateString('en',{month:'short',day:'numeric'});
       let bClass='',bText=(s.mission||1)===2?'M2':'Step '+s.step;
@@ -2380,13 +2347,12 @@ function renderList(){
       html+=`<div class="session-row">
         <div class="session-item ${isActive?'active':''}" onclick="loadSession('${s.id}')">
           <div class="session-name-row">
-            <div class="session-name" id="sname-${s.id}">${searchQuery ? highlightText(s.name, searchQuery) : escHtml(s.name)}</div>
+            <div class="session-name" id="sname-${s.id}">${escHtml(s.name)}</div>
             <button class="session-rename-btn" onclick="event.stopPropagation();openRenameModal('${s.id}')" title="Rename project">
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             </button>
           </div>
           <div class="session-meta"><span>${date}</span><span class="badge ${bClass}">${bText}</span></div>
-          ${searchQuery ? (()=>{ const m=searchInSession(s,searchQuery); return m&&m.field!=='name'?'<div class="search-match-snippet">'+highlightText(m.snippet,searchQuery)+'</div>':''; })() : ''}
         </div>
         <button class="session-del" onclick="event.stopPropagation();confirmDelete('${s.id}')" title="Delete project">×</button>
       </div>`;
@@ -4230,6 +4196,136 @@ async function exportAll(){
   sections.push(chatMd);
   downloadBlob(sections.join('\n'), 'kickman-full-export-'+slugify(s.name)+'-'+TODAY()+'.md');
 }
+// ── CHAT SEARCH ───────────────────────────────────────────────────────────────
+let chatSearchMatches = [];
+let chatSearchIdx = -1;
+let chatSearchActive = false;
+
+function toggleChatSearch(){
+  const bar = document.getElementById('chat-search-bar');
+  if(!bar) return;
+  chatSearchActive = !chatSearchActive;
+  bar.classList.toggle('active', chatSearchActive);
+  if(chatSearchActive){
+    document.getElementById('chat-search-input').focus();
+    document.getElementById('chat-search-input').select();
+  } else {
+    clearChatSearchHighlights();
+    chatSearchMatches = []; chatSearchIdx = -1;
+    document.getElementById('chat-search-count').textContent = '';
+  }
+}
+
+function closeChatSearch(){
+  chatSearchActive = false;
+  document.getElementById('chat-search-bar').classList.remove('active');
+  clearChatSearchHighlights();
+  chatSearchMatches = []; chatSearchIdx = -1;
+  document.getElementById('chat-search-count').textContent = '';
+  document.getElementById('chat-search-input').value = '';
+}
+
+function chatSearch(query){
+  clearChatSearchHighlights();
+  chatSearchMatches = []; chatSearchIdx = -1;
+  const q = query.trim().toLowerCase();
+  if(!q){ document.getElementById('chat-search-count').textContent = ''; return; }
+
+  // Find all text nodes in messages and highlight
+  const msgs = document.getElementById('messages');
+  if(!msgs) return;
+
+  // Walk all message bubbles
+  const bubbles = msgs.querySelectorAll('.km-bubble, .user-bubble');
+  bubbles.forEach((bubble, bi) => {
+    const text = bubble.textContent || '';
+    const lc = text.toLowerCase();
+    let idx = 0;
+    while((idx = lc.indexOf(q, idx)) !== -1){
+      chatSearchMatches.push({ bubble, charIdx: idx });
+      idx += q.length;
+    }
+  });
+
+  if(chatSearchMatches.length === 0){
+    document.getElementById('chat-search-count').textContent = 'No results';
+    return;
+  }
+
+  // Highlight all using innerHTML replacement
+  bubbles.forEach(bubble => {
+    const orig = bubble.innerHTML;
+    // Simple text highlight (works for plain text, may skip styled spans)
+    bubble.innerHTML = highlightInHTML(bubble.innerHTML, q);
+  });
+
+  // Re-query after highlight
+  const allHighlights = msgs.querySelectorAll('.msg-search-highlight, .msg-search-current');
+  chatSearchMatches = Array.from(allHighlights);
+  chatSearchIdx = 0;
+  navigateToMatch(0);
+}
+
+function highlightInHTML(html, query){
+  // Only highlight in text nodes (avoid breaking HTML tags)
+  const esc = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp('(' + esc + ')(?![^<]*>)', 'gi');
+  return html.replace(re, '<span class="msg-search-highlight">$1</span>');
+}
+
+function navigateToMatch(idx){
+  const all = document.getElementById('messages').querySelectorAll('.msg-search-highlight, .msg-search-current');
+  all.forEach((el,i) => {
+    el.className = i === idx ? 'msg-search-current' : 'msg-search-highlight';
+  });
+  chatSearchMatches = Array.from(all);
+  if(chatSearchMatches[idx]){
+    chatSearchMatches[idx].scrollIntoView({ behavior:'smooth', block:'center' });
+  }
+  const count = chatSearchMatches.length;
+  document.getElementById('chat-search-count').textContent = count > 0 ? (idx+1) + ' / ' + count : 'No results';
+  document.getElementById('chat-search-prev').disabled = idx <= 0;
+  document.getElementById('chat-search-next').disabled = idx >= count - 1;
+}
+
+function chatSearchNav(dir){
+  const count = chatSearchMatches.length;
+  if(count === 0) return;
+  chatSearchIdx = Math.max(0, Math.min(count-1, chatSearchIdx + dir));
+  navigateToMatch(chatSearchIdx);
+}
+
+function clearChatSearchHighlights(){
+  const msgs = document.getElementById('messages');
+  if(!msgs) return;
+  // Restore original text by removing highlight spans
+  msgs.querySelectorAll('.msg-search-highlight, .msg-search-current').forEach(el => {
+    el.replaceWith(document.createTextNode(el.textContent));
+  });
+  // Normalize text nodes
+  msgs.normalize();
+}
+
+// Keyboard shortcut: Cmd/Ctrl+F to open search
+document.addEventListener('keydown', function(e){
+  if((e.metaKey || e.ctrlKey) && e.key === 'f'){
+    const chatPane = document.getElementById('pane-chat');
+    if(chatPane && chatPane.classList.contains('active')){
+      e.preventDefault();
+      toggleChatSearch();
+    }
+  }
+  if(e.key === 'Escape' && chatSearchActive){
+    closeChatSearch();
+  }
+  // Enter to go to next match when search input focused
+  if(e.key === 'Enter' && document.activeElement === document.getElementById('chat-search-input')){
+    e.preventDefault();
+    chatSearchNav(e.shiftKey ? -1 : 1);
+  }
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 </script>
 </body>
 </html>
