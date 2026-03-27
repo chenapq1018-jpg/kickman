@@ -815,6 +815,17 @@ YPE html>
   <!-- PANE: CHAT -->
   <div class="view-pane active" id="pane-chat">
   <div class="chat-container">
+    <!-- CHAT SEARCH BAR -->
+    <div class="chat-search-bar" id="chat-search-bar">
+      <div class="chat-search-inner">
+        <span class="chat-search-icon">⌕</span>
+        <input type="text" id="chat-search-input" class="chat-search-input" placeholder="Search in this conversation..." oninput="chatSearch(this.value)" autocomplete="off">
+        <span class="chat-search-count" id="chat-search-count"></span>
+        <button class="chat-search-nav" id="chat-search-prev" onclick="chatSearchNav(-1)" disabled>↑</button>
+        <button class="chat-search-nav" id="chat-search-next" onclick="chatSearchNav(1)" disabled>↓</button>
+        <button class="chat-search-close" onclick="closeChatSearch()">×</button>
+      </div>
+    </div>
     <!-- STEP RESULTS OVERLAY — covers chat area -->
     <div class="step-overlay" id="step-overlay">
       <div class="step-overlay-head">
@@ -849,16 +860,6 @@ YPE html>
       </div>
       <button class="start-btn" onclick="startCurrentSession()">Start your campaign &#x2192;</button>
       <div class="welcome-note">Honest evaluation &middot; Go / No-Go decision &middot; Full launch plan</div>
-    </div>
-    <div class="chat-search-bar" id="chat-search-bar" style="display:none">
-      <div class="chat-search-inner">
-        <span class="chat-search-icon">⌕</span>
-        <input type="text" id="chat-search-input" class="chat-search-input" placeholder="Search in this conversation..." oninput="chatSearch(this.value)" autocomplete="off">
-        <span class="chat-search-count" id="chat-search-count"></span>
-        <button class="chat-search-nav" id="chat-search-prev" onclick="chatSearchNav(-1)">↑</button>
-        <button class="chat-search-nav" id="chat-search-next" onclick="chatSearchNav(1)">↓</button>
-        <button class="chat-search-close" onclick="closeChatSearch()">×</button>
-      </div>
     </div>
     <div class="messages" id="messages" style="display:none"></div>
     <div class="input-area" id="input-area" style="display:none"
