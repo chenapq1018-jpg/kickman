@@ -578,6 +578,7 @@ YPE html>
   .lp-feat-icon{color:var(--accent);font-size:14px;flex-shrink:0;margin-top:1px;}
   .lp-cta{background:linear-gradient(135deg,var(--accent),#009980);color:#060e14;font-family:var(--font-mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;padding:14px 32px;cursor:pointer;max-width:360px;margin-bottom:12px;transition:opacity .2s;}
   .lp-cta:hover{opacity:.9;}
+  .lp-access-hint{font-family:var(--font-mono);font-size:10px;color:var(--text-3);margin-bottom:8px;letter-spacing:.5px;}
   .lp-built{font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:1px;margin-bottom:60px;}
   /* ─────────────────────────────────────────────────────── */
 </style>
@@ -609,7 +610,8 @@ YPE html>
       <div class="lp-feat"><span class="lp-feat-icon">✓</span> Flags red flags before you waste money</div>
     </div>
 
-    <button class="lp-cta" onclick="var el=document.getElementById('login-username');el.focus();el.style.borderColor='var(--accent)';setTimeout(function(){el.style.borderColor='';},1500)">Try Kickman Free ↓</button>
+    <button class="lp-cta" onclick="var pw=document.getElementById('login-password');pw.value='kickman2026';var el=document.getElementById('login-username');el.focus();el.style.borderColor='var(--accent)';pw.style.borderColor='var(--accent)';setTimeout(function(){el.style.borderColor='';pw.style.borderColor='';},2000);">Try Kickman Free →</button>
+    <div class="lp-access-hint">Access code: <span id="lp-pw-hint" style="font-family:var(--font-mono);color:var(--accent);letter-spacing:1px;">kickman2026</span></div>
     <div class="lp-built">Built for hardware founders · Consumer products · First-time launchers</div>
   </div>
 
