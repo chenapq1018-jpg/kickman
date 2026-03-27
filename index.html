@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+<!DOC
+
+YPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -558,6 +560,26 @@
   .tl-drawer-body::-webkit-scrollbar-thumb{background:var(--border);}
   .tl-drawer-note{padding:8px 14px;font-family:var(--font-mono);font-size:9px;color:var(--text-3);line-height:1.7;border-top:1px solid var(--border);flex-shrink:0;}
   @media(max-width:1080px){.tl-fab{display:flex;}}
+
+/* ── Landing Page ──────────────────────────────────────── */
+  .login-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:row;align-items:stretch;z-index:100;overflow:hidden;}
+  .lp-hero{flex:1;min-width:0;padding:60px 48px;overflow-y:auto;display:flex;flex-direction:column;justify-content:center;background:var(--bg);}
+  .lp-logo{font-family:var(--font-serif);font-size:36px;color:var(--text);letter-spacing:-1px;margin-bottom:4px;}
+  .lp-logo span{color:var(--accent);font-style:italic;}
+  .lp-tagline{font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:24px;}
+  .lp-headline{font-family:var(--font-serif);font-size:26px;color:var(--text);line-height:1.45;margin-bottom:28px;font-weight:400;max-width:480px;}
+  .lp-stats{display:flex;align-items:center;gap:0;margin-bottom:32px;border:1px solid var(--border);background:var(--card);max-width:480px;}
+  .lp-stat{padding:16px 24px;text-align:center;flex:1;}
+  .lp-stat-n{display:block;font-family:var(--font-serif);font-size:22px;color:var(--accent);margin-bottom:3px;}
+  .lp-stat-l{display:block;font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;color:var(--text-3);text-transform:uppercase;}
+  .lp-stat-div{width:1px;background:var(--border);align-self:stretch;}
+  .lp-features{text-align:left;margin-bottom:36px;display:flex;flex-direction:column;gap:10px;}
+  .lp-feat{font-family:var(--font-sans);font-size:13px;color:var(--text-2);display:flex;align-items:flex-start;gap:10px;line-height:1.5;}
+  .lp-feat-icon{color:var(--accent);font-size:14px;flex-shrink:0;margin-top:1px;}
+  .lp-cta{background:linear-gradient(135deg,var(--accent),#009980);color:#060e14;font-family:var(--font-mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;padding:14px 32px;cursor:pointer;max-width:360px;margin-bottom:12px;transition:opacity .2s;}
+  .lp-cta:hover{opacity:.9;}
+  .lp-built{font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:1px;margin-bottom:60px;}
+  /* ─────────────────────────────────────────────────────── */
 </style>
 </head>
 <body>
@@ -583,7 +605,7 @@
       <div class="lp-feat"><span class="lp-feat-icon">✓</span> Validates your idea with real ad testing</div>
       <div class="lp-feat"><span class="lp-feat-icon">✓</span> Builds your campaign page, video script & pricing</div>
       <div class="lp-feat"><span class="lp-feat-icon">✓</span> Tells you exactly how many email leads you need</div>
-      <div class="lp-feat"><span class="lp-feat-icon">✓</span> Knows 10 campaigns that raised $2M+ — references them for you</div>
+      <div class="lp-feat"><span class="lp-feat-icon">✓</span> Trained on $1M+ Kickstarter campaigns — knows what actually works</div>
       <div class="lp-feat"><span class="lp-feat-icon">✓</span> Flags red flags before you waste money</div>
     </div>
 
@@ -4126,23 +4148,4 @@ async function exportAll(){
 }
 </script>
 </body>
-</html  /* ── Landing Page ──────────────────────────────────────── */
-  .login-screen{overflow-y:auto!important;}
-  .lp-hero{flex:1;min-width:0;padding:60px 48px;overflow-y:auto;display:flex;flex-direction:column;justify-content:center;background:var(--bg);}
-  .lp-logo{font-family:var(--font-serif);font-size:36px;color:var(--text);letter-spacing:-1px;margin-bottom:4px;}
-  .lp-logo span{color:var(--accent);font-style:italic;}
-  .lp-tagline{font-family:var(--font-mono);font-size:10px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:24px;}
-  .lp-headline{font-family:var(--font-serif);font-size:26px;color:var(--text);line-height:1.45;margin-bottom:28px;font-weight:400;max-width:480px;}
-  .lp-stats{display:flex;align-items:center;gap:0;margin-bottom:32px;border:1px solid var(--border);background:var(--card);max-width:480px;}
-  .lp-stat{padding:16px 24px;text-align:center;flex:1;}
-  .lp-stat-n{display:block;font-family:var(--font-serif);font-size:22px;color:var(--accent);margin-bottom:3px;}
-  .lp-stat-l{display:block;font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;color:var(--text-3);text-transform:uppercase;}
-  .lp-stat-div{width:1px;background:var(--border);align-self:stretch;}
-  .lp-features{text-align:left;margin-bottom:36px;display:flex;flex-direction:column;gap:10px;}
-  .lp-feat{font-family:var(--font-sans);font-size:13px;color:var(--text-2);display:flex;align-items:flex-start;gap:10px;line-height:1.5;}
-  .lp-feat-icon{color:var(--accent);font-size:14px;flex-shrink:0;margin-top:1px;}
-  .lp-cta{background:linear-gradient(135deg,var(--accent),#009980);color:#060e14;font-family:var(--font-mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;padding:14px 32px;cursor:pointer;max-width:360px;margin-bottom:12px;transition:opacity .2s;}
-  .lp-cta:hover{opacity:.9;}
-  .lp-built{font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:1px;margin-bottom:60px;}
-  /* ─────────────────────────────────────────────────────── */
->
+</html>
