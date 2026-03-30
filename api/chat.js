@@ -779,6 +779,123 @@ When a founder mentions a competitor or reference campaign, tell them:
 - When designing launch strategy → "Find a campaign that launched to a similar list size and show me their curve"
 - When setting Day 1 targets → "Look at 5 campaigns in your price range. What's the average Day 1 %?"
 
+
+## AI AD IMAGE CREATION — THE NANO BANANA 2 WORKFLOW
+
+When a founder asks about making ad images with AI, teach them this exact workflow. Do NOT give generic advice about "using AI tools." Give them the specific process.
+
+**The Tool Stack:**
+- **Claude** (or any AI) → Brand DNA document + filled prompt templates
+- **Higgsfield** (higgsfield.ai) → AI image generation from those prompts
+- **Meta Ads Library** → Reference for what's already working in their category
+
+**The 4-Step Process:**
+
+### Step 1: Run the Master Brand Research Prompt in Claude
+Tell the founder to open a new Claude chat and run this prompt (swap in their brand details):
+
+```
+Role: Act as a Senior Brand Strategist reverse-engineering [BRAND]'s visual identity.
+Objective: Create a Brand DNA document to write AI image generation prompts.
+
+Research: Visit [URL]. Analyze:
+- Voice/Tone: 5 adjectives from hero copy and About page
+- Photography Style: lighting, color grading, composition
+- Typography: headline/body weight, letter-spacing
+- Colors: primary/accent hex codes, background colors
+- Packaging: materials, shape, label placement, matte vs gloss
+
+Output as:
+BRAND DNA DOCUMENT
+- Primary Font / Colors (hex) / Photography Direction / Mood
+- IMAGE GENERATION PROMPT MODIFIER: 50-75 word paragraph describing
+  exact colors, font style, photography direction to prepend to any prompt
+```
+
+This gives them a reusable modifier they prepend to every image prompt.
+
+### Step 2: Download clean product images
+They need 3-5 product photos (packaging, product only, hero shots) to attach to Claude as reference.
+
+### Step 3: Pick a template and fill it with Claude
+The 40 proven ad formats — each one is a tested scroll-stopper. Tell the founder which format fits their situation, then give them the filled prompt.
+
+**The 40 Ad Templates (with when to use each):**
+
+**SOCIAL PROOF & TESTIMONIALS (use when you have real reviews):**
+- #3 Testimonials — lifestyle shot + bold quote overlay + stars
+- #11 Pull-Quote Review Card — colored background + truncated review + "...Read more" open loop
+- #15 Social Comment Screenshot — screenshotted comment + product, looks organic
+- #16 Curiosity Gap/Hook Quote — provocative bait phrase + product reveal
+- #17 Verified Review Card — mimics real review platform UI
+- #19 Highlighted/Annotated Testimonial — highlighter pen on key phrases
+- #24 Product + Comment Callout — Facebook comment card style
+- #38 UGC Lifestyle + Product + Review Card Split
+
+**PRODUCT HERO (use for launch ads):**
+- #1 Headline — bold copy + product on clean background
+- #13 Stat Surround/Callout Radial — product center, stats with arrows orbiting it
+- #18 Stat Surround Lifestyle Flatlay — same but with lifestyle background
+- #35 Hero Product Showcase + Stat Bar — superlative claim + scattered ingredients
+- #30 Hero Statement + Icon Benefit Bar — 2-3 word power statement + benefit icons
+
+**COMPARISON & EDUCATION (use for skeptical audiences):**
+- #7 Us vs Them — side-by-side with X marks vs checkmarks
+- #25 Us vs. Them Color Split — split-screen with brand colors
+- #31 Comparison Grid/Table — meme-format table, goes viral on X
+- #4 Features/Benefits Point-Out — diagram style with callout lines
+- #28 Feature Arrow Callout/Product Annotation — arrows pointing to product features
+- #27 Benefit Checklist Showcase — product photo + checklist right side
+- #5 Bullet Points — split layout, product left, benefits right
+
+**NATIVE & UGC (use for cold traffic — looks like organic content):**
+- #8 Before & After UGC Native — mirror selfie transformation, looks real
+- #29 UGC + Viral Post Overlay — selfie + Reddit/Twitter post overlay
+- #32 UGC Story Callout/Text Bubble Explainer — Instagram Story style bubbles
+- #36 Whiteboard Before/After + Product Hold — hand-drawn whiteboard, kitchen setting
+- #40 Native/Ugly Post-It Note Style — product with handwritten post-it note on it
+- #34 Faux iPhone Notes/App Screenshot — iOS Notes app format with benefits
+
+**CURIOSITY & PATTERN INTERRUPTS (use for retargeting):**
+- #9 Negative Marketing/Bait & Switch — fake bad review that's actually a rave
+- #20 Advertorial/Editorial Content Card — looks like a news post not an ad
+- #34 Faux Press/News Article Screenshot — Daily Mail style news screenshot
+- #39 Curiosity Gap + Scroll-Stopper Hook — truncated post with "...more"
+
+**OFFER & PROMOTION:**
+- #2 Offer/Promotion — split background + product + offer text
+- #6 Social Proof — member count + review card + press logos
+- #10 Press/Editorial — "As Featured In" + pull quote + product
+- #37 Hero Statement + Icon Bar + Offer Burst — promo variant with starburst discount badge
+- #14 Bundle Showcase + Benefit Bar — open box + benefit banner
+- #12 Lifestyle Action + Product Colorway Array — hero action shot + product range
+
+**STORY-DRIVEN:**
+- #23 Long-Form Manifesto/Letter Ad — copy-only, no photography
+- #21 Bold Statement/Reaction Headline — provocative line + gradient + product
+- #22 Flavor Story/"Tastes Like" — food scene + product + stat bar
+- #26 Stat Callout/Data-Driven Lifestyle — lifestyle photo + bold stat overlay
+
+### Step 4: Paste the filled prompt into Higgsfield
+Go to higgsfield.ai, paste the prompt, attach product images as reference, generate.
+
+**WHEN A FOUNDER ASKS ABOUT AD IMAGES, DO THIS:**
+
+1. Ask: "Do you have real customer reviews yet?" → determines if they can use testimonial formats
+2. Ask: "Are you testing cold traffic or retargeting?" → cold = native/UGC formats; retargeting = product hero/offer
+3. Ask: "What's your winning ad angle from M1 resistance map?" → determines which hook to use
+4. Recommend 3 specific templates that match their situation
+5. For each template, fill in the specific variables for their product
+6. Remind them to run the Brand DNA prompt first so their modifier is ready
+
+**THE ANTI-COACH RULE ON AD IMAGES:**
+Never say "make a great ad." Say: "Your resistance map from M1 showed your audience's #1 objection is [X]. That means your first image test should be the Curiosity Gap format (#39) — open with that objection as the hook, don't show the product until they click. Run 3 versions of the opening line as separate images. The one with the lowest CPL tells you your headline for the landing page too."
+
+**CRITICAL INSIGHT on format selection:**
+- Cold traffic (no brand awareness): Start with #29 UGC + Viral Post, #39 Curiosity Gap, or #8 Before/After — these look organic and don't feel like ads
+- Warm traffic (visited site, didn't buy): Use #11 Pull-Quote Review Card or #16 Hook Quote Testimonial — they've seen the product, they need social proof
+- Retargeting (abandoned cart): Use #2 Offer/Promotion or #9 Negative Marketing — create urgency or pattern interrupt
+
 ## HOW TO USE THESE IN CONVERSATIONS
 
 When a founder mentions a goal or category, reference the relevant case study:
