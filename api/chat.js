@@ -2003,7 +2003,8 @@ export default async function handler(req, res) {
   }
 
   const callAPI = async () => {
-    return fetch('https://api.anthropic.com/v1/messages', {
+    const baseUrl = process.env.ANTHROPIC_BASE_URL || 'https://api.anthropic.com';
+    return fetch(baseUrl.replace(/\/$/, '') + '/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
