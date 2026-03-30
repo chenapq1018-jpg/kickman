@@ -2009,6 +2009,7 @@ export default async function handler(req, res) {
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
+        'Authorization': 'Bearer ' + apiKey,
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
@@ -2034,7 +2035,9 @@ export default async function handler(req, res) {
       if (response.status === 529) {
         return res.status(529).json({ error: 'Kickman is very busy right now. Please try again in a moment.' });
       }
-      return res.status(response.status).json({ error: data.error?.message || 'API error' });
+      // Include full error detail for debugging
+      const errDetail = data.error?.message || data.message || JSON.stringify(data).slice(0,200);
+      return res.status(response.status).json({ error: errDetail });
     }
     return res.status(200).json(data);
   } catch (err) {
