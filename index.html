@@ -90,6 +90,8 @@ YPE html>
   .idle .pc-title{color:var(--text-3);}
   .pc-preview{font-size:11px;color:var(--text-3);line-height:1.6;flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;}
   .has-data .pc-preview,.confirmed .pc-preview{color:var(--text-3);}
+  .pc-conclusion{font-family:var(--font-mono);font-size:10px;color:var(--accent);font-weight:700;letter-spacing:.5px;margin:2px 0 4px;}
+  .pc-metric{color:var(--accent);opacity:.8;font-size:9px;margin-left:2px;}
   .pc-cta{font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:1px;margin-top:auto;}
   .has-data .pc-cta{color:var(--accent);}
   .confirmed .pc-cta{color:var(--green);}
@@ -232,6 +234,12 @@ YPE html>
   .msg-name{font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--text-3);text-transform:uppercase;margin-bottom:7px;}
   .message.user .msg-name{text-align:right;}
   .msg-content{font-size:14px;line-height:1.75;color:var(--text);}
+  .km-alert{border-radius:2px;padding:10px 14px;margin:10px 0;font-family:var(--font-mono);font-size:12px;line-height:1.6;border-left:3px solid;}
+  .km-alert-red{background:rgba(255,80,80,.08);border-color:#ff5050;color:#ff8888;}
+  .km-alert-green{background:rgba(0,201,167,.08);border-color:var(--accent);color:var(--accent);}
+  .km-alert-yellow{background:rgba(244,132,95,.1);border-color:var(--accent2);color:var(--accent2);}
+  .km-alert-label{font-weight:700;letter-spacing:1px;font-size:10px;text-transform:uppercase;margin-bottom:4px;display:block;}
+  .km-num{display:inline-block;background:rgba(0,201,167,.12);color:var(--accent);font-family:var(--font-mono);font-size:11px;padding:1px 6px;border-radius:2px;font-weight:700;}
   .message.user .msg-content{background:var(--card);border:1px solid var(--border);padding:14px 18px;color:var(--text-2);font-size:13px;line-height:1.65;}
   .msg-content p{margin-bottom:12px;} .msg-content p:last-child{margin-bottom:0;}
   .msg-content strong{font-weight:500;color:var(--text);}
@@ -287,7 +295,7 @@ YPE html>
   #user-input{flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:var(--font-sans);font-size:14px;line-height:1.6;padding:12px 16px;resize:none;min-height:46px;max-height:200px;outline:none;transition:border-color .2s;}
   #user-input:focus{border-color:rgba(0,201,167,.4);box-shadow:0 0 0 2px rgba(0,201,167,0.05);}
   #user-input::placeholder{color:var(--text-3);}
-  .send-btn{background:var(--accent);color:#fff;border:none;width:40px;height:40px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .2s;}
+  .send-btn{background:var(--text-3);color:#fff;border:none;width:40px;height:40px;flex-shrink:0;transition:background .2s,transform .1s;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .2s;}
   .send-btn:hover{opacity:.9;box-shadow:0 0 16px rgba(0,201,167,0.3);transform:translateY(-1px);} .send-btn:disabled{opacity:.3;cursor:not-allowed;}
   .send-btn svg{width:15px;height:15px;}
   .input-meta{display:flex;justify-content:flex-end;margin-top:6px;}
@@ -867,7 +875,7 @@ YPE html>
       </div>
       <div class="image-preview-strip" id="image-preview-strip"></div>
       <div class="input-row">
-        <textarea id="user-input" placeholder="Type a message or drop an image..." rows="1" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+        <textarea id="user-input" placeholder="Tell me about your product idea..." rows="1" oninput="autoResize(this);updateSendBtn()" onkeydown="handleKey(event)"></textarea>
         <div class="input-actions">
           <button class="img-btn" onclick="document.getElementById('file-input').click()" title="Upload image">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1756,7 +1764,7 @@ function setSyncStatus(state){const el=document.getElementById('sync-status');el
 function loadSession(id){
   activeId=id; pendingImages=[]; renderPreviewStrip(); kbLoaded=false; kbCache={};
   const session=getSession(id); if(!session)return;
-  document.getElementById('messages').innerHTML=''; updateStepUI(session.step);
+  document.getElementById('messages').innerHTML=''; updateStepUI(session.step); updateInputPlaceholder(session.step||1);
   if(!session.started||session.history.length===0){
     document.getElementById('welcome-state').style.display='flex';
     document.getElementById('messages').style.display='none';
@@ -1983,6 +1991,13 @@ async function callKickman(trigger){
         }
       }
     }
+    // Extract CPL/CVR for Playbook display
+    if(fresh){
+      const cplM = text.match(/CPL[:\s]+\$?([\d.]+)/i);
+      const cvrM = text.match(/CVR[:\s]+([\d.]+)%/i);
+      if(cplM){ if(!fresh.stepData) fresh.stepData={}; if(!fresh.stepData[4]) fresh.stepData[4]={}; fresh.stepData[4]._cpl=cplM[1]; }
+      if(cvrM){ if(!fresh.stepData) fresh.stepData={}; if(!fresh.stepData[4]) fresh.stepData[4]={}; fresh.stepData[4]._cvr=cvrM[1]; }
+    }
     // Auto-extract step data from this response
     autoExtractStepData(text, fresh.step, fresh.id);
     // Extract email list size if mentioned (for Day 1 Math Check)
@@ -2141,7 +2156,7 @@ function addMessageDOM(role,raw,images=[]){
   }
 
   if(role==='km'){
-    const div=document.createElement('div'); div.innerHTML=renderMd(raw); c.appendChild(div);
+    const div=document.createElement('div'); div.innerHTML=enhanceKickmanMessage(renderMd(raw)); c.appendChild(div);
   } else {
     if(raw){const p=document.createElement('p'); p.textContent=raw; c.appendChild(p);}
   }
@@ -2154,9 +2169,30 @@ function escHtml(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(
 
 function renderMd(text){
   let h=text;
+
+  // ── Verdict blocks ──────────────────────────────────────────────────────
   if(h.includes('VERDICT: GO')||h.includes('GO ✅'))h=h.replace(/\*\*VERDICT:.*?GO.*?\*\*/g,'<div class="verdict-go"><span class="verdict-icon">✅</span><span class="verdict-text">GO — Launch it</span></div>');
   if(h.includes('VERDICT: NO-GO')||h.includes('NO-GO ❌'))h=h.replace(/\*\*VERDICT:.*?NO-GO.*?\*\*/g,'<div class="verdict-no"><span class="verdict-icon">❌</span><span class="verdict-text">No-Go — Not yet</span></div>');
   if(h.includes('VERDICT: CONDITIONAL')||h.includes('CONDITIONAL ⚠️'))h=h.replace(/\*\*VERDICT:.*?CONDITIONAL.*?\*\*/g,'<div class="verdict-conditional"><span class="verdict-icon">⚠️</span><span class="verdict-text">Conditional</span></div>');
+
+  // ── RED FLAG blocks ─────────────────────────────────────────────────────
+  // Match: **Red Flag N: Title** or RED FLAG: Title lines
+  h=h.replace(/\*\*Red Flag (\d+)[:\s]+([^*\n]+)\*\*/g, function(m, num, title){
+    return '<div class="km-flag-red"><div class="km-flag-label">Red Flag '+num+'</div><strong>'+title.trim()+'</strong></div>';
+  });
+  h=h.replace(/🚩\s*\*\*([^*]+)\*\*/g, '<div class="km-flag-red"><div class="km-flag-label">Red Flag</div><strong>$1</strong></div>');
+
+  // ── DAY 1 MATH CHECK block ──────────────────────────────────────────────
+  h=h.replace(/(📊 DAY 1 MATH CHECK)/g, '<div class="km-flag-green"><div class="km-flag-label">📊 Day 1 Math Check</div>');
+    // ── Inline stat highlighting: $X.XX CPL, XX.X% CVR, $XXXK ──────────────
+  if(h.includes('CPL')||h.includes('CVR')||h.includes('CTR')){
+    h=h.replace(/\$([\d.]+)\s*(CPL)/g, '<span class="km-stat"><span class="km-stat-val">$$$1</span><span class="km-stat-label">$2</span></span>');
+    h=h.replace(/([\d.]+)%\s*(CVR|CTR|conversion rate)/gi, '<span class="km-stat"><span class="km-stat-val">$1%</span><span class="km-stat-label">$2</span></span>');
+  }
+
+  // ── CRITICAL / WARNING blocks ───────────────────────────────────────────
+  h=h.replace(/\*\*(CRITICAL[^*]+)\*\*/g, '<div class="km-flag-red"><div class="km-flag-label">Critical</div>$1</div>');
+
   h=h.replace(/^### (.+)$/gm,'<h3>$1</h3>');
   h=h.replace(/^## (.+)$/gm,'<h2>$1</h2>');
   h=h.replace(/^# (.+)$/gm,'<h2>$1</h2>');
@@ -2273,6 +2309,7 @@ function parseStepConfirmSignal(text){
 }
 
 function updateStepUI(step, mission=1){
+  updateInputPlaceholder(step, mission);
   // Header dots — M1 progress
   for(let i=1;i<=5;i++){
     const dot=document.getElementById('dot-'+i);
@@ -2471,6 +2508,14 @@ function showTyping(){const c=document.getElementById('messages');const w=docume
 function removeTyping(){document.getElementById('typing-indicator')?.remove();}
 
 // ── UTILS ───────────────────────────────────────────────────────────────────────
+function updateSendBtn(){
+  const input = document.getElementById('user-input');
+  const btn = document.getElementById('send-btn');
+  if(!input || !btn) return;
+  const hasText = input.value.trim().length > 0;
+  btn.classList.toggle('has-content', hasText || pendingImages.length > 0);
+}
+
 function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,200)+'px';}
 function setSendDisabled(v){document.getElementById('send-btn').disabled=v;}
 
@@ -3667,7 +3712,7 @@ function renderPlaybook(){
         <span class="pc-title">${escHtml(def.title)}</span>
       </div>
       ${preview?`<div class="pc-preview">${escHtml(preview)}</div>`:''}
-      <div class="pc-cta">${cta}</div>
+      ${conclusionHtml}<div class="pc-cta">${cta}</div>
     </div>`;
     }
     html += '</div>'; // end mission grid
@@ -4196,6 +4241,40 @@ async function exportAll(){
   sections.push(chatMd);
   downloadBlob(sections.join('\n'), 'kickman-full-export-'+slugify(s.name)+'-'+TODAY()+'.md');
 }
+// ── STEP-AWARE INPUT PLACEHOLDER ─────────────────────────────────────────────
+const STEP_PLACEHOLDERS = {
+  1: 'Tell me about your product — why are you building this?',
+  2: 'Any questions about the product alignment?',
+  3: 'Which marketing approach feels most true to your product?',
+  4: 'Ready to set up the validation ads, or any questions?',
+  5: 'Confirm the Go/No-Go, or share what changed...',
+  6: "What's your video budget and target launch date?",
+  7: 'Thoughts on the script direction? Any scenes to add or cut?',
+  8: 'Any sections of the campaign page to adjust?',
+  9: "How's the pre-launch warmup going? Share any early data.",
+  10: "Share your COGS and target price — I'll run the numbers.",
+  11: 'Ready to go live? Share your launch date and list size.',
+  default: 'Message Kickman...',
+};
+
+function updateInputPlaceholder(step){
+  const input = document.getElementById('user-input');
+  if(!input) return;
+  const placeholder = STEP_PLACEHOLDERS[step] || STEP_PLACEHOLDERS.default;
+  input.placeholder = placeholder;
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+function enhanceKickmanMessage(html) {
+  if(!html) return html;
+  // Highlight key metrics inline: $3.86 CPL, 22.8% CVR, 6/10
+  html = html.replace(/(\$[\d.]+\s*CPL|\d+\.?\d*%\s*CVR|\d+\.?\d*%\s*CTR|\d+\s*\/\s*10\b)/g,
+    '<span class="km-num">$1</span>');
+  return html;
+}
+
+// ── DYNAMIC PLACEHOLDER ───────────────────────────────────────────────────────
+
 // ── CHAT SEARCH ───────────────────────────────────────────────────────────────
 let chatSearchMatches = [];
 let chatSearchIdx = -1;
