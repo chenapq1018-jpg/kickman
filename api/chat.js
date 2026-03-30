@@ -2405,7 +2405,7 @@ export default async function handler(req, res) {
   const username = req.body.username || '';
   const usageCheck = checkAndIncrementUsage(username, mission || 1);
   if (!usageCheck.allowed) {
-    const missionNames = {2:'Campaign Build',3:'Pricing & Launch',4:'Live Campaign'};
+    const missionNames = {2:'Campaign Build',3:'Pricing & Launch',4:'Campaign Operations'};
     const mName = missionNames[usageCheck.mission] || `Mission ${usageCheck.mission}`;
     return res.status(429).json({
       error: `USAGE_LIMIT`,
