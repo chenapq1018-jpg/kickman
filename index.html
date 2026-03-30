@@ -3703,7 +3703,20 @@ function renderPlaybook(){
       if(preview.length===110) preview+='…';
     }
 
-    const cta = confirmed?'✓ Confirmed':hasData?'→ View & confirm':'→ Discuss with Kickman';
+    // Build metric tag for confirmed steps
+    let metric = '';
+    if(confirmed){
+      if(i===5){ metric = session.verdict==='go'?'GO':session.verdict==='no-go'?'No-Go':''; }
+      else if(i===2 && session.alignment && session.alignment.productName){ metric = session.alignment.productName.slice(0,14); }
+      else if(session.stepData && session.stepData[i]){
+        const sd=session.stepData[i];
+        if(sd._cpl) metric='CPL $'+sd._cpl;
+        else if(sd._cvr) metric=sd._cvr+'% CVR';
+      }
+    }
+    const cta = confirmed
+      ? '✓ Confirmed'+(metric?' <span style="color:var(--accent);opacity:.8;font-size:9px;">· '+escHtml(metric)+'</span>':'')
+      : hasData?'→ View & confirm':'→ Discuss with Kickman';
 
     html += `<div class="playbook-card ${state}" onclick="openPlaybookStep(${i})">
       <div class="pc-meta">
@@ -3712,7 +3725,7 @@ function renderPlaybook(){
         <span class="pc-title">${escHtml(def.title)}</span>
       </div>
       ${preview?`<div class="pc-preview">${escHtml(preview)}</div>`:''}
-      ${conclusionHtml}<div class="pc-cta">${cta}</div>
+      <div class="pc-cta">${cta}</div>
     </div>`;
     }
     html += '</div>'; // end mission grid
