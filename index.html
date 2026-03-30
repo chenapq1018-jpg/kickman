@@ -1940,9 +1940,15 @@ async function callKickman(trigger){
   }
   showTyping();
   try{
-    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:apiMessages,mission:curSess?(curSess.mission||1):1,missionContext,memoryContext,tlContext,kbContext,password:currentPw,lang:getSessionLanguage(curSess)})});
+    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:apiMessages,mission:curSess?(curSess.mission||1):1,missionContext,memoryContext,tlContext,kbContext,password:currentPw,lang:getSessionLanguage(curSess),username:currentUser||''})});
     removeTyping();
     if(res.status===401){doLogout();return;}
+    if(res.status===429){
+      const err=await res.json().catch(()=>({}));
+      addMessageDOM('km', err.message || 'You\'ve reached the usage limit for this Mission. This resets in 24 hours.');
+      removeTyping();
+      return;
+    }
     if(!res.ok){const err=await res.json().catch(()=>({}));addMessageDOM('km',`Error: ${err.error||res.status}. Please try again.`);isLoading=false;setSendDisabled(false);return;}
     const data=await res.json();
     const text=data.content?.[0]?.text||'';
