@@ -2342,6 +2342,51 @@ function getSystemPrompt(mission){
   return mission===2 ? SYSTEM_M2 : SYSTEM_M1;
 }
 
+// ── USAGE LIMITS ─────────────────────────────────────────────────────────────
+// In-memory counters (resets on cold start — good enough for abuse prevention)
+// Key: username, Value: { counts: {mission: n}, resetAt: timestamp }
+const usageCounts = new Map();
+
+const LIMITS = {
+  0: Infinity,  // utility calls (summary, insights) — unlimited
+  1: Infinity,  // M1 — free, unlimited
+  2: 60,        // M2 — 60 messages covers full mission with room to spare
+  3: 50,        // M3
+  4: 80,        // M4 (live campaign, needs more)
+};
+
+const RESET_HOURS = 24; // reset counters every 24 hours
+
+function checkAndIncrementUsage(username, mission) {
+  if (!username) return { allowed: true };
+  const limit = LIMITS[mission] ?? 40;
+  if (limit === Infinity) return { allowed: true };
+
+  const now = Date.now();
+  const key = username.toLowerCase().trim();
+  let userData = usageCounts.get(key);
+
+  // Reset if 24h passed
+  if (!userData || now > userData.resetAt) {
+    userData = { counts: {}, resetAt: now + RESET_HOURS * 3600 * 1000 };
+    usageCounts.set(key, userData);
+  }
+
+  const current = userData.counts[mission] || 0;
+  if (current >= limit) {
+    return {
+      allowed: false,
+      used: current,
+      limit,
+      mission,
+    };
+  }
+
+  userData.counts[mission] = current + 1;
+  return { allowed: true, used: current + 1, limit };
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -2354,6 +2399,19 @@ export default async function handler(req, res) {
   const ACCESS_PASSWORD = process.env.ACCESS_PASSWORD;
   if (ACCESS_PASSWORD && password !== ACCESS_PASSWORD) {
     return res.status(401).json({ error: 'Invalid password' });
+  }
+
+  // Usage limit check
+  const username = req.body.username || '';
+  const usageCheck = checkAndIncrementUsage(username, mission || 1);
+  if (!usageCheck.allowed) {
+    const missionNames = {2:'Campaign Build',3:'Pricing & Launch',4:'Live Campaign'};
+    const mName = missionNames[usageCheck.mission] || `Mission ${usageCheck.mission}`;
+    return res.status(429).json({
+      error: `USAGE_LIMIT`,
+      mission: usageCheck.mission,
+      message: `You've reached the ${usageCheck.limit}-message limit for ${mName} in the last 24 hours. This resets in a few hours — or reply here if you need more time to work through your campaign.`
+    });
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
