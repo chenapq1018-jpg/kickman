@@ -1939,7 +1939,7 @@ async function callKickman(trigger){
   }
   showTyping();
   try{
-    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:apiMessages,mission:curSess?(curSess.mission||1):1,missionContext,memoryContext,tlContext,kbContext,password:currentPw})});
+    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:apiMessages,mission:curSess?(curSess.mission||1):1,missionContext,memoryContext,tlContext,kbContext,password:currentPw,lang:getSessionLanguage(curSess)})});
     removeTyping();
     if(res.status===401){doLogout();return;}
     if(!res.ok){const err=await res.json().catch(()=>({}));addMessageDOM('km',`Error: ${err.error||res.status}. Please try again.`);isLoading=false;setSendDisabled(false);return;}
@@ -2092,6 +2092,20 @@ function showMissionBanner(){
 }
 
 async function sendMessage(){
+  // Detect and store language preference from user input
+  const inputEl = document.getElementById('user-input');
+  const rawInput = inputEl ? inputEl.value.trim() : '';
+  if(rawInput && curSess){
+    const detected = detectUserLanguage(rawInput);
+    if(detected === 'zh' && curSess.lang !== 'zh'){
+      curSess.lang = 'zh';
+      saveSessions();
+    } else if(detected === 'en' && rawInput.length > 10 && !/[\u4e00-\u9fff]/.test(rawInput) && curSess.lang !== 'en'){
+      // Only switch to 'en' if message is clearly English (10+ chars, no Chinese)
+      curSess.lang = 'en';
+      saveSessions();
+    }
+  }
   const input=document.getElementById('user-input');
   const text=input.value.trim();
   if((!text&&pendingImages.length===0)||isLoading)return;
@@ -4285,6 +4299,33 @@ function enhanceKickmanMessage(html) {
     '<span class="km-num">$1</span>');
   return html;
 }
+
+// ── LANGUAGE DETECTION ───────────────────────────────────────────────────────
+function detectUserLanguage(text){
+  // Check if text contains Chinese characters
+  if(text && /[\u4e00-\u9fff\u3400-\u4dbf]/.test(text)) return 'zh';
+  // Check browser language
+  const bl = (navigator.language || navigator.userLanguage || '').toLowerCase();
+  if(bl.startsWith('zh')) return 'zh';
+  return 'en';
+}
+
+function getSessionLanguage(session){
+  if(!session) return 'en';
+  // Check stored preference
+  if(session.lang) return session.lang;
+  // Check history for Chinese
+  const hist = session.history || [];
+  for(const msg of hist){
+    if(msg.role === 'user'){
+      const text = typeof msg.content === 'string' ? msg.content :
+        (Array.isArray(msg.content) ? msg.content.map(b=>b.text||'').join('') : '');
+      if(/[\u4e00-\u9fff]/.test(text)) return 'zh';
+    }
+  }
+  return 'en';
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 // ── DYNAMIC PLACEHOLDER ───────────────────────────────────────────────────────
 
