@@ -4448,6 +4448,38 @@ function enhanceKickmanMessage(html) {
   return html;
 }
 
+// ── MOBILE LAYOUT (runs on load, bypasses CSS specificity issues) ─────────────
+function applyMobileLayout() {
+  const isMobile = window.innerWidth <= 768;
+  const screen = document.getElementById('login-screen');
+  const hero = screen ? screen.querySelector('.lp-hero') : null;
+  const card = screen ? screen.querySelector('.login-card') : null;
+
+  if (!screen || !hero || !card) return;
+
+  if (isMobile) {
+    screen.style.cssText = 'position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:stretch;z-index:100;overflow-y:auto;overflow-x:hidden;';
+    hero.style.cssText = 'flex:none;width:100%;padding:32px 20px 20px;overflow:visible;background:var(--bg);';
+    card.style.cssText = 'flex:none;width:100%;min-width:0;min-height:auto;padding:28px 20px 48px;border-left:none;border-top:1px solid var(--border);background:var(--surface);';
+    // Fix inputs
+    const inputs = card.querySelectorAll('.login-input, .login-btn');
+    inputs.forEach(el => { el.style.width = '100%'; el.style.boxSizing = 'border-box'; });
+  } else {
+    // Restore desktop layout
+    screen.style.cssText = 'position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:row;align-items:stretch;z-index:100;overflow:hidden;';
+    hero.style.cssText = '';
+    card.style.cssText = '';
+    const inputs = card.querySelectorAll('.login-input, .login-btn');
+    inputs.forEach(el => { el.style.width = ''; el.style.boxSizing = ''; });
+  }
+}
+
+window.addEventListener('resize', applyMobileLayout);
+document.addEventListener('DOMContentLoaded', applyMobileLayout);
+// Also run immediately in case DOMContentLoaded already fired
+setTimeout(applyMobileLayout, 50);
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ── MOBILE SIDEBAR ────────────────────────────────────────────────────────────
 function toggleMobileSidebar(){
   const sidebar = document.querySelector('.sidebar');
