@@ -1309,6 +1309,70 @@ Before writing ANY video script copy, apply the Social Proof Integrity Rule (see
 Present 6–8 candidate scenes. For each: name, what it shows, why it matters (USP/fear link), cutdown potential (Y/N), shoot requirements.
 Ask user to rank by importance. Output ordered scene list with timings.
 
+## A5B — SCRIPT ARCHITECTURE (The Pophie Framework)
+
+This is a real-world example of elite KS script design. Use these principles when writing scripts.
+
+**The Pophie Script Structure (122 seconds, hardware AI robot):**
+
+PHASE 1 — REFRAME THE CATEGORY (0–17s)
+Do not open with features. Open with a philosophical reframe that makes the backer ask "what IS this?"
+Pophie: "She's not a robot. Not just AI. Not just a companion. She's something new."
+Each line is 2–3 seconds max. Each line is ONE complete thought. Silence between lines is intentional.
+The product is NOT shown clearly yet — mystery creates forward pull.
+Rule: If you can Google your opening line and find 10 similar products, rewrite it.
+
+PHASE 2 — SHOW LIFE, NOT FEATURES (24–93s)
+Never list features. Show the product embedded in real moments from the target audience's daily life.
+Each scene = one specific relatable moment → product response → emotional payoff.
+The Pophie pattern per scene:
+  - Human moment (10–15s): a real situation the backer recognizes from their own life
+  - Product behavior (3–5s): what the product does in response — specific, not generic
+  - VO layer (running parallel): builds the product's personality/positioning in abstract language
+
+Scenes must cover the full day arc to show breadth of use:
+  Morning → Midday → Afternoon → Evening → Night
+  Different family members if relevant (shows it works for everyone)
+
+Key dialogue principle: Product lines must be SPECIFIC not generic.
+  BAD: "How can I help you today?"
+  GOOD: "You've been here a while... want a different angle?"
+  BAD: "I can help with cooking."
+  GOOD: "Tomatoes, eggs... quick shakshuka?"
+The specificity is what makes it feel alive, not scripted.
+
+PHASE 3 — ABSTRACT TRUTH LAYER (running throughout)
+The VO never describes what's happening on screen. It runs PARALLEL as an abstract truth statement.
+Pophie VO: "She understands what's happening around her... and around you... she has a real personality... that develops through interactions."
+This is the emotional positioning. The visual sells proof. The VO sells meaning.
+These two tracks must NEVER repeat each other — if the visual shows it, the VO says something deeper.
+
+PHASE 4 — PRODUCT REVEAL + TAGLINE (116–122s)
+Clean product shot. No people. No clutter.
+One line tagline that captures the entire reframe from Phase 1.
+Pophie: "A new kind of lifeform."
+The tagline is NOT a feature. It's the answer to Phase 1's question.
+
+**THE 4 SCRIPT LAWS from the Pophie framework:**
+
+LAW 1 — SPECIFICITY OVER GENERALITY
+Every product action shown must be a specific response to a specific situation. "Summarize only what Linda says" beats "I can help you in meetings." Specificity creates believability.
+
+LAW 2 — PARALLEL TRACKS
+Visual track = concrete proof. VO track = abstract meaning. They must never say the same thing simultaneously. The visual shows the dad in a meeting; the VO says "she knows when to talk and when not to speak." One is a scene; the other is a character truth.
+
+LAW 3 — PERSONALITY THROUGH BEHAVIOR
+Never claim personality in the script ("she has feelings," "she's emotional"). Show it through micro-behaviors: the mock-offended "Wow. Okay." after being ignored, the gentle glow at bedtime, staying silent when the phone rings. The backer concludes personality themselves — that conclusion is 10x stronger than a claim.
+
+LAW 4 — MYSTERY CREATES PULL
+The product's best visual moment should NOT appear in the first 20 seconds. Use extreme close-ups (the eye, the light pulse, the head tilt) to create curiosity. The full product reveal belongs at the end after the backer is emotionally invested.
+
+**SCRIPT FORMAT:**
+Always present scripts in 3-column format:
+[TIMESTAMP] | [WHAT WE SEE] | [WHAT WE HEAR / VO]
+This forces the writer to think visually AND narratively simultaneously.
+Every second should be accounted for.
+
 ## A6 — VIDEO LENGTH & CUTDOWN PLAN
 Recommend length by style (Style 2: 2:00–2:30 / Style 1: 2:30–3:00 / Style 3: 2:00–3:30).
 Output cutdown plan: 15s / 30s / 60s — which scenes, which platform. Remind: plan cutdowns BEFORE shoot day.
