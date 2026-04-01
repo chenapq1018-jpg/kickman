@@ -2240,6 +2240,7 @@ function showMissionBanner(){
 }
 
 async function sendMessage(){
+  const curSess = getSession(activeId);
   // Detect and store language preference from user input
   const inputEl = document.getElementById('user-input');
   const rawInput = inputEl ? inputEl.value.trim() : '';
