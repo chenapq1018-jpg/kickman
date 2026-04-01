@@ -632,13 +632,20 @@ YPE html>
       flex-direction: column !important;
       overflow-y: auto !important;
       overflow-x: hidden !important;
+      align-items: stretch !important;
+      position: fixed !important;
+      inset: 0 !important;
     }
 
-    /* Landing hero: compact padding, full width */
+    /* Landing hero: compact padding, full width, no overflow */
     .lp-hero {
-      padding: 40px 24px 32px !important;
+      width: 100% !important;
+      flex: none !important;
+      min-width: 0 !important;
+      padding: 36px 20px 24px !important;
       min-height: auto !important;
       justify-content: flex-start !important;
+      overflow: visible !important;
     }
 
     .lp-logo { font-size: 28px !important; }
@@ -655,9 +662,21 @@ YPE html>
       width: 100% !important;
       min-width: 0 !important;
       min-height: auto !important;
+      flex: none !important;
       border-left: none !important;
       border-top: 1px solid var(--border) !important;
-      padding: 32px 24px 48px !important;
+      padding: 32px 20px 48px !important;
+    }
+
+    /* Login inputs: full width on mobile */
+    .login-input {
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    .login-btn {
+      width: 100% !important;
+      box-sizing: border-box !important;
     }
 
     /* Main app layout: hide sidebar, full width chat */
