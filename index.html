@@ -616,6 +616,146 @@ YPE html>
   .msg-search-current{background:rgba(0,201,167,.5);color:#060e14;border-radius:2px;padding:0 2px;}
   .search-box{display:none;}
   /* ─────────────────────────────────────────────────────────────────────────── */
+
+  /* ── Mobile Responsive ───────────────────────────────────────────────────── */
+  .sidebar.mobile-open {
+    max-height: 80vh !important;
+    overflow-y: auto !important;
+    z-index: 200 !important;
+  }
+  .sidebar.mobile-open .sessions-list,
+  .sidebar.mobile-open .steps-section { display: block !important; }
+
+  @media (max-width: 768px) {
+    /* Login screen: stack vertically on mobile */
+    .login-screen {
+      flex-direction: column !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      align-items: stretch !important;
+      position: fixed !important;
+      inset: 0 !important;
+    }
+
+    /* Landing hero: compact padding, full width, no overflow */
+    .lp-hero {
+      width: 100% !important;
+      flex: none !important;
+      min-width: 0 !important;
+      padding: 36px 20px 24px !important;
+      min-height: auto !important;
+      justify-content: flex-start !important;
+      overflow: visible !important;
+    }
+
+    .lp-logo { font-size: 28px !important; }
+    .lp-headline { font-size: 20px !important; margin-bottom: 20px !important; }
+    .lp-stats { max-width: 100% !important; margin-bottom: 20px !important; }
+    .lp-stat { padding: 12px 10px !important; }
+    .lp-stat-n { font-size: 18px !important; }
+    .lp-features { margin-bottom: 24px !important; gap: 8px !important; }
+    .lp-feat { font-size: 13px !important; }
+    .lp-cta { max-width: 100% !important; padding: 14px 24px !important; }
+
+    /* Login card: full width, no left border, natural height */
+    .login-card {
+      width: 100% !important;
+      min-width: 0 !important;
+      min-height: auto !important;
+      flex: none !important;
+      border-left: none !important;
+      border-top: 1px solid var(--border) !important;
+      padding: 32px 20px 48px !important;
+    }
+
+    /* Login inputs: full width on mobile */
+    .login-input {
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    .login-btn {
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    /* Main app layout: hide sidebar, full width chat */
+    .app-layout { flex-direction: column !important; }
+    .sidebar {
+      width: 100% !important;
+      min-width: 0 !important;
+      height: auto !important;
+      max-height: 56px !important;
+      overflow: hidden !important;
+      border-right: none !important;
+      border-bottom: 1px solid var(--border) !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      padding: 0 12px !important;
+    }
+    .sidebar-top { padding: 0 !important; }
+    .new-btn { padding: 6px 12px !important; font-size: 9px !important; }
+    .sessions-list { display: none !important; }
+    .steps-section { display: none !important; }
+    .sync-status { display: none !important; }
+
+    /* Input area: better sizing on mobile */
+    .input-area { padding: 8px 12px !important; }
+    .user-input { font-size: 16px !important; } /* prevent iOS zoom */
+
+    /* Messages: more width */
+    .message { max-width: 100% !important; padding: 8px 12px !important; }
+    .msg-content { font-size: 14px !important; }
+
+    /* Nav tabs: smaller */
+    .project-nav { padding: 0 8px !important; gap: 0 !important; }
+    .proj-tab { font-size: 8px !important; padding: 6px 8px !important; letter-spacing: 0.5px !important; }
+
+    /* Welcome state */
+    .welcome-state { padding: 24px 20px !important; }
+    .welcome-logo { font-size: 32px !important; }
+    .welcome-headline { font-size: 15px !important; }
+    .welcome-steps { gap: 6px !important; }
+    .ws-step { font-size: 10px !important; padding: 4px 8px !important; }
+    .start-btn { padding: 14px 24px !important; font-size: 10px !important; }
+
+    /* Step overlay: full screen on mobile */
+    .step-overlay { width: 100% !important; }
+    .step-overlay-head { padding: 0 12px !important; }
+    .step-drawer-body { padding: 16px !important; }
+  }
+
+  @media (max-width: 768px) {
+    /* Hide search bar in top nav on mobile — use chat search button instead */
+    #chat-search-bar { font-size: 13px !important; }
+
+    /* Hide the search input placeholder area in project nav on mobile */
+    .proj-tab[onclick="toggleChatSearch()"] { display: none !important; }
+
+    /* Fix input area not being covered by browser chrome */
+    .input-area {
+      padding-bottom: max(12px, env(safe-area-inset-bottom)) !important;
+    }
+
+    /* Make chat container fill properly */
+    .chat-container {
+      padding-bottom: 0 !important;
+    }
+
+    /* Tighten proj tab text on mobile */
+    .proj-tab { font-size: 8px !important; letter-spacing: 0.5px !important; padding: 6px 8px !important; }
+    .proj-tab-icon { font-size: 12px !important; }
+
+    /* Sidebar top: compact on mobile */
+    .sidebar-top { flex-shrink: 0; }
+  }
+
+  @media (max-width: 480px) {
+    .lp-hero { padding: 28px 16px 24px !important; }
+    .lp-headline { font-size: 18px !important; }
+    .login-card { padding: 24px 16px 40px !important; }
+  }
+  /* ─────────────────────────────────────────────────────────────────────────── */
 </style>
 </head>
 <body>
@@ -894,7 +1034,7 @@ YPE html>
       </div>
       <input type="file" id="file-input" accept="image/*" multiple onchange="handleImageUpload(event)">
       <div class="input-meta">
-        <span class="input-hint">Enter &#x21B5; newline &middot; Shift+Enter send &middot; Drop or paste image</span>
+        <span class="input-hint">Enter → send &middot; Shift+Enter newline &middot; Drop or paste image</span>
       </div>
     </div>
   </div>
@@ -2153,8 +2293,8 @@ async function sendMessage(){
 
 // ── KEY HANDLER — Enter = newline, Shift+Enter = send ─────────────────────────
 function handleKey(e){
-  if(e.key==='Enter'&&e.shiftKey){e.preventDefault();sendMessage();}
-  // plain Enter just lets the browser insert a newline naturally
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}
+  // Shift+Enter inserts newline naturally
 }
 
 // ── DOM RENDER ─────────────────────────────────────────────────────────────────
@@ -4307,6 +4447,72 @@ function enhanceKickmanMessage(html) {
     '<span class="km-num">$1</span>');
   return html;
 }
+
+// ── MOBILE LAYOUT (runs on load, bypasses CSS specificity issues) ─────────────
+function applyMobileLayout() {
+  // Don't interfere if user is already logged in
+  if (currentUser) return;
+
+  const isMobile = window.innerWidth <= 768;
+  const screen = document.getElementById('login-screen');
+  const hero = screen ? screen.querySelector('.lp-hero') : null;
+  const card = screen ? screen.querySelector('.login-card') : null;
+
+  if (!screen || !hero || !card) return;
+  // Don't override if login screen is intentionally hidden
+  if (screen.style.display === 'none') return;
+
+  if (isMobile) {
+    screen.style.cssText = 'position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:stretch;z-index:100;overflow-y:auto;overflow-x:hidden;';
+    hero.style.cssText = 'flex:none;width:100%;padding:32px 20px 20px;overflow:visible;background:var(--bg);';
+    card.style.cssText = 'flex:none;width:100%;min-width:0;min-height:auto;padding:28px 20px 48px;border-left:none;border-top:1px solid var(--border);background:var(--surface);';
+    // Fix inputs
+    const inputs = card.querySelectorAll('.login-input, .login-btn');
+    inputs.forEach(el => { el.style.width = '100%'; el.style.boxSizing = 'border-box'; });
+  } else {
+    // Restore desktop layout
+    screen.style.cssText = 'position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:row;align-items:stretch;z-index:100;overflow:hidden;';
+    hero.style.cssText = '';
+    card.style.cssText = '';
+    const inputs = card.querySelectorAll('.login-input, .login-btn');
+    inputs.forEach(el => { el.style.width = ''; el.style.boxSizing = ''; });
+  }
+}
+
+window.addEventListener('resize', applyMobileLayout);
+document.addEventListener('DOMContentLoaded', applyMobileLayout);
+// Run once immediately
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', applyMobileLayout);
+} else {
+  applyMobileLayout();
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── MOBILE SIDEBAR ────────────────────────────────────────────────────────────
+function toggleMobileSidebar(){
+  const sidebar = document.querySelector('.sidebar');
+  if(!sidebar) return;
+  const isOpen = sidebar.classList.contains('mobile-open');
+  if(isOpen){
+    sidebar.classList.remove('mobile-open');
+    sidebar.style.maxHeight = '56px';
+  } else {
+    sidebar.classList.add('mobile-open');
+    sidebar.style.maxHeight = '80vh';
+    sidebar.style.overflowY = 'auto';
+  }
+}
+
+// Show mobile project button on small screens
+function checkMobileUI(){
+  const btn = document.querySelector('.mobile-proj-btn');
+  if(!btn) return;
+  btn.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
+}
+window.addEventListener('resize', checkMobileUI);
+document.addEventListener('DOMContentLoaded', checkMobileUI);
+// ─────────────────────────────────────────────────────────────────────────────
 
 // ── LANGUAGE DETECTION ───────────────────────────────────────────────────────
 function detectUserLanguage(text){
