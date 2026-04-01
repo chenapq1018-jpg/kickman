@@ -1938,7 +1938,24 @@ async function startCurrentSession(){
   document.getElementById('welcome-state').style.display='none';
   document.getElementById('messages').style.display='flex';
   document.getElementById('input-area').style.display='block';
-  await callKickman('start');
+
+  // Instant greeting — no API call needed, content is always the same
+  const greeting = `I'm Kickman — your crowdfunding coach. I don't do cheerleading or generic advice. In 14 days, I'll tell you whether your product is worth launching on Kickstarter and build the exact plan to win if it is.
+
+Five questions. Answer them raw:
+
+1. Why are you building this? Personal story or frustration behind it.
+2. What does it do? Plain language, no jargon.
+3. Cost to make one unit (rough estimate) + price you're thinking.
+4. Timeline: sample ready when? Launch when? Ship to backers when?
+5. Funding goal: what are you targeting?
+
+Go.`;
+
+  s.history = [{role:'assistant', content: greeting}];
+  scheduleSave(s);
+  addMessageDOM('km', greeting);
+  updateStepUI(s.step || 1, s.mission || 1);
 }
 
 // ── IMAGE UPLOAD ───────────────────────────────────────────────────────────────
