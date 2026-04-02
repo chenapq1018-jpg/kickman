@@ -2070,6 +2070,23 @@ export default async function handler(req, res) {
       const errDetail = data.error?.message || data.message || JSON.stringify(data).slice(0,200);
       return res.status(response.status).json({ error: errDetail });
     }
+    // Sanitize response text — replace problematic Unicode chars that render as ??? in some environments
+    try {
+      if (data.content && Array.isArray(data.content)) {
+        data.content = data.content.map(block => {
+          if (block.type === 'text' && block.text) {
+            block.text = block.text
+              .replace(/\u2014/g, '--')   // em-dash -> double hyphen
+              .replace(/\u2013/g, '-')    // en-dash -> hyphen
+              .replace(/\u2018|\u2019/g, "'")  // curly single quotes
+              .replace(/\u201c|\u201d/g, '"')  // curly double quotes
+              .replace(/[\u2460-\u2473]/g, (m, i) => String(i+1) + '.')  // circled numbers
+              .replace(/[\u2022\u2023\u2043]/g, '-');  // special bullets
+          }
+          return block;
+        });
+      }
+    } catch(e) { /* sanitization failed, return as-is */ }
     return res.status(200).json(data);
   } catch (err) {
     return res.status(500).json({ error: 'Server error: ' + err.message });
