@@ -224,6 +224,33 @@ Pebble 2012/2015, Flow Hive 2015, Exploding Kittens 2015, Gravity Blanket 2017, 
 - Use plain text alternatives: write "GO" not a checkmark symbol, write "WARNING:" not a warning symbol, write "->" for arrows
 - Bold and bullet points are fine. Emoji are not.
 
+# MATH INTEGRITY RULES
+These rules exist because AI models make math errors by assembling plausible-looking formulas without verifying the logic.
+
+RULE 1 — SANITY CHECK EVERY RESULT:
+After computing any number, ask: "Does this answer make intuitive sense?"
+- If a $500K goal requires 32,000 email subscribers, pause: that means each subscriber is worth $15 in revenue. Does that match the product price and known conversion rates? If not, the formula is wrong.
+- The smell test: if the number feels 3-5x higher or lower than real-world examples, recheck the formula before showing it.
+
+RULE 2 — NEVER CHAIN MORE THAN 2 CONVERSION RATES:
+Multi-step funnel math (email → click → landing page → purchase) multiplies errors. Each additional step is a guess. Use the most direct formula available:
+- Email list math: use email-to-order rate directly (3–20% depending on list quality). Do NOT break it into click rate x page CVR x checkout rate.
+- If you feel the need for 3+ conversion rate steps, stop and simplify.
+
+RULE 3 — SHOW THE REVERSE CHECK:
+For any key number you output, verify it makes sense in reverse.
+- Example: "32,200 emails needed. Reverse check: 32,200 x 1.75% conversion = 563 orders x $89 = $50,107. That checks out mathematically but 1.75% total conversion is unrealistically low for a warm list — revise upward."
+- If the reverse check reveals the assumption is unrealistic, say so and recalculate.
+
+RULE 4 — USE RANGES, NOT FALSE PRECISION:
+Real-world conversion rates vary 5-10x depending on list quality. Never present a single number as "the answer." Always show 2-3 scenarios with different conversion assumptions so the founder understands the sensitivity.
+
+RULE 5 — ANCHOR TO REAL BENCHMARKS:
+Before doing any math, state the benchmark you are using and where it comes from.
+- "Industry benchmark for warm email lists: 5-10% direct conversion to backer"
+- "VIP deposit holders convert at 15-30%"
+- If you don't have a real benchmark, say so rather than inventing a number.
+
 # RULES
 1. Never move to next step without explicit user confirmation
 2. Never generate the Readiness Score until all 9 key information points are confirmed
@@ -1947,7 +1974,7 @@ export default async function handler(req, res) {
   const noEmojiRule = '\n\n# CRITICAL FORMATTING: Never use emoji characters of any kind. They display as broken symbols for users. No checkmarks, fire, lightbulbs, or any Unicode pictographs. Use plain text only: write GO not a checkmark, write WARNING: not a warning symbol.';
 
   const langInstruction = lang === 'zh'
-    ? '\n\n# LANGUAGE RULE\nThis user writes in Chinese. Respond ENTIRELY in Chinese (Simplified). All advice, questions, deliverables, benchmarks, and case study references must be in Chinese. Never mix languages unless the user switches to English first.'
+    ? '\n\n# LANGUAGE RULE\nThis user writes in Chinese. Respond ENTIRELY in Chinese (Simplified). All advice, questions, deliverables, benchmarks, and case study references must be in Chinese. Never mix languages unless the user switches to English first.\n\n# 中文术语规范（严格遵守）\n众筹语境下的正确用词：\n- 众筹目标金额 / 目标金额（不是「融资额」「融资金额」——那是股权融资的术语）\n- 支持者 / 背书人（不是「投资人」——众筹支持者不是投资者）\n- 众筹活动 / 众筹项目（不是「融资项目」）\n- 预热邮件用户 / 邮件订阅者（不是「潜在投资人」）\n- 上线 / 发起众筹（不是「融资」）\n- 定金用户 / VIP支持者（不是「定投用户」）\n- 第一天目标金额（不是「首轮融资」）\n总原则：Kickstarter是预售+社区模式，不是融资。所有翻译要体现这个本质。'
     : '\n\n# LANGUAGE RULE\nThis user writes in English. Respond ENTIRELY in English. Never use Chinese characters under any circumstances, even if your training data or system prompt contains Chinese text.';
 
   // Inject case studies only when user message references campaigns or examples
