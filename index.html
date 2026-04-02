@@ -1034,7 +1034,7 @@ YPE html>
       </div>
       <input type="file" id="file-input" accept="image/*" multiple onchange="handleImageUpload(event)">
       <div class="input-meta">
-        <span class="input-hint">Enter → send &middot; Shift+Enter newline &middot; Drop or paste image</span>
+        <span class="input-hint">Enter &#x21B5; newline &middot; Shift+Enter send &middot; Drop or paste image</span>
       </div>
     </div>
   </div>
@@ -2316,7 +2316,7 @@ async function sendMessage(){
 
 // ── KEY HANDLER — Enter = newline, Shift+Enter = send ─────────────────────────
 function handleKey(e){
-  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}
+  if(e.key==='Enter'&&e.shiftKey){e.preventDefault();sendMessage();}
   // Shift+Enter inserts newline naturally
 }
 
