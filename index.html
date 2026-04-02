@@ -2271,7 +2271,7 @@ async function sendMessage(){
     if(detected === 'zh' && curSess.lang !== 'zh'){
       curSess.lang = 'zh';
       saveSessions();
-    } else if(detected === 'en' && rawInput.length > 10 && !/[\u4e00-\u9fff]/.test(rawInput) && curSess.lang !== 'en'){
+    } else if(detected === 'en' && rawInput.length > 3 && !/[\u4e00-\u9fff]/.test(rawInput) && curSess.lang !== 'en'){
       // Only switch to 'en' if message is clearly English (10+ chars, no Chinese)
       curSess.lang = 'en';
       saveSessions();
@@ -2348,6 +2348,8 @@ function addMessageDOM(role,raw,images=[]){
 
   b.appendChild(n); b.appendChild(c); w.appendChild(av); w.appendChild(b);
   container.appendChild(w); container.scrollTop=container.scrollHeight;
+  // Guarantee: whenever Kickman message appears, unlock input
+  if(role==='km'){isLoading=false;setSendDisabled(false);}
 }
 
 function escHtml(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -4539,11 +4541,10 @@ document.addEventListener('DOMContentLoaded', checkMobileUI);
 
 // ── LANGUAGE DETECTION ───────────────────────────────────────────────────────
 function detectUserLanguage(text){
-  // Check if text contains Chinese characters
+  // Detect language from actual text content ONLY
+  // Do NOT use browser language - user may have Chinese browser but write in English
   if(text && /[\u4e00-\u9fff\u3400-\u4dbf]/.test(text)) return 'zh';
-  // Check browser language
-  const bl = (navigator.language || navigator.userLanguage || '').toLowerCase();
-  if(bl.startsWith('zh')) return 'zh';
+  return 'en';
   return 'en';
 }
 
