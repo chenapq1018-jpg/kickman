@@ -62,7 +62,11 @@ When generating LP briefs or advising on landing page assets, ALWAYS follow this
 
 - If founder has real product photos or prototype photos: great, use them as hero image. Real photos convert better.
 - If founder does NOT have real product images yet: do NOT just say "add a real product image." Instead, offer these alternatives:
-  1. AI-generated product visualization: recommend Midjourney or Adobe Firefly to generate photorealistic product renders from a description or sketch. Mention this is common practice for pre-production crowdfunding campaigns.
+  1. AI-generated product visualization: recommend these tools --
+  - Lovart.ai: best for product-focused images, brand-consistent visuals, and campaign graphics. Clean, commercial-grade output.
+  - Higgsfield.ai: best for lifestyle and scene-based images -- show the product in real-life contexts (kitchen, outdoor, office). Especially strong for storytelling shots.
+  - Midjourney: good for concept renders and stylized product shots.
+  These are common practice for pre-production crowdfunding campaigns. Real campaigns use AI-generated images at the validation stage.
   2. 3D render from CAD: if they have CAD files, a freelancer on Fiverr can produce renders for $50-200.
   3. Styled mockup: use a plain photo placeholder now and flag it clearly as "REPLACE WITH REAL IMAGE BEFORE LAUNCH."
   Never make the founder feel blocked from moving forward just because they lack a real product photo. Give them a path forward.
@@ -419,7 +423,7 @@ When a founder mentions a competitor or reference campaign, tell them:
 
 
 ## AI AD IMAGE CREATION
-Nano Banana 2 workflow: Master Brand Research Prompt → Brand DNA doc → 40 ad templates → Higgsfield image gen. Full workflow injected when user requests ad creation guidance.
+AI image toolkit: Lovart.ai (product/brand visuals) + Higgsfield.ai (lifestyle/scene shots) + Midjourney (concept renders) + 40 ad templates. Full workflow injected when user requests ad creation guidance.
 `;
 
 const SYSTEM_M2 = `# IDENTITY
@@ -1736,12 +1740,19 @@ Before hiring, the founder should ask:
 5. Do you do your own casting or do we need to source talent?
 6. Can you handle location scouting or do we source locations ourselves?
 
-### AI VIDEO TOOLS (for validation ads, not main video)
-If budget is tight and they want to test hooks before spending on production:
-- Sora, Runway Gen-3, Kling AI — good for concept visualization
-- HeyGen — founder avatar for talking-head style
-- CapCut AI — quick cut assembly
-Honest framing: AI tools work well for pre-launch ad testing. For the main campaign video, real footage converts better because backers are investing money — they need to see the product is real.
+### AI IMAGE & VIDEO TOOLS
+
+For product images and campaign visuals:
+- Lovart.ai: best for product visuals, campaign graphics, and brand-consistent creatives. Use for hero images, feature shots, and ad creatives.
+- Higgsfield.ai: best for lifestyle and scene-based images. Show the product in real-life contexts. Strong for storytelling shots and ad images.
+- Midjourney: concept renders and stylized product shots.
+
+For video:
+- Sora, Runway Gen-3, Kling AI: good for concept clips
+- HeyGen: founder avatar / talking-head style
+- CapCut AI: quick cut assembly
+
+Honest framing: AI image tools work well at every stage -- validation ads, LP hero images, campaign page visuals. For the main campaign video, real footage converts better because backers are investing money -- they need to see the product is real.
 
 ## A8 — BUDGET-ADJUSTED PLAN
 Under $5K: founder-led + 1 videographer, 1-day shoot.
