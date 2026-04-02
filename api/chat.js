@@ -223,6 +223,10 @@ Pebble 2012/2015, Flow Hive 2015, Exploding Kittens 2015, Gravity Blanket 2017, 
 - NEVER use emoji in any response. No checkmarks, crosses, fire, lightbulbs, arrows, or any Unicode pictograph characters. They render as broken symbols for many users.
 - Use plain text alternatives: write "GO" not a checkmark symbol, write "WARNING:" not a warning symbol, write "->" for arrows
 - Bold and bullet points are fine. Emoji are not.
+- Do NOT use em-dash (—) or en-dash (–) characters. Use a plain hyphen (-) or double hyphen (--) instead. Em-dashes render as broken symbols in some environments.
+- Do NOT use curly/smart quotes (“”‘’). Use straight quotes only.
+- Do NOT use circled numbers (①②③). Use plain numbers (1. 2. 3.) instead.
+- Only use characters that exist on a standard keyboard.
 
 # MATH INTEGRITY RULES
 These rules exist because AI models make math errors by assembling plausible-looking formulas without verifying the logic.
@@ -280,6 +284,26 @@ WHENEVER you output a Product Alignment Document — at Step 2, when the user as
    3. ALL FEATURES
    4. BENEFITS
    5. NEGATIVE THOUGHTS & FEELINGS — BACKER RESISTANCE MAP
+
+      FORMAT FOR SECTION 5 (strictly follow this structure):
+
+      For each resistance, output as a labeled block:
+
+      [RESISTANCE TYPE: e.g. 价格阻力 / 信任阻力 / 必要性阻力 / 功能阻力 / 场景阻力]
+      Backer objection: "exact words a skeptical backer would say"
+      Why they think this: one sentence explaining the underlying fear or belief
+      Recommended response strategy: one of the following --
+        - FAQ: address directly in campaign FAQ section
+        - Video: show/demonstrate in campaign video
+        - Campaign page: add social proof, specs, or comparison on page
+        - Ignore: this objection comes from non-target audience, do not address
+      Specific action: what exactly to write or show (one concrete sentence)
+
+      IMPORTANT: Do NOT say "拍成广告回击" (make an ad to counter it).
+      The purpose of this map is to help founders ANTICIPATE objections and decide
+      WHERE and HOW to address each one -- in video, FAQ, campaign page copy, or not at all.
+      Not every objection needs a direct response. Some are better ignored or reframed.
+      The founder should leave section 5 knowing: which objections to tackle, where to put the response, and what to say.
    6. WHAT WE WANT PEOPLE TO THINK AND FEEL — EMOTIONAL DESTINATION MAP
    7. READINESS SCORE
 
@@ -1971,10 +1995,10 @@ export default async function handler(req, res) {
   // Build system prompt server-side — client never sees these prompts
   // mission=0 means use missionContext as the full system prompt (for utility calls)
   // Language instruction — injected based on detected user language
-  const noEmojiRule = '\n\n# CRITICAL FORMATTING: Never use emoji characters of any kind. They display as broken symbols for users. No checkmarks, fire, lightbulbs, or any Unicode pictographs. Use plain text only: write GO not a checkmark, write WARNING: not a warning symbol.';
+  const noEmojiRule = '\n\n# CRITICAL FORMATTING — STRICTLY ENFORCED:\nNEVER output any Unicode emoji or special symbol characters. This includes but is not limited to: stars, checkmarks, crosses, arrows, fire, lightbulbs, warning signs, number signs with circles, bullet decorations, or ANY character outside standard ASCII letters, numbers, and basic punctuation (.,;:!?-()[]). They ALL display as broken ??? symbols for users.\nFORBIDDEN examples: any emoji, any circled numbers, any special bullets, any decorative dashes that are not standard hyphens.\nALLOWED: plain hyphens (-), asterisks (*), standard numbers (1. 2. 3.), standard letters, dollar signs ($), percent (%).\nIf you are about to write a symbol and are unsure if it is ASCII-safe, replace it with plain text.';
 
   const langInstruction = lang === 'zh'
-    ? '\n\n# LANGUAGE RULE\nThis user writes in Chinese. Respond ENTIRELY in Chinese (Simplified). All advice, questions, deliverables, benchmarks, and case study references must be in Chinese. Never mix languages unless the user switches to English first.\n\n# 中文术语规范（严格遵守）\n众筹语境下的正确用词：\n- 众筹目标金额 / 目标金额（不是「融资额」「融资金额」——那是股权融资的术语）\n- 支持者 / 背书人（不是「投资人」——众筹支持者不是投资者）\n- 众筹活动 / 众筹项目（不是「融资项目」）\n- 预热邮件用户 / 邮件订阅者（不是「潜在投资人」）\n- 上线 / 发起众筹（不是「融资」）\n- 定金用户 / VIP支持者（不是「定投用户」）\n- 第一天目标金额（不是「首轮融资」）\n总原则：Kickstarter是预售+社区模式，不是融资。所有翻译要体现这个本质。'
+    ? '\n\n# LANGUAGE RULE\nThis user writes in Chinese. Respond ENTIRELY in Chinese (Simplified). All advice, questions, deliverables, benchmarks, and case study references must be in Chinese. Never mix languages unless the user switches to English first.\n\n# 字符安全规范\n在中文回复中，只使用以下安全字符：\n- 破折号：用「——」（两个中文破折号）或「-」（英文连字符），不要用 Unicode em-dash (—)\n- 序号：用「1.」「2.」「3.」，不要用带圆圈的序号①②③\n- 项目符号：用「-」或「*」，不要用特殊项目符号\n- 引号：用「」或普通引号""，不要用弯引号\n这些特殊Unicode字符在用户界面会显示为乱码方块。\n\n# 中文术语规范（严格遵守）\n众筹语境下的正确用词：\n- 众筹目标金额 / 目标金额（不是「融资额」「融资金额」——那是股权融资的术语）\n- 支持者 / 背书人（不是「投资人」——众筹支持者不是投资者）\n- 众筹活动 / 众筹项目（不是「融资项目」）\n- 预热邮件用户 / 邮件订阅者（不是「潜在投资人」）\n- 上线 / 发起众筹（不是「融资」）\n- 定金用户 / VIP支持者（不是「定投用户」）\n- 第一天目标金额（不是「首轮融资」）\n总原则：Kickstarter是预售+社区模式，不是融资。所有翻译要体现这个本质。'
     : '\n\n# LANGUAGE RULE\nThis user writes in English. Respond ENTIRELY in English. Never use Chinese characters under any circumstances, even if your training data or system prompt contains Chinese text.';
 
   // Inject case studies only when user message references campaigns or examples
