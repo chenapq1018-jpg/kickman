@@ -1956,6 +1956,9 @@ Go.`;
   scheduleSave(s);
   addMessageDOM('km', greeting);
   updateStepUI(s.step || 1, s.mission || 1);
+  // Reset loading state so first user message sends on first click
+  isLoading = false;
+  setSendDisabled(false);
 }
 
 // ── IMAGE UPLOAD ───────────────────────────────────────────────────────────────
