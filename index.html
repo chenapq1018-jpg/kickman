@@ -1017,7 +1017,7 @@ YPE html>
       </div>
       <div class="image-preview-strip" id="image-preview-strip"></div>
       <div class="input-row">
-        <textarea id="user-input" placeholder="Tell me about your product idea..." rows="1" oninput="autoResize(this);updateSendBtn()" onkeydown="handleKey(event)"></textarea>
+        <textarea id="user-input" placeholder="Tell me about your product idea..." rows="1" oninput="autoResize(this);updateSendBtn()" onkeydown="handleKey(event)" oncompositionstart="isComposing=true" oncompositionend="isComposing=false"></textarea>
         <div class="input-actions">
           <button class="img-btn" onclick="document.getElementById('file-input').click()" title="Upload image">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2279,7 +2279,9 @@ async function sendMessage(){
   }
   const input=document.getElementById('user-input');
   const text=input.value.trim();
-  if((!text&&pendingImages.length===0)||isLoading)return;
+  if(!text&&pendingImages.length===0)return;
+  // Force-reset isLoading before each send to prevent stuck state
+  isLoading=false; setSendDisabled(false);
   input.value=''; autoResize(input);
 
   const session=getSession(activeId); if(!session)return;
@@ -2315,7 +2317,11 @@ async function sendMessage(){
 }
 
 // ── KEY HANDLER — Enter = newline, Shift+Enter = send ─────────────────────────
+let isComposing = false;
+
 function handleKey(e){
+  // Never send during IME composition (Chinese/Japanese/Korean input)
+  if(isComposing) return;
   if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}
   // Shift+Enter inserts newline naturally
 }
