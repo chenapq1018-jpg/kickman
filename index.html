@@ -2360,14 +2360,14 @@ async function sendMessage(){
     if(docTexts) fullText = (fullText ? fullText+'\n\n' : '') + docTexts;
   }
 
-  // Add to history
-  const userMsg={role:'user',content:fullText,images:msgImages.length>0?msgImages:undefined};
+  // Add to history — store displayText only, NOT fullText (which may contain full doc content)
+  // fullText is sent to API but NOT saved to Redis to prevent storage overflow
+  const displayText = text + (msgDocs.length>0 ? ' ['+msgDocs.map(d=>d.name).join(', ')+']' : '');
+  const userMsg={role:'user',content:displayText,images:msgImages.length>0?msgImages:undefined};
   session.history.push(userMsg);
   session.updatedAt=Date.now(); scheduleSave(session);
 
   // Show in UI
-  // Show user message in UI (show original text + doc names, not full doc content)
-  const displayText = text + (msgDocs.length>0 ? '\n['+msgDocs.map(d=>d.name).join(', ')+']' : '');
   addMessageDOM('user',displayText,msgImages);
   await callKickman('continue');
 }
