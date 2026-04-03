@@ -2384,6 +2384,17 @@ function handleKey(e){
 }
 
 // ── DOM RENDER ─────────────────────────────────────────────────────────────────
+function sanitizeText(text){
+  if(!text) return text;
+  return String(text)
+    .replace(/—/g,'--')
+    .replace(/–/g,'-')
+    .replace(/‘|’/g,"'")
+    .replace(/“|”/g,'"')
+    .replace(/[①-⑳]/g,function(m){return (m.codePointAt(0)-0x245F)+'.';})
+    .replace(/[•‣⁃]/g,'-');
+}
+
 function addMessageDOM(role,raw,images=[]){
   const container=document.getElementById('messages');
   const w=document.createElement('div'); w.className=`message ${role}`;
