@@ -2403,9 +2403,9 @@ function addMessageDOM(role,raw,images=[]){
   }
 
   if(role==='km'){
-    const div=document.createElement('div'); div.innerHTML=enhanceKickmanMessage(renderMd(raw)); c.appendChild(div);
+    const div=document.createElement('div'); div.innerHTML=enhanceKickmanMessage(renderMd(sanitizeText(raw))); c.appendChild(div);
   } else {
-    if(raw){const p=document.createElement('p'); p.textContent=raw; c.appendChild(p);}
+    if(raw){const p=document.createElement('p'); p.textContent=sanitizeText(raw); c.appendChild(p);}
   }
 
   b.appendChild(n); b.appendChild(c); w.appendChild(av); w.appendChild(b);
