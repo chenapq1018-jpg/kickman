@@ -1032,9 +1032,9 @@ YPE html>
           </button>
         </div>
       </div>
-      <input type="file" id="file-input" accept="image/*" multiple onchange="handleImageUpload(event)">
+      <input type="file" id="file-input" accept="image/*,.pdf,.txt,.md,.doc,.docx,.csv" multiple onchange="handleFileUpload(event)">
       <div class="input-meta">
-        <span class="input-hint">Shift+Enter &#x21B5; newline &middot; Enter send &middot; Drop or paste image</span>
+        <span class="input-hint">Shift+Enter &#x21B5; newline &middot; Enter send &middot; Drop or paste image/doc</span>
       </div>
     </div>
   </div>
@@ -1108,6 +1108,7 @@ let currentUser = null, currentPw = null;
 let sessions = [], activeId = null;
 let isLoading = false, saveTimer = null;
 let pendingImages = []; // [{base64, mediaType, name}]
+let pendingDocs = []; // [{text, name, type}]
 
 
 // ── TIMELINE ───────────────────────────────────────────────────────────────────
@@ -1904,7 +1905,7 @@ function setSyncStatus(state){const el=document.getElementById('sync-status');el
 
 // ── LOAD SESSION ───────────────────────────────────────────────────────────────
 function loadSession(id){
-  activeId=id; pendingImages=[]; renderPreviewStrip(); kbLoaded=false; kbCache={};
+  activeId=id; pendingImages=[];pendingDocs=[]; renderPreviewStrip(); kbLoaded=false; kbCache={};
   const session=getSession(id); if(!session)return;
   document.getElementById('messages').innerHTML=''; updateStepUI(session.step); updateInputPlaceholder(session.step||1);
   if(!session.started||session.history.length===0){
@@ -1962,10 +1963,46 @@ Go.`;
 }
 
 // ── IMAGE UPLOAD ───────────────────────────────────────────────────────────────
+function handleFileUpload(event){
+  const files=Array.from(event.target.files);
+  const imageFiles = files.filter(f=>f.type.startsWith('image/'));
+  const docFiles = files.filter(f=>!f.type.startsWith('image/'));
+  if(imageFiles.length>0) addImageFiles(imageFiles);
+  if(docFiles.length>0) addDocFiles(docFiles);
+  event.target.value='';
+}
+
 function handleImageUpload(event){
   const files=Array.from(event.target.files);
   addImageFiles(files);
   event.target.value='';
+}
+
+function addDocFiles(files){
+  const supported = ['text/plain','text/markdown','text/csv','application/pdf',
+    'application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const text = e.target.result;
+      pendingDocs.push({text, name:file.name, type:file.type});
+      renderPreviewStrip();
+    };
+    // PDF reads as base64, text files read as text
+    if(file.type==='application/pdf'){
+      reader.readAsDataURL(file);
+      // For PDF, store as base64 for API
+      const r2=new FileReader();
+      r2.onload=e2=>{
+        const b64=e2.target.result.split(',')[1];
+        pendingDocs.push({base64:b64, name:file.name, type:'application/pdf', isPDF:true});
+        renderPreviewStrip();
+      };
+      r2.readAsDataURL(file);
+    } else {
+      reader.readAsText(file, 'UTF-8');
+    }
+  });
 }
 
 function addImageFiles(files){
@@ -2009,7 +2046,13 @@ document.addEventListener('paste',function(e){
 function renderPreviewStrip(){
   const strip=document.getElementById('image-preview-strip');
   if(pendingImages.length===0){strip.innerHTML='';return;}
-  strip.innerHTML=pendingImages.map((img,i)=>`
+  // Build combined preview - images + docs
+  const docHtml = pendingDocs.map((doc,i)=>`
+    <div class="preview-thumb preview-doc" title="${doc.name}">
+      <div style="font-size:10px;padding:4px 6px;text-align:center;color:var(--accent);word-break:break-all;">${doc.name.length>20?doc.name.slice(0,18)+'...':doc.name}</div>
+      <button onclick="removePendingDoc(${i})" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:16px;height:16px;cursor:pointer;font-size:10px;line-height:1;padding:0;">x</button>
+    </div>`).join('');
+  strip.innerHTML=docHtml+pendingImages.map((img,i)=>`
     <div class="preview-thumb">
       <img src="${img.dataUrl}" alt="${img.name}">
       <button class="remove-img" onclick="removeImage(${i})">×</button>
@@ -2302,17 +2345,30 @@ async function sendMessage(){
     session.name = session.alignment.productName;
   }
 
-  // Save images snapshot and clear pending
+  // Save images + docs snapshot and clear pending
   const msgImages=pendingImages.map(img=>({base64:img.base64,mediaType:img.mediaType}));
-  pendingImages=[]; renderPreviewStrip();
+  const msgDocs=pendingDocs.slice();
+  pendingImages=[];pendingDocs=[]; renderPreviewStrip();
+
+  // Build full text - append document content for text-based files
+  let fullText = text;
+  if(msgDocs.length>0){
+    const docTexts = msgDocs
+      .filter(d=>d.text)
+      .map(d=>'[Attached document: '+d.name+']\n'+d.text)
+      .join('\n\n---\n\n');
+    if(docTexts) fullText = (fullText ? fullText+'\n\n' : '') + docTexts;
+  }
 
   // Add to history
-  const userMsg={role:'user',content:text,images:msgImages.length>0?msgImages:undefined};
+  const userMsg={role:'user',content:fullText,images:msgImages.length>0?msgImages:undefined};
   session.history.push(userMsg);
   session.updatedAt=Date.now(); scheduleSave(session);
 
   // Show in UI
-  addMessageDOM('user',text,msgImages);
+  // Show user message in UI (show original text + doc names, not full doc content)
+  const displayText = text + (msgDocs.length>0 ? '\n['+msgDocs.map(d=>d.name).join(', ')+']' : '');
+  addMessageDOM('user',displayText,msgImages);
   await callKickman('continue');
 }
 
